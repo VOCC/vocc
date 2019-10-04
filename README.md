@@ -1,2 +1,2 @@
-# GBA_image_editor_converter
-Gameboy Advance Image Editor/Converter intended for use in Georgia Tech's CS 2261
+# Game Boy Advance Image Editor/Converter
+This is the repository for the Game Boy Advance Image Editor/Converter intended for use in Georgia Tech's CS 2261
