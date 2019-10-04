@@ -5,6 +5,9 @@ This is the repository for the Game Boy Advance Image Editor/Converter intended 
 
 - Logan Bussell
 - Bennett Hillier
+- Rosemary Blair
+- Jacob Lambert
+- John Beckner
 
 ### Making changes
 
