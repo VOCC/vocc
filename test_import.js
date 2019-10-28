@@ -11,13 +11,12 @@ function importImage() {
 
     // add new (selected) contents
     var selectedFiles = input_image.files;
-    if (selectedFiles === 0) {
+    if (selectedFiles.length === 0) {
         let text = document.createElement('P');
-        text.innerHTML = 'No files were selected.';
+        text.innerHTML = 'No files currently selected.';
         imageContainer.appendChild(text);
     } else {
         let image = document.createElement('IMG');
-        // image.src = input_image.value;
         image.src = window.URL.createObjectURL(selectedFiles[0]);
         imageContainer.appendChild(image);
     }
