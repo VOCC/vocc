@@ -1,0 +1,21 @@
+#select-image {
+    display: none;
+}
+
+html {
+    font-family: sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+label {
+    background-color: skyblue;
+    border-radius: 5px;
+    border: 1px ridge black;
+    padding: 5px 10px;
+}
+
+img {
+    margin-top: 10px;
+    height: 64px;
+}

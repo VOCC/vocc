@@ -5,11 +5,12 @@
     </head>
     <body>
         <div>
-            <button id="importButton" type="button">Import Image!</button>
-            <br>
-            <img id="image" src="" alt="Imported image goes here">
+            <label for="select-image">Import Image!</label>
+            <input id = "select-image" type="file">
         </div>
-
+        <div id="imgContainer">
+            <p>No files currently selected.</p>
+        </div>
         <script type="text/javascript" src="test_import.js"></script>
     </body>
 </html>
