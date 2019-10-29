@@ -1,6 +1,6 @@
 function toHex(num) {
     return num.toString(16);
-}
+};
 
 function pixel2hex(img_data) {
     let hexcode = '#';
@@ -8,6 +8,13 @@ function pixel2hex(img_data) {
         hexcode += toHex(img_data[i]);
     }
     return hexcode.toUpperCase();
+};
+
+function draw() {
+    let canvas = document.getElementById('myCanvas');
+    let context = canvas.getContext('2d');
+    let img = document.getElementById('pogo');
+    context.drawImage(img, 0, 0, canvas.width, canvas.height);
 }
 
 // var testArray = [55, 165, 20, 255];
