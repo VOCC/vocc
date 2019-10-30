@@ -1,15 +1,23 @@
+#select-image {
+    display: none;
+}
+
 html {
     font-family: sans-serif;
     margin: 0 auto;
     padding: 20px;
 }
 
-canvas {
+label {
     background-color: skyblue;
-    /* height: 128px;
-    width: 128px; */
+    border-radius: 5px;
+    border: 1px ridge black;
+    padding: 5px 10px;
 }
-/* 
-#pogo {
-    display: none;
-} */
+
+canvas {
+    margin-top: 10px;
+    background-color: lightcoral;
+    width: 128px;
+    height: 128px;
+}
