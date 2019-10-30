@@ -40,7 +40,33 @@ function drawImage(imageObj) {
 
     var imageData = context.getImageData(imageX, imageY, imageWidth, imageHeight);
     var data = imageData.data;
+    //testing
+    var rgbText = document.getElementById('rgb');
+    rgbText.innerHTML = data.toString();
 
-    var text = document.getElementById('test');
-    text.innerHTML = data.toString();
+    var hexData = image2hex(data);
+    var hexText = document.getElementById('hex');
+    hexText.innerHTML = hexData;
+};
+
+function image2hex(data) {
+    let image_asHex = "";
+    for (var i = 0, j = data.length; i < j; i += 4) {
+        let rgb = [data[i], data[i+1], data[i+2]];
+        hexcode = pixel2hex(rgb);
+        image_asHex += hexcode + ' ';
+    }
+    return image_asHex;
+}
+
+function pixel2hex(rgb) {
+    let hexcode = '#';
+    rgb.forEach(element => {
+        hexcode += toHex(element);
+    });
+    return hexcode.toUpperCase();
+};
+
+function toHex(num) {
+    return num.toString(16);
 };
