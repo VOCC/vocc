@@ -71,5 +71,10 @@ function pixel2hex(rgb) {
 };
 
 function toHex(num) {
-    return num.toString(16);
+    let hexNum = '';
+    if (num < 16) {
+        hexNum += '0'
+    }
+    hexNum += num.toString(16);
+    return hexNum;
 };
