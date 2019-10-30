@@ -44,23 +44,28 @@ function drawImage(imageObj) {
     var rgbText = document.getElementById('rgb');
     rgbText.innerHTML = data.toString();
 
-    var hexData = image2hex(data);
+    var hexData = image2hex(data, imageWidth);
     var hexText = document.getElementById('hex');
     hexText.innerHTML = hexData;
 
-    //fix image size
+    //adjust image size
     context.drawImage(imageObj, imageX, imageY, canvas.width, canvas.height);
 };
 
-function image2hex(data) {
+function image2hex(data, w) {
     let image_asHex = "";
+    let pixelCount = 0;
     for (var i = 0, j = data.length; i < j; i += 4) {
         let rgb = [data[i], data[i+1], data[i+2]];
         hexcode = pixel2hex(rgb);
         image_asHex += hexcode + ' ';
+        pixelCount++;
+        if ((pixelCount % 16) == 0) {
+            image_asHex += '<br>';
+        }
     }
     return image_asHex;
-}
+};
 
 function pixel2hex(rgb) {
     let hexcode = '#';
