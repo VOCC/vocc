@@ -47,6 +47,9 @@ function drawImage(imageObj) {
     var hexData = image2hex(data);
     var hexText = document.getElementById('hex');
     hexText.innerHTML = hexData;
+
+    //fix image size
+    context.drawImage(imageObj, imageX, imageY, canvas.width, canvas.height);
 };
 
 function image2hex(data) {

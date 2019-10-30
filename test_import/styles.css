@@ -18,4 +18,6 @@ label {
 canvas {
     margin-top: 10px;
     background-color: lightcoral;
+    width: 128px;
+    height: 128px;
 }
