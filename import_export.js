@@ -60,7 +60,7 @@ function image2hex(data, w) {
         hexcode = pixel2hex(rgb);
         image_asHex += hexcode + ' ';
         pixelCount++;
-        if ((pixelCount % 16) == 0) {
+        if ((pixelCount % w) == 0) {
             image_asHex += '<br>';
         }
     }
