@@ -1,9 +1,13 @@
 var input_image = document.getElementById('select-image');
+var export_image = document.getElementById('export-image');
 var imageContainer = document.getElementById('imgContainer');
-// var canvas = document.getElementById('myCanvas');
-// var ctx = canvas.getContext('2d');
 
 input_image.addEventListener('change', importImage);
+export_image.addEventListener('click', function() {
+    let text = 'some text';
+    let filename = 'filename';
+    exportImage(filename, text);
+}, false);
 
 function importImage() {
     // remove current contents
@@ -82,4 +86,20 @@ function toHex(num) {
     }
     hexNum += num.toString(16);
     return hexNum;
+};
+
+function exportImage(filename, text) {
+    // create file url
+    filename += '.c';
+    let file = new File([text], filename, { type: 'text/plain' });
+    let url = URL.createObjectURL(file);
+
+    // download file "offline"
+    let element = document.createElement('A');
+    element.style.display = 'none';
+    element.setAttribute('href', url);
+    element.setAttribute('download', filename);
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
 };
