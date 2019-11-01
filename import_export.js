@@ -3,11 +3,7 @@ var export_image = document.getElementById('export-image');
 var imageContainer = document.getElementById('imgContainer');
 
 input_image.addEventListener('change', importImage);
-export_image.addEventListener('click', function() {
-    let text = 'some text';
-    let filename = 'filename';
-    exportImage(filename, text);
-}, false);
+export_image.addEventListener('click', exportImage);
 
 function importImage() {
     // remove current contents
@@ -88,18 +84,12 @@ function toHex(num) {
     return hexNum;
 };
 
-function exportImage(filename, text) {
+function exportImage() {
     // create file url
-    filename += '.c';
-    let file = new File([text], filename, { type: 'text/plain' });
-    let url = URL.createObjectURL(file);
-
-    // download file "offline"
-    let element = document.createElement('A');
-    element.style.display = 'none';
-    element.setAttribute('href', url);
-    element.setAttribute('download', filename);
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    let text = 'some text';
+    let filename = 'filename';
+    let filetype = '.c';
+    filename += filetype;
+    let blob = new Blob([text], {type: 'text/plain'});
+    saveAs(blob, filename);
 };
