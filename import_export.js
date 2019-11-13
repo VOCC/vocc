@@ -1,6 +1,7 @@
 var input_image = document.getElementById('select-image');
 var export_image = document.getElementById('export-image');
 var imageContainer = document.getElementById('imgContainer');
+var hexText = document.getElementById('hex');
 
 input_image.addEventListener('change', importImage);
 export_image.addEventListener('click', exportImage);
@@ -44,49 +45,54 @@ function drawImage(imageObj) {
     var rgbText = document.getElementById('rgb');
     rgbText.innerHTML = data.toString();
 
-    var hexData = image2hex(data, imageWidth);
-    var hexText = document.getElementById('hex');
+    var hexData = image2hex(data);
     hexText.innerHTML = hexData;
 
     //adjust image size
     context.drawImage(imageObj, imageX, imageY, canvas.width, canvas.height);
 };
 
-function image2hex(data, w) {
+function image2hex(data) {
     let image_asHex = "";
     let pixelCount = 0;
     for (var i = 0, j = data.length; i < j; i += 4) {
-        let rgb = [data[i], data[i+1], data[i+2]];
-        hexcode = pixel2hex(rgb);
-        image_asHex += hexcode + ' ';
+        let bgr = [data[i+2], data[i+1], data[i]]; // bgr for little endian
+        hexcode = pixel2hex(bgr);
+        image_asHex += hexcode + ',';
         pixelCount++;
-        if ((pixelCount % w) == 0) {
+        if ((pixelCount % 8) == 0) {
+            image_asHex += '<br>';
+        }
+        if ((pixelCount % 64) == 0) {
             image_asHex += '<br>';
         }
     }
     return image_asHex;
 };
 
-function pixel2hex(rgb) {
-    let hexcode = '#';
-    rgb.forEach(element => {
-        hexcode += toHex(element);
+function pixel2hex(bgr) {
+    // convert to 16-bit binary format: 0bbbbbgggggrrrrr
+    let binary_value = '0';
+    bgr.forEach(element => {
+        element = Math.floor(element * 32/256);
+        element = element.toString(2); // convert to binary
+        while (element.length < 5) {
+            element = '0' + element;
+        }
+        binary_value += element;
     });
-    return hexcode.toUpperCase();
-};
-
-function toHex(num) {
-    let hexNum = '';
-    if (num < 16) {
-        hexNum += '0'
+    // convert to hex
+    let hex_value = parseInt(binary_value, 2).toString(16);
+    while (hex_value.length < 4) {
+        hex_value = '0' + hex_value;
     }
-    hexNum += num.toString(16);
-    return hexNum;
+    hex_value = hex_value.toUpperCase();
+    return '0x' + hex_value;
 };
 
 function exportImage() {
     // create file url
-    let text = 'some text';
+    let text = hexText.innerHTML;
     let filename = 'filename';
     let filetype = '.c';
     filename += filetype;
