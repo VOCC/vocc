@@ -2,6 +2,7 @@ var input_image = document.getElementById('select-image');
 var export_image = document.getElementById('export-image');
 var imageContainer = document.getElementById('imgContainer');
 var hexText = document.getElementById('hex');
+var imageName;
 
 input_image.addEventListener('change', importImage);
 export_image.addEventListener('click', exportImage);
@@ -13,15 +14,17 @@ function importImage() {
     }
 
     // add new (selected) contents
-    var selectedFiles = input_image.files;
-    if (selectedFiles.length === 0) {
+    var selectedFile = input_image.files[0];
+    var sliceIndex = selectedFile.name.lastIndexOf('.');
+    imageName = selectedFile.name.slice(0, sliceIndex);
+    if (selectedFile.length === 0) {
         let text = document.createElement('P');
         text.innerHTML = 'No files currently selected.';
         imageContainer.appendChild(text);
     } else {
         var imageObj = new Image();
         imageObj.crossOrigin = 'anonymous';
-        imageObj.src = window.URL.createObjectURL(selectedFiles[0]);
+        imageObj.src = window.URL.createObjectURL(selectedFile);
         imageObj.onload = function() {
             drawImage(this);
         };
@@ -53,21 +56,23 @@ function drawImage(imageObj) {
 };
 
 function image2hex(data) {
-    let image_asHex = "";
+    let image_asHex = "const unsigned short " + imageName + "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
     let pixelCount = 0;
     for (var i = 0, j = data.length; i < j; i += 4) {
         let bgr = [data[i+2], data[i+1], data[i]]; // bgr for little endian
         hexcode = pixel2hex(bgr);
         image_asHex += hexcode + ',';
         pixelCount++;
-        if ((pixelCount % 8) == 0) {
-            image_asHex += '<br>';
-        }
-        if ((pixelCount % 64) == 0) {
-            image_asHex += '<br>';
+        if ((pixelCount % 8) == 0 && pixelCount < 256) {
+            image_asHex += '\n';
+            if ((pixelCount % 64) == 0) {
+                image_asHex += '\n\t';
+            } else {
+                image_asHex += '\t';
+            }
         }
     }
-    return image_asHex;
+    return image_asHex + "\n};";
 };
 
 function pixel2hex(bgr) {
@@ -91,9 +96,11 @@ function pixel2hex(bgr) {
 };
 
 function exportImage() {
+    // check if any images to export
+    // if (imageContainer.childElementCount == 0) { return; }
     // create file url
     let text = hexText.innerHTML;
-    let filename = 'filename';
+    let filename = imageName;
     let filetype = '.c';
     filename += filetype;
     let blob = new Blob([text], {type: 'text/plain'});
