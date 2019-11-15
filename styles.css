@@ -1,7 +1,3 @@
-#select-image {
-    display: none;
-}
-
 html {
     font-family: sans-serif;
     margin: 0 auto;
@@ -13,6 +9,7 @@ label {
     border-radius: 5px;
     border: 1px ridge black;
     padding: 5px 10px;
+    margin-right: 10px;
 }
 
 canvas {
@@ -20,4 +17,8 @@ canvas {
     background-color: lightcoral;
     width: 128px;
     height: 128px;
+}
+
+input {
+    display: none;
 }

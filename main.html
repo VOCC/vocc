@@ -6,7 +6,10 @@
     <body>
         <div>
             <label for="select-image">Import Image!</label>
-            <input id = "select-image" type="file" accept=".png, .jpg, .jpeg">
+            <input id ="select-image" type="file" accept=".png, .jpg, .jpeg">
+
+            <label for="export-image">Export Image!</label>
+            <input id ="export-image" name="export-image" type="button">
         </div>
         <div id="imgContainer">
             <p>No files currently selected.</p>
@@ -17,6 +20,7 @@
             <p id="rgb"></p>
             <p id="hex"></p>
         </div>
+        <script type="text/javascript" src="./FileSaver.min.js"></script>
         <script type="text/javascript" src="./import_export.js"></script>
     </body>
 </html>
