@@ -1,20 +1,20 @@
-var inputImage = document.getElementById("select-image");
-var exportImage = document.getElementById("export-image");
+var inputImageElement = document.getElementById("select-image");
+var exportImageElement = document.getElementById("export-image");
 var imageContainer = document.getElementById("imgContainer");
 var hexText = document.getElementById("hex");
 var imageName;
 
-inputImage.addEventListener("change", importImage);
-exportImage.addEventListener("click", exportImage);
+inputImageElement.addEventListener("change", importImage);
+exportImageElement.addEventListener("click", exportImage);
 
-function importImage() {
+export function importImage() {
   // remove current contents
   while (imageContainer.childElementCount !== 0) {
     imageContainer.removeChild(imageContainer.firstChild);
   }
 
   // add new (selected) contents
-  var selectedFile = inputImage.files[0];
+  var selectedFile = inputImageElement.files[0];
   var sliceIndex = selectedFile.name.lastIndexOf(".");
   imageName = selectedFile.name.slice(0, sliceIndex);
   if (selectedFile.length === 0) {
@@ -26,7 +26,8 @@ function importImage() {
     imageObj.crossOrigin = "anonymous";
     imageObj.src = window.URL.createObjectURL(selectedFile);
     imageObj.onload = function() {
-      drawImage(this);
+      // drawImage(this);
+      console.log("successfully loaded image");
     };
   }
 }
@@ -63,7 +64,7 @@ function image2hex(data) {
   let pixelCount = 0;
   for (var i = 0, j = data.length; i < j; i += 4) {
     let bgr = [data[i + 2], data[i + 1], data[i]]; // bgr for little endian
-    hexcode = pixel2hex(bgr);
+    let hexcode = pixel2hex(bgr);
     image_asHex += hexcode + ",";
     pixelCount++;
     if (pixelCount % 8 == 0 && pixelCount < 256) {
@@ -107,5 +108,5 @@ function exportImage() {
   let filetype = ".c";
   filename += filetype;
   let blob = new Blob([text], { type: "text/plain" });
-  saveAs(blob, filename);
+  // saveAs(blob, filename);
 }

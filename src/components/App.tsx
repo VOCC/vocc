@@ -1,5 +1,7 @@
 import React from "react";
 import "../styles/App.css";
+import ImportButton from "./ImportButton";
+import ExportButton from "./ExportButton";
 
 const App: React.FC = () => {
   return (
@@ -9,25 +11,5 @@ const App: React.FC = () => {
     </div>
   );
 };
-
-type ButtonProps = {
-  message: string;
-};
-
-const Button = ({ message: message }: ButtonProps) => (
-  <button>{message}</button>
-);
-
-class ImportButton extends React.Component {
-  render() {
-    return <Button message={"Import Image"} />;
-  }
-}
-
-class ExportButton extends React.Component {
-  render() {
-    return <Button message={"Export as .c"} />;
-  }
-}
 
 export default App;
