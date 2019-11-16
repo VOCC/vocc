@@ -1,0 +1,54 @@
+$border-color: #c7c7cc;
+$lightgray: #e5e5ea;
+$darkgray: #3a3a3c;
+$textcolor: $darkgray;
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+  min-height: 32pt;
+  line-height: 32pt;
+  padding-left: 1rem;
+  border-bottom: 1px solid $border-color;
+  color: $textcolor;
+  .title {
+    padding-right: 1rem;
+    font-weight: 900;
+  }
+  .subtitle {
+    flex-grow: 1;
+  }
+}
+
+.workspace-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.left-panel {
+  border-right: 1px solid $border-color;
+  min-width: 128px;
+}
+
+.right-panel {
+  border-left: 1px solid $border-color;
+  min-width: 256px;
+}
+
+.panel-label {
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  font-weight: 600;
+  color: $textcolor;
+}
+
+.image-container {
+  min-height: 100vh;
+  flex-grow: 1;
+  background-color: $lightgray;
+}

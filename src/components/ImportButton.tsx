@@ -1,6 +1,5 @@
 import React from "react";
-import { Button } from "./Button";
-// import { importImage } from "../lib/importExport";
+import "../styles/buttons.scss";
 
 export default class ImportButton extends React.Component {
   fileInput: React.RefObject<HTMLInputElement>;
@@ -27,25 +26,29 @@ export default class ImportButton extends React.Component {
           fileName: this.fileInput.current.files[0].name,
           hasLoadedImage: true
         });
-        alert(`Successfully imported ${this.state.fileName}`);
+        // alert(`Successfully imported ${this.state.fileName}`);
       }
     }
   }
 
   renderLoaded = (imageTitle: string) => (
-    <div>Successfully loaded {imageTitle}</div>
+    <div className="import-loaded">
+      Loaded <em>{imageTitle}</em>
+    </div>
   );
 
   renderUnloaded = () => (
-    <div>
-      <label>Import Image</label>
-      <input
-        type="file"
-        accept=".png, .jpg, .jpeg"
-        ref={this.fileInput}
-        onChange={e => this.handleSubmit(e)}
-      />
-    </div>
+    <button className="button import-button">
+      <label>
+        Import Image
+        <input
+          type="file"
+          accept=".png, .jpg, .jpeg"
+          ref={this.fileInput}
+          onChange={e => this.handleSubmit(e)}
+        />
+      </label>
+    </button>
   );
 
   render() {

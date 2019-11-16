@@ -1,10 +1,18 @@
 import React from "react";
-import { Button } from "./Button";
+import "../styles/buttons.scss";
 
 export default class ExportButton extends React.Component {
   render() {
-    return <Button onClick={this.handleClick} message={"Export as .c"} />;
+    return (
+      <button
+        className="button export-button"
+        onClick={() => this.handleClick()}
+      >
+        Export
+      </button>
+    );
   }
+
   handleClick() {
     console.log("exporting image");
   }
