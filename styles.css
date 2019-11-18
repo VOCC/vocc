@@ -1,0 +1,24 @@
+html {
+    font-family: sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+label {
+    background-color: skyblue;
+    border-radius: 5px;
+    border: 1px ridge black;
+    padding: 5px 10px;
+    margin-right: 10px;
+}
+
+canvas {
+    margin-top: 10px;
+    background-color: lightcoral;
+    width: 128px;
+    height: 128px;
+}
+
+input {
+    display: none;
+}

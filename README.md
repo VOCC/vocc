@@ -1,6 +1,14 @@
 # Game Boy Advance Image Editor/Converter
 This is the repository for the Game Boy Advance Image Editor/Converter intended for use in Georgia Tech's CS 2261
 
+## Team Members
+
+- Logan Bussell
+- Bennett Hillier
+- Rosemary Blair
+- Jacob Lambert
+- John Beckner
+
 ### Making changes
 
 See https://help.github.com/en/articles/configuring-a-remote-for-a-fork to configure your own fork of this repo.
