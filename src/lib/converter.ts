@@ -1,8 +1,8 @@
-export function image2hex(data: number[], imageName: string) : string {
+export function image2hex(data: Uint8ClampedArray, imageName: string): string {
   let image_asHex =
-      "const unsigned short " +
-      imageName +
-      "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
+    "const unsigned short " +
+    imageName +
+    "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
   let pixelCount = 0;
   for (var i = 0, j = data.length; i < j; i += 4) {
     let bgr = [data[i + 2], data[i + 1], data[i]]; // bgr for little endian
@@ -20,8 +20,8 @@ export function image2hex(data: number[], imageName: string) : string {
   }
   return image_asHex + "\n};";
 }
-  
-function pixel2hex(bgr : number[]) : string {
+
+function pixel2hex(bgr: number[]): string {
   // convert to 16-bit binary format: 0bbbbbgggggrrrrr
   let binary_value = "0";
   bgr.forEach(element => {
