@@ -1,17 +1,23 @@
 import React from "react";
 import "../styles/buttons.scss";
 
-export default class ImportButton extends React.Component {
+type ImportButtonProps = {
+  onImageChange: (imageFile: any) => void;
+};
+
+export default class ImportButton extends React.Component<ImportButtonProps> {
   fileInput: React.RefObject<HTMLInputElement>;
+  handleImageChange: (file: any) => void;
   state: {
     fileName: string;
     hasLoadedImage: boolean;
   };
 
-  constructor(props: {}) {
+  constructor(props: ImportButtonProps) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.fileInput = React.createRef();
+    this.handleImageChange = props.onImageChange;
     this.state = {
       fileName: "No file name",
       hasLoadedImage: false
@@ -27,6 +33,7 @@ export default class ImportButton extends React.Component {
           hasLoadedImage: true
         });
         // alert(`Successfully imported ${this.state.fileName}`);
+        this.handleImageChange(this.fileInput.current.files[0]);
       }
     }
   }
