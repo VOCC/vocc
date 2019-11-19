@@ -1,19 +1,21 @@
 import React from "react";
 import "../styles/buttons.scss";
 
-export default class ExportButton extends React.Component {
+interface ExportButtonProps {
+  startImageExport: () => void;
+}
+
+class ExportButton extends React.Component<ExportButtonProps> {
   render() {
     return (
       <button
         className="button export-button"
-        onClick={() => this.handleClick()}
+        onClick={this.props.startImageExport}
       >
         Export
       </button>
     );
   }
-
-  handleClick() {
-    console.log("exporting image");
-  }
 }
+
+export default ExportButton;

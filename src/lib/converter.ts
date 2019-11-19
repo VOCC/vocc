@@ -9,9 +9,9 @@ export function image2hex(data: Uint8ClampedArray, imageName: string): string {
     let hexcode = pixel2hex(bgr);
     image_asHex += hexcode + ",";
     pixelCount++;
-    if (pixelCount % 8 == 0 && pixelCount < 256) {
+    if (pixelCount % 8 === 0 && pixelCount < 256) {
       image_asHex += "\n";
-      if (pixelCount % 64 == 0) {
+      if (pixelCount % 64 === 0) {
         image_asHex += "\n\t";
       } else {
         image_asHex += "\t";
@@ -30,7 +30,7 @@ function pixel2hex(bgr: number[]): string {
     while (elementString.length < 5) {
       elementString = "0" + elementString;
     }
-    binary_value += element;
+    binary_value += elementString;
   });
   // convert to hex
   let hex_value = parseInt(binary_value, 2).toString(16);
