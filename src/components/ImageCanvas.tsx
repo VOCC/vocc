@@ -30,6 +30,7 @@ class ImageCanvas extends React.Component<ImageCanvasProps> {
       canvas.setAttribute("height", image.height.toString() + "px");
       canvas.width = 1000;
       canvas.height = 1000;
+      context.imageSmoothingEnabled = false;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
     };
   }
