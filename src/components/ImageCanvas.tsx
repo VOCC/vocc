@@ -13,8 +13,8 @@ class ImageCanvas extends React.Component<ImageCanvasProps> {
 
   constructor(props: ImageCanvasProps) {
     super(props);
-    this.canvasRef = this.props.canvasRef;
-    this.imageRef = this.props.imageRef;
+    this.canvasRef = props.canvasRef;
+    this.imageRef = props.imageRef;
     this.imageFile = props.imageFile;
   }
 
@@ -40,6 +40,7 @@ class ImageCanvas extends React.Component<ImageCanvasProps> {
       <img
         ref={this.imageRef}
         src={window.URL.createObjectURL(this.imageFile)}
+        alt="hidden"
         className="hidden"
       />
     </div>
