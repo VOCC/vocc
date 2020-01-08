@@ -1,26 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-interface ImageCanvasProps {
+///////////// Type Definitions:
+interface IProps {
   imageFile: File;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   imageRef: React.RefObject<HTMLImageElement>;
 }
 
-class ImageCanvas extends React.Component<ImageCanvasProps> {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  imageRef: React.RefObject<HTMLImageElement>;
-  imageFile: File;
-
-  constructor(props: ImageCanvasProps) {
-    super(props);
-    this.canvasRef = props.canvasRef;
-    this.imageRef = props.imageRef;
-    this.imageFile = props.imageFile;
-  }
-
-  componentDidMount() {
-    const image = this.imageRef.current;
-    const canvas = this.canvasRef.current;
+function ImageCanvas({ imageFile, canvasRef, imageRef }: IProps): JSX.Element {
+  useEffect(() => {
+    const image = imageRef.current;
+    const canvas = canvasRef.current;
     if (!canvas || !image) return;
     const context = canvas.getContext("2d");
     if (!context) return;
@@ -33,14 +23,14 @@ class ImageCanvas extends React.Component<ImageCanvasProps> {
       context.imageSmoothingEnabled = false;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
     };
-  }
+  }, [canvasRef, imageRef]);
 
-  render = () => (
+  return (
     <div>
-      <canvas ref={this.canvasRef} className="image-canvas" />
+      <canvas ref={canvasRef} className="image-canvas" />
       <img
-        ref={this.imageRef}
-        src={window.URL.createObjectURL(this.imageFile)}
+        ref={imageRef}
+        src={window.URL.createObjectURL(imageFile)}
         alt="hidden"
         className="hidden"
       />
