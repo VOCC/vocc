@@ -1,19 +1,18 @@
 import React, { useState, useRef } from "react";
 import "../styles/buttons.scss";
-import { file } from "@babel/types";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 interface IProps {
   handleImageChange: (imageFile: ImageFile) => void;
 };
-interface IState {
+interface IFile {
   fileName: string
   hasLoadedImage: boolean
 }
 
 function ImportButton({handleImageChange}: IProps): JSX.Element {
-  const [file, setImageFile] = useState<IState>({
+  const [file, setImageFile] = useState<IFile>({
     fileName: "No file name",
     hasLoadedImage: false
   });
@@ -53,7 +52,6 @@ function ImportButton({handleImageChange}: IProps): JSX.Element {
     </button>
   );
 
-  // return <Button onClick={this.handleClick} message={"Import Image"} />;
   return file.hasLoadedImage
     ? renderLoaded(file.fileName)
     : renderUnloaded();
