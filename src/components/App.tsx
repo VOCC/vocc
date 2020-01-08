@@ -60,7 +60,7 @@ function App(): JSX.Element {
           Game Boy Advance Image Editor and Converter
         </span>
         <ImportButton
-          handleImageChange={handleImageChange}
+          onImageChange={handleImageChange}
         />
         <ExportButton startImageExport={handleImageExport} />
       </div>

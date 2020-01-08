@@ -4,14 +4,14 @@ import "../styles/buttons.scss";
 ///////////// Type Definitions:
 type ImageFile = File | null;
 interface IProps {
-  handleImageChange: (imageFile: ImageFile) => Promise<void>;
+  onImageChange: (imageFile: ImageFile) => Promise<void>;
 };
 interface IFile {
   fileName: string
   hasLoadedImage: boolean
 }
 
-function ImportButton({handleImageChange}: IProps): JSX.Element {
+function ImportButton({onImageChange}: IProps): JSX.Element {
   const [file, setImageFile] = useState<IFile>({
     fileName: "No file name",
     hasLoadedImage: false
@@ -26,9 +26,7 @@ function ImportButton({handleImageChange}: IProps): JSX.Element {
           fileName: fileInput.current.files[0].name,
           hasLoadedImage: true
         });
-        // alert(`Successfully imported ${this.state.fileName}`);
-        console.log(handleImageChange);
-        handleImageChange(fileInput.current.files[0]);
+        onImageChange(fileInput.current.files[0]);
       }
     }
   }
