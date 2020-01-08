@@ -1,67 +1,61 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import "../styles/buttons.scss";
 
-type ImportButtonProps = {
-  onImageChange: (imageFile: any) => void;
+///////////// Type Definitions:
+type ImageFile = File | null;
+interface IProps {
+  handleImageChange: (imageFile: ImageFile) => Promise<void>;
 };
+interface IFile {
+  fileName: string
+  hasLoadedImage: boolean
+}
 
-export default class ImportButton extends React.Component<ImportButtonProps> {
-  fileInput: React.RefObject<HTMLInputElement>;
-  handleImageChange: (file: any) => void;
-  state: {
-    fileName: string;
-    hasLoadedImage: boolean;
-  };
+function ImportButton({handleImageChange}: IProps): JSX.Element {
+  const [file, setImageFile] = useState<IFile>({
+    fileName: "No file name",
+    hasLoadedImage: false
+  });
+  const fileInput = useRef<HTMLInputElement>(null);
 
-  constructor(props: ImportButtonProps) {
-    super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.fileInput = React.createRef();
-    this.handleImageChange = props.onImageChange;
-    this.state = {
-      fileName: "No file name",
-      hasLoadedImage: false
-    };
-  }
-
-  handleSubmit(event: React.FormEvent<HTMLInputElement>) {
-    event.preventDefault();
-    if (this.fileInput.current) {
-      if (this.fileInput.current.files) {
-        this.setState({
-          fileName: this.fileInput.current.files[0].name,
+  const handleSubmit = (e: React.FormEvent<HTMLInputElement>): void => {
+    e.preventDefault();
+    if (fileInput.current) {
+      if (fileInput.current.files) {
+        setImageFile({
+          fileName: fileInput.current.files[0].name,
           hasLoadedImage: true
         });
         // alert(`Successfully imported ${this.state.fileName}`);
-        this.handleImageChange(this.fileInput.current.files[0]);
+        console.log(handleImageChange);
+        handleImageChange(fileInput.current.files[0]);
       }
     }
   }
 
-  renderLoaded = (imageTitle: string) => (
+  const renderLoaded = (imageTitle: string): JSX.Element => (
     <div className="import-loaded">
       Loaded <em>{imageTitle}</em>
     </div>
   );
 
-  renderUnloaded = () => (
+  const renderUnloaded = (): JSX.Element => (
     <button className="button import-button">
       <label>
         Import Image
         <input
           type="file"
           accept=".png, .jpg, .jpeg"
-          ref={this.fileInput}
-          onChange={e => this.handleSubmit(e)}
+          ref={fileInput}
+          onChange={handleSubmit}
         />
       </label>
     </button>
   );
 
-  render() {
-    // return <Button onClick={this.handleClick} message={"Import Image"} />;
-    return this.state.hasLoadedImage
-      ? this.renderLoaded(this.state.fileName)
-      : this.renderUnloaded();
-  }
+  return file.hasLoadedImage
+    ? renderLoaded(file.fileName)
+    : renderUnloaded();
 }
+
+export default ImportButton;

@@ -1,21 +1,25 @@
 import React from "react";
 import "../styles/buttons.scss";
 
-interface ExportButtonProps {
+///////////// Type Definitions:
+interface IProps {
   startImageExport: () => void;
 }
 
-class ExportButton extends React.Component<ExportButtonProps> {
-  render() {
-    return (
-      <button
-        className="button export-button"
-        onClick={this.props.startImageExport}
-      >
-        Export
-      </button>
-    );
+function ExportButton({startImageExport}: IProps): JSX.Element {
+// const ExportButton: React.FC<ExportButtonProps> = ({startImageExport}) => {
+  const handleClick = (e: any): void => {
+    startImageExport();
   }
+  
+  return (
+    <button
+      className="button export-button"
+      onClick={handleClick}
+    >
+      Export
+    </button>
+  );
 }
 
 export default ExportButton;
