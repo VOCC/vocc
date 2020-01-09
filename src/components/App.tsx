@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import CodePreview from "./CodePreview";
 import ImportButton from "./ImportButton";
 import ExportButton from "./ExportButton";
 import ImageCanvas from "./ImageCanvas";
@@ -9,9 +10,9 @@ import { saveAs } from "file-saver";
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
-
 function App(): JSX.Element {
   const [imageFile, setImageFile] = useState<ImageFile>(null);
+  const [exportCode, setExportCode] = useState<string>("Nothing to display");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -40,14 +41,12 @@ function App(): JSX.Element {
       }
 
       let imageData = context.getImageData(0, 0, image.width, image.height);
-      let hexData = image2hex(imageData.data, imageFile.name);
+      setExportCode(image2hex(imageData.data, imageFile.name));
       let fileName = imageFile.name;
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      let blob = new Blob([hexData], { type: "text/plain" });
-      console.log(imageData.data);
-      console.log(hexData);
+      let blob = new Blob([exportCode], { type: "text/plain" });
       saveAs(blob, fullFileName);
     }
   }
@@ -80,6 +79,11 @@ function App(): JSX.Element {
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
         </div>
+      </div>
+      <div className="preview-container">
+        <CodePreview 
+          exportCode={exportCode}
+        />
       </div>
     </div>
   );
