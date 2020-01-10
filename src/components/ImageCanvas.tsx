@@ -5,9 +5,10 @@ interface IProps {
   imageFile: File;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   imageRef: React.RefObject<HTMLImageElement>;
+  onImageLoad: () => void;
 }
 
-function ImageCanvas({ imageFile, canvasRef, imageRef }: IProps): JSX.Element {
+function ImageCanvas({ imageFile, canvasRef, imageRef, onImageLoad }: IProps): JSX.Element {
   useEffect(() => {
     const image = imageRef.current;
     const canvas = canvasRef.current;
@@ -22,6 +23,7 @@ function ImageCanvas({ imageFile, canvasRef, imageRef }: IProps): JSX.Element {
       canvas.height = 1000;
       context.imageSmoothingEnabled = false;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      onImageLoad();
     };
   }, [canvasRef, imageRef]);
 

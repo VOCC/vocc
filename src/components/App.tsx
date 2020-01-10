@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CodePreview from "./CodePreview";
 import ImportButton from "./ImportButton";
 import ExportButton from "./ExportButton";
@@ -20,7 +20,7 @@ function App(): JSX.Element {
     setImageFile(imageFile);
   }
 
-  const handleImageExport = (): void => {
+  const handleImageLoad = (): void => {
     const alertMsg = () => alert("Please import an image first!");
     if (!imageFile) {
       alertMsg();
@@ -42,6 +42,14 @@ function App(): JSX.Element {
 
       let imageData = context.getImageData(0, 0, image.width, image.height);
       setExportCode(image2hex(imageData.data, imageFile.name));
+    }
+  }
+
+  const handleImageExport = (): void => {
+    const alertMsg = () => alert("Please import an image first!");
+    if (!imageFile) {
+      alertMsg();
+    } else {
       let fileName = imageFile.name;
       let fileType = ".c";
       let fullFileName =
@@ -73,6 +81,7 @@ function App(): JSX.Element {
               imageFile={imageFile}
               canvasRef={canvasRef}
               imageRef={imageRef}
+              onImageLoad={handleImageLoad}
             />
           ) : null}
         </div>
