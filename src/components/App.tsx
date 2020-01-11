@@ -13,21 +13,22 @@ type ImageFile = File | null;
 function App(): JSX.Element {
   const [imageFile, setImageFile] = useState<ImageFile>(null);
   const [exportCode, setExportCode] = useState<string>("Nothing to display");
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  // const canvasRef = useRef<HTMLCanvasElement>(null);
+  // const imageRef = useRef<HTMLImageElement>(null);
 
   const handleImageChange = async (imageFile: ImageFile): Promise<void> => {
     setImageFile(imageFile);
   }
 
-  const handleImageLoad = (): void => {
+  const handleImageLoad = (context: CanvasRenderingContext2D,
+                           image: HTMLImageElement): void => {
     const alertMsg = () => alert("Please import an image first!");
     if (!imageFile) {
       alertMsg();
     } else {
-      let canvas = canvasRef.current as HTMLCanvasElement;
-      let image = imageRef.current as HTMLImageElement;
-      let context = canvas.getContext("2d") as CanvasRenderingContext2D;
+      // let canvas = canvasRef.current as HTMLCanvasElement;
+      // let image = imageRef.current as HTMLImageElement;
+      // let context = canvas.getContext("2d") as CanvasRenderingContext2D;
       let imageData = context.getImageData(0, 0, image.width, image.height);
       setExportCode(image2hex(imageData.data, imageFile.name));
     }
@@ -66,8 +67,8 @@ function App(): JSX.Element {
         <div className="image-container">
           <ImageCanvas
             imageFile={imageFile}
-            canvasRef={canvasRef}
-            imageRef={imageRef}
+            // canvasRef={canvasRef}
+            // imageRef={imageRef}
             onImageLoad={handleImageLoad}
           />
         </div>

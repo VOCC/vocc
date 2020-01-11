@@ -1,14 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 ///////////// Type Definitions:
 interface IProps {
   imageFile: File | null;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  imageRef: React.RefObject<HTMLImageElement>;
-  onImageLoad: () => void;
+  // canvasRef: React.RefObject<HTMLCanvasElement>;
+  // imageRef: React.RefObject<HTMLImageElement>;
+  onImageLoad: (context: CanvasRenderingContext2D,
+                image: HTMLImageElement) => void;
 }
 
-function ImageCanvas({ imageFile, canvasRef, imageRef, onImageLoad }: IProps): JSX.Element {
+function ImageCanvas({ imageFile, onImageLoad }: IProps): JSX.Element {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+
   useEffect(() => {
     const image = imageRef.current as HTMLImageElement;
     const canvas = canvasRef.current as HTMLCanvasElement;
@@ -16,14 +20,14 @@ function ImageCanvas({ imageFile, canvasRef, imageRef, onImageLoad }: IProps): J
 
       image.onload = () => {
         console.log("Loading Image to canvas ...");
-        
+
         canvas.setAttribute("width", image.width.toString() + "px");
         canvas.setAttribute("height", image.height.toString() + "px");
         canvas.width = 1000;
         canvas.height = 1000;
         context.imageSmoothingEnabled = false;
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
-        onImageLoad();
+        onImageLoad(context, image);
     };
   }, [imageFile]);
 
