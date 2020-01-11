@@ -25,21 +25,9 @@ function App(): JSX.Element {
     if (!imageFile) {
       alertMsg();
     } else {
-      let canvas = canvasRef.current;
-      let image = imageRef.current;
-
-      if (!canvas || !image) {
-        alertMsg();
-        return;
-      }
-
-      let context = canvas.getContext("2d");
-
-      if (!context) {
-        alertMsg();
-        return;
-      }
-
+      let canvas = canvasRef.current as HTMLCanvasElement;
+      let image = imageRef.current as HTMLImageElement;
+      let context = canvas.getContext("2d") as CanvasRenderingContext2D;
       let imageData = context.getImageData(0, 0, image.width, image.height);
       setExportCode(image2hex(imageData.data, imageFile.name));
     }
@@ -76,14 +64,12 @@ function App(): JSX.Element {
           <div className="panel-label">Tools</div>
         </div>
         <div className="image-container">
-          {imageFile ? (
-            <ImageCanvas
-              imageFile={imageFile}
-              canvasRef={canvasRef}
-              imageRef={imageRef}
-              onImageLoad={handleImageLoad}
-            />
-          ) : null}
+          <ImageCanvas
+            imageFile={imageFile}
+            canvasRef={canvasRef}
+            imageRef={imageRef}
+            onImageLoad={handleImageLoad}
+          />
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>

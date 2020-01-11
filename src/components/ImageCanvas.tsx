@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 ///////////// Type Definitions:
 interface IProps {
-  imageFile: File;
+  imageFile: File | null;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   imageRef: React.RefObject<HTMLImageElement>;
   onImageLoad: () => void;
@@ -10,29 +10,32 @@ interface IProps {
 
 function ImageCanvas({ imageFile, canvasRef, imageRef, onImageLoad }: IProps): JSX.Element {
   useEffect(() => {
-    const image = imageRef.current;
-    const canvas = canvasRef.current;
-    if (!canvas || !image) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
+    const image = imageRef.current as HTMLImageElement;
+    const canvas = canvasRef.current as HTMLCanvasElement;
+    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    image.onload = () => {
-      canvas.setAttribute("width", image.width.toString() + "px");
-      canvas.setAttribute("height", image.height.toString() + "px");
-      canvas.width = 1000;
-      canvas.height = 1000;
-      context.imageSmoothingEnabled = false;
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      onImageLoad();
+      image.onload = () => {
+        console.log("Loading Image to canvas ...");
+        
+        canvas.setAttribute("width", image.width.toString() + "px");
+        canvas.setAttribute("height", image.height.toString() + "px");
+        canvas.width = 1000;
+        canvas.height = 1000;
+        context.imageSmoothingEnabled = false;
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        onImageLoad();
     };
-  }, [canvasRef, imageRef]);
+  }, [imageFile]);
 
   return (
     <div>
-      <canvas ref={canvasRef} className="image-canvas" />
+      <canvas ref={canvasRef} className="image-canvas" id="image-canvas"/>
       <img
         ref={imageRef}
-        src={window.URL.createObjectURL(imageFile)}
+        src={imageFile ? 
+              window.URL.createObjectURL(imageFile) :
+              ""
+            }
         alt="hidden"
         className="hidden"
       />
