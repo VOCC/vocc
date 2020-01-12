@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import CodePreview from "./CodePreview";
+import React, { useState } from "react";
 import ImportButton from "./ImportButton";
 import ExportButton from "./ExportButton";
 import ImageCanvas from "./ImageCanvas";
+import ImageObject from "./Image";
 import "../styles/app.scss";
 import { image2hex } from "../lib/converter";
 import { saveAs } from "file-saver";
@@ -11,28 +11,33 @@ import { saveAs } from "file-saver";
 type ImageFile = File | null;
 
 function App(): JSX.Element {
+  const [imageObject, setImageObject] = useState<ImageObject>(
+    new ImageObject()
+  );
   const [imageFile, setImageFile] = useState<ImageFile>(null);
   const [exportCode, setExportCode] = useState<string>("Nothing to display");
-  // const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const imageRef = useRef<HTMLImageElement>(null);
 
-  const handleImageChange = async (imageFile: ImageFile): Promise<void> => {
+  const handleImageChange = async (imageFile: ImageFile) => {
     setImageFile(imageFile);
-  }
+    let imageObj = new ImageObject();
+    if (imageFile) {
+      imageObj.loadImage(imageFile);
+    }
+    setImageObject(imageObj);
+  };
 
-  const handleImageLoad = (context: CanvasRenderingContext2D,
-                           image: HTMLImageElement): void => {
+  const handleImageLoad = (
+    context: CanvasRenderingContext2D,
+    image: HTMLImageElement
+  ): void => {
     const alertMsg = () => alert("Please import an image first!");
     if (!imageFile) {
       alertMsg();
     } else {
-      // let canvas = canvasRef.current as HTMLCanvasElement;
-      // let image = imageRef.current as HTMLImageElement;
-      // let context = canvas.getContext("2d") as CanvasRenderingContext2D;
       let imageData = context.getImageData(0, 0, image.width, image.height);
       setExportCode(image2hex(imageData.data, imageFile.name));
     }
-  }
+  };
 
   const handleImageExport = (): void => {
     const alertMsg = () => alert("Please import an image first!");
@@ -46,7 +51,7 @@ function App(): JSX.Element {
       let blob = new Blob([exportCode], { type: "text/plain" });
       saveAs(blob, fullFileName);
     }
-  }
+  };
 
   return (
     <div className="app-container">
@@ -55,9 +60,7 @@ function App(): JSX.Element {
         <span className="subtitle">
           Game Boy Advance Image Editor and Converter
         </span>
-        <ImportButton
-          onImageChange={handleImageChange}
-        />
+        <ImportButton onImageChange={handleImageChange} />
         <ExportButton startImageExport={handleImageExport} />
       </div>
       <div className="workspace-container">
@@ -75,11 +78,6 @@ function App(): JSX.Element {
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
         </div>
-      </div>
-      <div className="preview-container">
-        <CodePreview 
-          exportCode={exportCode}
-        />
       </div>
     </div>
   );
