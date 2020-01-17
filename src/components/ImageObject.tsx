@@ -4,14 +4,17 @@ interface Dimensions {
 }
 
 export default class ImageObject {
-  hiddenCanvas: HTMLCanvasElement;
-  hiddenImage: HTMLImageElement;
-  dimensions: Dimensions = {
+  public fileName: string;
+  public dimensions: Dimensions = {
     height: 32,
     width: 32
   };
 
+  private hiddenCanvas: HTMLCanvasElement;
+  private hiddenImage: HTMLImageElement;
+
   constructor() {
+    this.fileName = "img";
     this.hiddenImage = document.createElement("img");
     this.hiddenImage.height = this.dimensions.height;
     this.hiddenImage.width = this.dimensions.width;
@@ -20,12 +23,14 @@ export default class ImageObject {
 
   async loadImage(imageFile: File) {
     this.hiddenImage = await this.loadHiddenImage(imageFile);
+    this.fileName = imageFile.name;
     this.setDimensions({
       height: this.hiddenImage.naturalHeight,
       width: this.hiddenImage.naturalWidth
     });
     this.hiddenCanvas = this.createHiddenCanvas(this.dimensions);
     console.log(this.dimensions);
+    console.log(this.fileName);
   }
 
   private loadHiddenImage(imageFile: File): Promise<HTMLImageElement> {
