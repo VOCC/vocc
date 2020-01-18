@@ -3,6 +3,23 @@ interface Dimensions {
   width: number;
 }
 
+interface PixelCoordinates {
+  x: number;
+  y: number;
+}
+
+const COLORS = {
+  R: "r",
+  G: "g",
+  B: "b"
+};
+
+interface color {
+  r: number;
+  g: number;
+  b: number;
+}
+
 export default class ImageObject {
   public fileName: string;
   public dimensions: Dimensions = {
@@ -12,6 +29,7 @@ export default class ImageObject {
 
   private hiddenCanvas: HTMLCanvasElement;
   private hiddenImage: HTMLImageElement;
+  private imageData: Uint8ClampedArray;
 
   constructor() {
     this.fileName = "img";
@@ -19,42 +37,77 @@ export default class ImageObject {
     this.hiddenImage.height = this.dimensions.height;
     this.hiddenImage.width = this.dimensions.width;
     this.hiddenCanvas = this.createHiddenCanvas(this.dimensions);
+    this.imageData = new Uint8ClampedArray(
+      this.dimensions.height * this.dimensions.width
+    );
   }
 
-  async loadImage(imageFile: File) {
-    this.hiddenImage = await this.loadHiddenImage(imageFile);
-    this.fileName = imageFile.name;
+  async loadImage(imagefile: File) {
+    this.hiddenImage = await this.loadHiddenImage(imagefile);
+    this.fileName = imagefile.name;
     this.setDimensions({
       height: this.hiddenImage.naturalHeight,
       width: this.hiddenImage.naturalWidth
     });
     this.hiddenCanvas = this.createHiddenCanvas(this.dimensions);
+    const context = this.hiddenCanvas.getContext("2d");
+    if (context != null) {
+      context.drawImage(this.hiddenImage, 0, 0);
+      this.loadImageDataFromCanvas(this.hiddenCanvas);
+    }
     console.log(this.dimensions);
     console.log(this.fileName);
   }
 
-  private loadHiddenImage(imageFile: File): Promise<HTMLImageElement> {
+  private loadImageDataFromCanvas(canvas: HTMLCanvasElement) {
+    const context = canvas.getContext("2d");
+    if (context == null) return;
+
+    const _data = context.getImageData(
+      0,
+      0,
+      this.dimensions.width,
+      this.dimensions.height
+    );
+
+    this.imageData = _data.data;
+    console.log(this.imageData);
+  }
+
+  private loadHiddenImage(imagefile: File): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       let image = new Image();
       image.hidden = true;
       image.onload = () => resolve(image);
       image.onerror = reject;
-      image.src = URL.createObjectURL(imageFile);
+      image.src = URL.createObjectURL(imagefile);
     });
   }
 
   private createHiddenCanvas(d: Dimensions): HTMLCanvasElement {
     let hiddenCanvas = document.createElement("canvas");
     hiddenCanvas.hidden = true;
-    hiddenCanvas.setAttribute("height", this.dimensions.height + "px");
-    hiddenCanvas.setAttribute("width", this.dimensions.width + "px");
+    hiddenCanvas.setAttribute("height", d.height + "px");
+    hiddenCanvas.setAttribute("width", d.width + "px");
     return hiddenCanvas;
   }
 
-  setDimensions(d: Dimensions) {
+  public setDimensions(d: Dimensions) {
     this.dimensions = d;
   }
+
+  public getPixelColorAt(pos: PixelCoordinates) {
+    const context = this.hiddenCanvas.getContext("2d");
+    if (context == null) return `rgba(0, 0, 0, 1)`;
+    const r = this.imageData[offset(pos, this.dimensions)];
+    const g = this.imageData[offset(pos, this.dimensions) + 1];
+    const b = this.imageData[offset(pos, this.dimensions) + 2];
+    return `rgb(${r}, ${g}, ${b})`;
+  }
 }
+
+const offset = (pos: PixelCoordinates, d: Dimensions) =>
+  3 * (pos.y * d.width + pos.x);
 
 // function pixel8(image: File, x: number, y: number, w: number, h: number) {
 //   "use strict";
