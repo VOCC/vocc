@@ -1,4 +1,14 @@
-export function image2hex(data: Uint8ClampedArray, imageName: string): string {
+import ImageObject from "../components/ImageObject"
+
+export const ImageExporter = {
+  getGBAImageString: (image: ImageObject) => getGBAImageString(image)
+}
+
+function getGBAImageString(iamge: ImageObject): string {
+  return "To be implemented later!"
+}
+
+function image2hex(data: Uint8ClampedArray, imageName: string): string {
   let image_asHex =
     "const unsigned short " +
     imageName +

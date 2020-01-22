@@ -1,17 +1,18 @@
 import React, { useState, useRef } from "react";
 import "../styles/buttons.scss";
 
-///////////// Type Definitions:
 type ImageFile = File | null;
+
 interface IProps {
-  onImageChange: (imageFile: ImageFile) => Promise<void>;
-};
-interface IFile {
-  fileName: string
-  hasLoadedImage: boolean
+  onImageChange: (imageFile: ImageFile) => void;
 }
 
-function ImportButton({onImageChange}: IProps): JSX.Element {
+interface IFile {
+  fileName: string;
+  hasLoadedImage: boolean;
+}
+
+function ImportButton({ onImageChange }: IProps): JSX.Element {
   const [file, setImageFile] = useState<IFile>({
     fileName: "No file name",
     hasLoadedImage: false
@@ -29,7 +30,7 @@ function ImportButton({onImageChange}: IProps): JSX.Element {
         onImageChange(fileInput.current.files[0]);
       }
     }
-  }
+  };
 
   const renderLoaded = (imageTitle: string): JSX.Element => (
     <div className="import-loaded">
@@ -51,9 +52,7 @@ function ImportButton({onImageChange}: IProps): JSX.Element {
     </button>
   );
 
-  return file.hasLoadedImage
-    ? renderLoaded(file.fileName)
-    : renderUnloaded();
+  return file.hasLoadedImage ? renderLoaded(file.fileName) : renderUnloaded();
 }
 
 export default ImportButton;
