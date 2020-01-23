@@ -31,69 +31,23 @@ export default class ImageObject {
   private hiddenImage: HTMLImageElement;
   private imageData: Uint8ClampedArray;
 
-  constructor() {
+  constructor(imageData?: Uint8ClampedArray, dimensions?: Dimensions) {
     this.fileName = "img";
     this.hiddenImage = document.createElement("img");
     this.hiddenImage.height = this.dimensions.height;
     this.hiddenImage.width = this.dimensions.width;
-    this.hiddenCanvas = this.createHiddenCanvas(this.dimensions);
-    this.imageData = new Uint8ClampedArray(
-      this.dimensions.height * this.dimensions.width
-    );
-  }
+    this.hiddenCanvas = createHiddenCanvas(this.dimensions);
 
-  async loadImage(imagefile: File) {
-    this.hiddenImage = await this.loadHiddenImage(imagefile);
-    this.fileName = imagefile.name;
-    this.setDimensions({
-      height: this.hiddenImage.naturalHeight,
-      width: this.hiddenImage.naturalWidth
-    });
-    this.hiddenCanvas = this.createHiddenCanvas(this.dimensions);
-    const context = this.hiddenCanvas.getContext("2d");
-    if (context != null) {
-      context.drawImage(this.hiddenImage, 0, 0);
-      this.loadImageDataFromCanvas(this.hiddenCanvas);
+    if (imageData) {
+      this.imageData = imageData;
+      if (dimensions) {
+        this.dimensions = dimensions;
+      }
+    } else {
+      this.imageData = new Uint8ClampedArray(
+        this.dimensions.height * this.dimensions.width
+      );
     }
-    console.log(this.dimensions);
-    console.log(this.fileName);
-  }
-
-  private loadImageDataFromCanvas(canvas: HTMLCanvasElement) {
-    const context = canvas.getContext("2d");
-    if (context == null) return;
-
-    const _data = context.getImageData(
-      0,
-      0,
-      this.dimensions.width,
-      this.dimensions.height
-    );
-
-    this.imageData = _data.data;
-    console.log(this.imageData);
-  }
-
-  private loadHiddenImage(imagefile: File): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      let image = new Image();
-      image.hidden = true;
-      image.onload = () => resolve(image);
-      image.onerror = reject;
-      image.src = URL.createObjectURL(imagefile);
-    });
-  }
-
-  private createHiddenCanvas(d: Dimensions): HTMLCanvasElement {
-    let hiddenCanvas = document.createElement("canvas");
-    hiddenCanvas.hidden = true;
-    hiddenCanvas.setAttribute("height", d.height + "px");
-    hiddenCanvas.setAttribute("width", d.width + "px");
-    return hiddenCanvas;
-  }
-
-  public setDimensions(d: Dimensions) {
-    this.dimensions = d;
   }
 
   public getPixelColorAt(pos: PixelCoordinates) {
@@ -105,6 +59,60 @@ export default class ImageObject {
     return `rgb(${r}, ${g}, ${b})`;
   }
 }
+
+export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
+  let hiddenImage = await loadHiddenImage(imageFile);
+  let dimensions = {
+    height: hiddenImage.naturalHeight,
+    width: hiddenImage.naturalWidth
+  };
+
+  let hiddenCanvas = createHiddenCanvas(dimensions);
+  const context = hiddenCanvas.getContext("2d");
+  if (context != null) {
+    context.drawImage(hiddenImage, 0, 0);
+    let imageData = loadImageDataFromCanvas(hiddenCanvas, dimensions);
+    if (imageData) {
+      return new ImageObject(imageData, dimensions);
+    }
+  }
+  console.warn("Couldn't load image - loaded blank image instead.");
+  return new ImageObject();
+};
+
+export const createHiddenCanvas = (d: Dimensions): HTMLCanvasElement => {
+  let hiddenCanvas = document.createElement("canvas");
+  hiddenCanvas.hidden = true;
+  hiddenCanvas.setAttribute("height", d.height + "px");
+  hiddenCanvas.setAttribute("width", d.width + "px");
+  return hiddenCanvas;
+};
+
+export const loadImageDataFromCanvas = (
+  canvas: HTMLCanvasElement,
+  dimensions: Dimensions
+): Uint8ClampedArray | void => {
+  const context = canvas.getContext("2d");
+  if (context == null) return;
+  const _data = context.getImageData(0, 0, dimensions.width, dimensions.height);
+  return _data.data;
+};
+
+export const loadHiddenImage = async (
+  imagefile: File
+): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    let image = new Image();
+    image.hidden = true;
+
+    image.onload = () => {
+      resolve(image);
+    };
+
+    image.onerror = reject;
+    image.src = URL.createObjectURL(imagefile);
+  });
+};
 
 const offset = (pos: PixelCoordinates, d: Dimensions) =>
   3 * (pos.y * d.width + pos.x);

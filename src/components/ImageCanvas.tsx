@@ -31,13 +31,11 @@ const getContext = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
 };
 
 function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
+  const [image, setImage] = useState<ImageObject>(imageObject);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(
     canvasRef ? getContext(canvasRef) : null
   );
-  const [mousePosition, setMousePosition] = useState<
-    MouseCoordinate | undefined
-  >(undefined);
   const [scale, setScale] = useState<number>(8);
 
   const setupCanvas = () => {
@@ -74,9 +72,13 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
     }
   };
 
+  const updateImage = () => {
+    setImage(image);
+  };
+
   const drawGrid = () => {
     if (!context) return;
-    const { width, height } = imageObject.dimensions;
+    const { width, height } = image.dimensions;
     context.strokeStyle = "gray";
     context.beginPath();
 
@@ -94,9 +96,22 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
   };
 
   useEffect(() => {
-    drawImage(imageObject);
+    if (context && canvasRef.current) {
+      context.clearRect(
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height
+      );
+    }
+
+    drawImage(image);
     drawGrid();
   });
+
+  useEffect(() => {
+    setImage(imageObject);
+  }, [imageObject]);
 
   return <canvas ref={canvasRef} className="image-canvas" />;
 }
