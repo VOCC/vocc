@@ -48,6 +48,10 @@ export default class ImageObject {
       };
     }
   }
+
+  public getImageData(): Uint8ClampedArray {
+    return this.imageData;
+  }
 }
 
 export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
@@ -88,7 +92,8 @@ export const loadImageDataFromCanvas = (
   return _data.data;
 };
 
-export const loadHiddenImage = async (
+// is async necessary here???? I don't think it is
+export const loadHiddenImage = ( 
   imagefile: File
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {

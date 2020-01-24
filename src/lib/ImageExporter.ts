@@ -5,7 +5,9 @@ export const ImageExporter = {
 };
 
 function getGBAImageString(image: ImageObject): string {
-  return "To be implemented later!";
+  let imageData = image.getImageData();
+  let imageName = image.fileName;
+  return image2hex(imageData, imageName);
 }
 
 function image2hex(data: Uint8ClampedArray, imageName: string): string {
