@@ -11,8 +11,12 @@ export default class ImageObject {
   private hiddenImage: HTMLImageElement;
   private imageData: Uint8ClampedArray;
 
-  constructor(imageData?: Uint8ClampedArray, dimensions?: Dimensions) {
-    this.fileName = "img";
+  constructor(
+    fileName: string,
+    imageData?: Uint8ClampedArray,
+    dimensions?: Dimensions
+  ) {
+    this.fileName = fileName;
     this.hiddenImage = document.createElement("img");
     this.hiddenImage.height = this.dimensions.height;
     this.hiddenImage.width = this.dimensions.width;
@@ -75,11 +79,11 @@ export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
     context.drawImage(hiddenImage, 0, 0);
     let imageData = loadImageDataFromCanvas(hiddenCanvas, dimensions);
     if (imageData) {
-      return new ImageObject(imageData, dimensions);
+      return new ImageObject(imageFile.name, imageData, dimensions);
     }
   }
   console.warn("Couldn't load image - loaded blank image instead.");
-  return new ImageObject();
+  return new ImageObject("img");
 };
 
 export const createHiddenCanvas = (d: Dimensions): HTMLCanvasElement => {

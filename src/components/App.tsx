@@ -4,14 +4,14 @@ import ExportButton from "./ExportButton";
 import ImageCanvas from "./ImageCanvas";
 import ImageObject, * as Loader from "./ImageObject";
 import "../styles/app.scss";
-import { ImageExporter } from "../lib/ImageExporter";
+import * as Exporter from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<ImageObject>(new ImageObject());
+  const [image, setImage] = useState<ImageObject>(new ImageObject("img"));
 
   const handleImageLoad = async (imageFile: ImageFile) => {
     if (imageFile) {
@@ -29,7 +29,7 @@ function App(): JSX.Element {
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      let blob = new Blob([ImageExporter.getGBAImageString(image)], {
+      let blob = new Blob([Exporter.getGBAImageString(image)], {
         type: "text/plain"
       });
       saveAs(blob, fullFileName);
