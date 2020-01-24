@@ -29,25 +29,26 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
   );
   const [scale, setScale] = useState<number>(8);
 
-  const setupCanvas = () => {
-    let canvas = getCanvas(canvasRef);
-    if (!canvas) return;
-    setContext(getContext(canvasRef));
-    if (!context) return;
+  useEffect(() => {
+    const setupCanvas = () => {
+      let canvas = getCanvas(canvasRef);
+      if (!canvas) return;
+      setContext(getContext(canvasRef));
+      if (!context) return;
 
-    var devicePixelRatio = window.devicePixelRatio || 1;
+      var devicePixelRatio = window.devicePixelRatio || 1;
 
-    var rect = canvas.getBoundingClientRect();
+      var rect = canvas.getBoundingClientRect();
 
-    canvas.width = rect.width * devicePixelRatio;
-    canvas.height = rect.height * devicePixelRatio;
+      canvas.width = rect.width * devicePixelRatio;
+      canvas.height = rect.height * devicePixelRatio;
 
-    context.scale(devicePixelRatio, devicePixelRatio);
+      context.scale(devicePixelRatio, devicePixelRatio);
 
-    console.log("Setting up canvas...");
-  };
-
-  useEffect(() => setupCanvas(), [context]);
+      console.log("Setting up canvas...");
+    };
+    setupCanvas();
+  }, [context]);
 
   const drawPixel = (pos: ImageCoordinates, color: Color) => {
     if (!context) return;
