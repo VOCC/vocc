@@ -1,56 +1,40 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import ImportButton from "./ImportButton";
 import ExportButton from "./ExportButton";
 import ImageCanvas from "./ImageCanvas";
+import ImageObject, * as Loader from "./ImageObject";
 import "../styles/app.scss";
-import { image2hex } from "../lib/converter";
+import * as Exporter from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
-
 function App(): JSX.Element {
-  const [imageFile, setImageFile] = useState<ImageFile>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const [image, setImage] = useState<ImageObject>(new ImageObject("img"));
 
-  const handleImageChange = async (imageFile: ImageFile): Promise<void> => {
-    setImageFile(imageFile);
-  }
+  const handleImageLoad = async (imageFile: ImageFile) => {
+    if (imageFile) {
+      let image = await Loader.loadNewImage(imageFile);
+      setImage(image);
+    }
+  };
 
   const handleImageExport = (): void => {
     const alertMsg = () => alert("Please import an image first!");
-    if (!imageFile) {
+    if (!image) {
       alertMsg();
     } else {
-      let canvas = canvasRef.current;
-      let image = imageRef.current;
-
-      if (!canvas || !image) {
-        alertMsg();
-        return;
-      }
-
-      let context = canvas.getContext("2d");
-
-      if (!context) {
-        alertMsg();
-        return;
-      }
-
-      let imageData = context.getImageData(0, 0, image.width, image.height);
-      let hexData = image2hex(imageData.data, imageFile.name);
-      let fileName = imageFile.name;
+      let fileName = image.fileName;
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      let blob = new Blob([hexData], { type: "text/plain" });
-      console.log(imageData.data);
-      console.log(hexData);
+      let blob = new Blob([Exporter.getGBAImageString(image)], {
+        type: "text/plain"
+      });
       saveAs(blob, fullFileName);
     }
-  }
+  };
 
   return (
     <div className="app-container">
@@ -59,9 +43,7 @@ function App(): JSX.Element {
         <span className="subtitle">
           Game Boy Advance Image Editor and Converter
         </span>
-        <ImportButton
-          onImageChange={handleImageChange}
-        />
+        <ImportButton onImageChange={handleImageLoad} />
         <ExportButton startImageExport={handleImageExport} />
       </div>
       <div className="workspace-container">
@@ -69,13 +51,7 @@ function App(): JSX.Element {
           <div className="panel-label">Tools</div>
         </div>
         <div className="image-container">
-          {imageFile ? (
-            <ImageCanvas
-              imageFile={imageFile}
-              canvasRef={canvasRef}
-              imageRef={imageRef}
-            />
-          ) : null}
+          <ImageCanvas imageObject={image} />
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
