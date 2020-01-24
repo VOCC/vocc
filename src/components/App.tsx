@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ImportButton from "./ImportButton";
 import ExportButton from "./ExportButton";
 import ImageCanvas from "./ImageCanvas";
-import ImageObject from "./ImageObject";
+import ImageObject, * as Loader from "./ImageObject";
 import "../styles/app.scss";
 import { ImageExporter } from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
@@ -13,12 +13,11 @@ type ImageFile = File | null;
 function App(): JSX.Element {
   const [image, setImage] = useState<ImageObject>(new ImageObject());
 
-  const handleImageChange = (imageFile: ImageFile) => {
-    let imageObj = new ImageObject();
+  const handleImageLoad = async (imageFile: ImageFile) => {
     if (imageFile) {
-      imageObj.loadImage(imageFile);
+      let image = await Loader.loadNewImage(imageFile);
+      setImage(image);
     }
-    setImage(imageObj);
   };
 
   const handleImageExport = (): void => {
@@ -44,7 +43,7 @@ function App(): JSX.Element {
         <span className="subtitle">
           Game Boy Advance Image Editor and Converter
         </span>
-        <ImportButton onImageChange={handleImageChange} />
+        <ImportButton onImageChange={handleImageLoad} />
         <ExportButton startImageExport={handleImageExport} />
       </div>
       <div className="workspace-container">

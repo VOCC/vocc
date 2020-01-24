@@ -1,11 +1,11 @@
-import ImageObject from "../components/ImageObject"
+import ImageObject from "../components/ImageObject";
 
 export const ImageExporter = {
   getGBAImageString: (image: ImageObject) => getGBAImageString(image)
-}
+};
 
-function getGBAImageString(iamge: ImageObject): string {
-  return "To be implemented later!"
+function getGBAImageString(image: ImageObject): string {
+  return "To be implemented later!";
 }
 
 function image2hex(data: Uint8ClampedArray, imageName: string): string {
