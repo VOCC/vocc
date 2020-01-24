@@ -6,7 +6,7 @@ export const ImageExporter = {
 
 function getGBAImageString(image: ImageObject): string {
   let imageData = image.getImageData();
-  let imageName = image.fileName;
+  let imageName = image.getFileName();
   return image2hex(imageData, imageName);
 }
 

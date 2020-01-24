@@ -25,7 +25,7 @@ function App(): JSX.Element {
     if (!image) {
       alertMsg();
     } else {
-      let fileName = image.fileName;
+      let fileName = image.getFileName();
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
