@@ -1,24 +1,4 @@
-interface Dimensions {
-  height: number;
-  width: number;
-}
-
-interface PixelCoordinates {
-  x: number;
-  y: number;
-}
-
-const COLORS = {
-  R: "r",
-  G: "g",
-  B: "b"
-};
-
-interface color {
-  r: number;
-  g: number;
-  b: number;
-}
+import { Color, Dimensions, ImageCoordinates } from "../lib/interfaces";
 
 export default class ImageObject {
   public fileName: string;
@@ -50,13 +30,23 @@ export default class ImageObject {
     }
   }
 
-  public getPixelColorAt(pos: PixelCoordinates) {
+  public getPixelColorAt(pos: ImageCoordinates): Color {
     const context = this.hiddenCanvas.getContext("2d");
-    if (context == null) return `rgba(0, 0, 0, 1)`;
-    const r = this.imageData[offset(pos, this.dimensions)];
-    const g = this.imageData[offset(pos, this.dimensions) + 1];
-    const b = this.imageData[offset(pos, this.dimensions) + 2];
-    return `rgb(${r}, ${g}, ${b})`;
+    if (context == null) {
+      return {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 0
+      };
+    } else {
+      return {
+        r: this.imageData[offset(pos, this.dimensions)],
+        g: this.imageData[offset(pos, this.dimensions) + 1],
+        b: this.imageData[offset(pos, this.dimensions) + 2],
+        a: this.imageData[offset(pos, this.dimensions) + 3]
+      };
+    }
   }
 }
 
@@ -114,58 +104,5 @@ export const loadHiddenImage = async (
   });
 };
 
-const offset = (pos: PixelCoordinates, d: Dimensions) =>
-  3 * (pos.y * d.width + pos.x);
-
-// function pixel8(image: File, x: number, y: number, w: number, h: number) {
-//   "use strict";
-
-//   // Defaults for x-offset, y-offset, width, and height values
-//   if (typeof x !== "number") x = 0;
-//   if (typeof y !== "number") y = 0;
-//   if (typeof w !== "number") w = image.width;
-//   if (typeof h !== "number") h = image.height;
-
-//   // For our friend Internet Explorer, FlashCanvas is supported
-//   // ExplorerCanvas does not support the getImageData function
-//   var canvas = document.createElement("canvas");
-//   if (canvas.getContext) var ctx = canvas.getContext("2d");
-//   else return;
-
-//   // Draw the image/canvas/video and return a CanvasPixelArray of pixel data
-//   // Image must be from the same origin! Use a server-side proxy if you need cross-domain resources.
-//   // Like this one: http://benalman.com/projects/php-simple-proxy/
-//   // See https://developer.mozilla.org/en-US/docs/HTML/Canvas/Pixel_manipulation_with_canvas
-//   // to find out how to get specific data from the array
-//   // Or just use the pixel8-provided methods below
-//   ctx.drawImage(image, x, y);
-//   var _data = ctx.getImageData(0, 0, w, h);
-//   var data = _data.data;
-//   data.width = _data.width;
-//   data.height = _data.height;
-
-//   // Returns {red, green, blue, alpha} object of a single specified pixel
-//   // or sets the specified pixel.
-//   data.draw = function(ctx, x, y) {
-//     ctx.putImageData(_data, x, y);
-//   };
-
-//   return data;
-// }
-
-// function pixelAt(x, y, set) {
-//   var i = y * this.width * 4 + x * 4;
-
-//   if (set) {
-//     this[i] = set.red;
-//     this[i + 1] = set.green;
-//     this[i + 2] = set.blue;
-//     this[i + 3] = set.alpha;
-//   } else
-//     return {
-//       red: this[i],
-//       green: this[i + 1],
-//       blue: this[i + 2],
-//       alpha: this[i + 3]
-//     };
-// }
+const offset = (pos: ImageCoordinates, d: Dimensions) =>
+  4 * (pos.y * d.width + pos.x);

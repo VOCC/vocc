@@ -1,15 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import ImageObject from "./ImageObject";
-
-interface MouseCoordinate {
-  x: number;
-  y: number;
-}
-
-interface ImageCoordinate {
-  x: number;
-  y: number;
-}
+import { Color, ImageCoordinates } from "../lib/interfaces";
 
 interface ImageCanvasProps {
   imageObject: ImageObject;
@@ -58,9 +49,10 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
 
   useEffect(() => setupCanvas(), [context]);
 
-  const drawPixel = (pos: ImageCoordinate, color: string) => {
+  const drawPixel = (pos: ImageCoordinates, color: Color) => {
     if (!context) return;
-    context.fillStyle = color;
+    let colorString = ``;
+    context.fillStyle = colorString;
     context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
   };
 
