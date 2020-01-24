@@ -51,7 +51,7 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
 
   const drawPixel = (pos: ImageCoordinates, color: Color) => {
     if (!context) return;
-    let colorString = ``;
+    let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
     context.fillStyle = colorString;
     context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
   };
@@ -62,10 +62,6 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
         drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
       }
     }
-  };
-
-  const updateImage = () => {
-    setImage(image);
   };
 
   const drawGrid = () => {
