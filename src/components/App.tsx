@@ -25,7 +25,7 @@ function App(): JSX.Element {
     if (!image) {
       alertMsg();
     } else {
-      let fileName = image.fileName;
+      let fileName = image.getFileName();
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
@@ -34,7 +34,7 @@ function App(): JSX.Element {
       });
       saveAs(blob, fullFileName);
     }
-  };
+  }
 
   return (
     <div className="app-container">
@@ -57,7 +57,7 @@ function App(): JSX.Element {
           <div className="panel-label">Color Palette</div>
         </div>
       </div>
-    </div>
+      </div>
   );
 }
 

@@ -1,8 +1,8 @@
 import { Color, Dimensions, ImageCoordinates } from "../lib/interfaces";
 
 export default class ImageObject {
-  public fileName: string;
-  public dimensions: Dimensions = {
+  private fileName: string;
+  private dimensions: Dimensions = {
     height: 32,
     width: 32
   };
@@ -52,6 +52,18 @@ export default class ImageObject {
       };
     }
   }
+
+  public getImageData(): Uint8ClampedArray {
+    return this.imageData;
+  }
+
+  public getFileName(): string {
+    return this.fileName;
+  }
+
+  public getDimensions(): Dimensions {
+    return this.dimensions;
+  }
 }
 
 export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
@@ -92,7 +104,8 @@ export const loadImageDataFromCanvas = (
   return _data.data;
 };
 
-export const loadHiddenImage = async (
+// is async necessary here???? I don't think it is
+export const loadHiddenImage = ( 
   imagefile: File
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {

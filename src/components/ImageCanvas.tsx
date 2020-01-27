@@ -58,8 +58,9 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
   };
 
   const drawImage = (image: ImageObject) => {
-    for (let x = 0; x < image.dimensions.width; x++) {
-      for (let y = 0; y < image.dimensions.height; y++) {
+    console.log("drawing the image...");
+    for (let x = 0; x < image.getDimensions().width; x++) {
+      for (let y = 0; y < image.getDimensions().height; y++) {
         drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
       }
     }
@@ -67,7 +68,7 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
 
   const drawGrid = () => {
     if (!context) return;
-    const { width, height } = image.dimensions;
+    const { width, height } = image.getDimensions();
     context.strokeStyle = "gray";
     context.beginPath();
 

@@ -7,7 +7,6 @@ interface IProps {
 }
 
 function ExportButton({startImageExport}: IProps): JSX.Element {
-// const ExportButton: React.FC<ExportButtonProps> = ({startImageExport}) => {
   const handleClick = (e: any): void => {
     startImageExport();
   }

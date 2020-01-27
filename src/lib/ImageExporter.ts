@@ -1,7 +1,14 @@
 import ImageObject from "../components/ImageObject";
+import {image2hex} from "./converter";
+
+export const ImageExporter = {
+  getGBAImageString: (image: ImageObject) => getGBAImageString(image)
+};
 
 export function getGBAImageString(image: ImageObject): string {
-  return "To be implemented later!";
+  let imageData = image.getImageData();
+  let imageName = image.getFileName();
+  return image2hex(imageData, imageName);
 }
 
 // function image2hex(data: Uint8ClampedArray, imageName: string): string {
