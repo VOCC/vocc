@@ -24,3 +24,8 @@ export interface Color {
   b: number;
   a: number;
 }
+
+export interface EditorSettings {
+  grid: boolean;
+  startingScale: number;
+}

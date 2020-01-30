@@ -1,9 +1,16 @@
 import React, { useReducer, useState, useRef, useEffect } from "react";
 import ImageObject from "./ImageObject";
-import { Color, ImageCoordinates, Dimensions } from "../lib/interfaces";
+import {
+  Color,
+  ImageCoordinates,
+  Dimensions,
+  EditorSettings
+} from "../lib/interfaces";
 
 interface ImageCanvasProps {
   imageObject: ImageObject;
+  settings: EditorSettings;
+  onChangeScale: (newScale: number) => void;
 }
 
 function scaleReducer(state: number, e: WheelEvent) {
@@ -12,7 +19,11 @@ function scaleReducer(state: number, e: WheelEvent) {
   return newScale < 1 ? 1 : newScale;
 }
 
-function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
+function ImageCanvas({
+  imageObject,
+  settings,
+  onChangeScale
+}: ImageCanvasProps): JSX.Element {
   const [image, setImage] = useState<ImageObject>(imageObject);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(
@@ -22,7 +33,7 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
     height: 0,
     width: 0
   });
-  const [scale, dispatch] = useReducer(scaleReducer, 8);
+  const [scale, dispatch] = useReducer(scaleReducer, settings.startingScale);
 
   useEffect(() => {
     const setupCanvas = () => {
@@ -104,7 +115,11 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
       drawImage(image);
       drawGrid();
     }
-  }, [image, context, scale, canvasSize]);
+  }, [image, context, scale, canvasSize, settings]);
+
+  useEffect(() => {
+    onChangeScale(scale);
+  }, [scale, onChangeScale]);
 
   useEffect(() => {
     setImage(imageObject);

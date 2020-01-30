@@ -1,17 +1,24 @@
 import React, { useState } from "react";
-import ImportButton from "./ImportButton";
-import ExportButton from "./ExportButton";
+import ImportButton from "./buttons/ImportButton";
+import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
 import ImageObject, * as Loader from "./ImageObject";
-import "../styles/app.scss";
 import * as Exporter from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
+import { EditorSettings } from "../lib/interfaces";
+import "../styles/app.scss";
+import "../styles/toolbar.scss";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
 function App(): JSX.Element {
   const [image, setImage] = useState<ImageObject>(new ImageObject("img"));
+  const [editorSettings, setEditorSettings] = useState<EditorSettings>({
+    grid: true,
+    startingScale: 8
+  });
+  const [scale, setScale] = useState<number>(editorSettings.startingScale);
 
   const handleImageLoad = async (imageFile: ImageFile) => {
     if (imageFile) {
@@ -34,7 +41,7 @@ function App(): JSX.Element {
       });
       saveAs(blob, fullFileName);
     }
-  }
+  };
 
   return (
     <div className="app-container">
@@ -49,15 +56,20 @@ function App(): JSX.Element {
       <div className="workspace-container">
         <div className="left-panel">
           <div className="panel-label">Tools</div>
+          <div className="tools-container">Scale: {scale.toFixed(2)}x</div>
         </div>
         <div className="image-container">
-          <ImageCanvas imageObject={image} />
+          <ImageCanvas
+            imageObject={image}
+            settings={editorSettings}
+            onChangeScale={(newScale: number) => setScale(newScale)}
+          />
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
         </div>
       </div>
-      </div>
+    </div>
   );
 }
 
