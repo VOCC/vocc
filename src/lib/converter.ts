@@ -1,7 +1,7 @@
 export function image2hex(data: Uint8ClampedArray, imageName: string): string {
   let image_asHex =
     "const unsigned short " +
-    imageName +
+    imageName.slice(0, imageName.lastIndexOf(".")) +
     "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
   let pixelCount = 0;
   for (var i = 0, j = data.length; i < j; i += 4) {
