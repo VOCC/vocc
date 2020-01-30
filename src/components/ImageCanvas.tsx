@@ -1,6 +1,6 @@
 import React, { useReducer, useState, useRef, useEffect } from "react";
 import ImageObject from "./ImageObject";
-import { Color, ImageCoordinates } from "../lib/interfaces";
+import { Color, ImageCoordinates, Dimensions } from "../lib/interfaces";
 
 interface ImageCanvasProps {
   imageObject: ImageObject;
@@ -17,6 +17,10 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(
     canvasRef ? getContext(canvasRef) : null
   );
+  const [canvasSize, setCanvasSize] = useState<Dimensions>({
+    height: 0,
+    width: 0
+  });
   const [scale, dispatch] = useReducer(scaleReducer, 8);
 
   useEffect(() => {
@@ -32,7 +36,19 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
 
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
+      setCanvasSize({ height: canvas.height, width: canvas.width });
+
       canvas.addEventListener("wheel", e => dispatch(e));
+
+      window.addEventListener("resize", () => {
+        if (canvas) {
+          let devicePixelRatio = window.devicePixelRatio || 1;
+          let rect = canvas.getBoundingClientRect();
+          canvas.width = rect.width * devicePixelRatio;
+          canvas.height = rect.height * devicePixelRatio;
+          setCanvasSize({ height: canvas.height, width: canvas.width });
+        }
+      });
 
       context.scale(devicePixelRatio, devicePixelRatio);
 
@@ -87,7 +103,7 @@ function ImageCanvas({ imageObject }: ImageCanvasProps): JSX.Element {
       drawImage(image);
       drawGrid();
     }
-  }, [image, context, scale]);
+  }, [image, context, scale, canvasSize]);
 
   useEffect(() => {
     setImage(imageObject);
