@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import "../styles/buttons.scss";
+import "../../styles/buttons.scss";
 
 type ImageFile = File | null;
 
