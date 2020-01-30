@@ -7,7 +7,8 @@ interface ImageCanvasProps {
 }
 
 function scaleReducer(state: number, e: WheelEvent) {
-  let newScale = state + e.deltaY;
+  let direction = e.deltaY < 1 ? -1 : 1
+  let newScale = state + direction;
   return newScale < 1 ? 1 : newScale;
 }
 
