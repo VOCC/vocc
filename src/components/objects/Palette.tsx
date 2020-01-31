@@ -1,4 +1,4 @@
-import { Color, Dimensions, ImageCoordinates } from "../lib/interfaces";
+import { Color, Dimensions } from "../../lib/interfaces";
 import ImageObject from "./ImageObject";
 
 const BLACK: Color = {
@@ -24,5 +24,9 @@ export default class Palette {
     return this.colorArray;
   }
 
+  public setColorArray(colorArray: Color[]) {
+    this.colorArray = colorArray;
+  }
+  
   // function edits array, do not mutate state, return new palette
 }

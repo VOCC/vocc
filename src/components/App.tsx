@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ImportButton from "./buttons/ImportButton";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
-import ImageObject, * as Loader from "./ImageObject";
+import ImageObject, * as Loader from "./objects/ImageObject";
 import * as Exporter from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
 import { EditorSettings } from "../lib/interfaces";
