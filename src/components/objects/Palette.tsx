@@ -9,13 +9,14 @@ const BLACK: Color = {
 }
 
 export default class Palette {
-  private dimensions: Dimensions = {
-    height: 16,
-    width: 16
-  }
+  private dimensions: Dimensions;
   private colorArray: Color[];
 
   constructor() { // currently only fills palette with black
+    this.dimensions = {
+      height: 16,
+      width: 16
+    }
     this.colorArray = new Array(this.dimensions.height * this.dimensions.width);
     this.colorArray.fill(BLACK);
   }
