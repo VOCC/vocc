@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { EditorSettings } from "../lib/interfaces";
 import Toggle from "./buttons/Toggle";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBorderAll } from "@fortawesome/free-solid-svg-icons";
 
 type ToolsPanelProps = {
   settings: EditorSettings;
@@ -15,14 +17,14 @@ export default function ToolsPanel({
     <div>
       {/* Grid Toggle */}
       <Toggle
-        state={true}
+        state={settings.grid}
         onClick={() => {
           let newSettings = { ...settings };
           newSettings.grid = !settings.grid;
           onSettingsChange(newSettings);
         }}
       >
-        Grid
+        <FontAwesomeIcon icon={faBorderAll} />
       </Toggle>
     </div>
   );

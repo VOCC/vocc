@@ -1,4 +1,5 @@
 import React, { useState, PropsWithChildren } from "react";
+import "../../styles/buttons.scss";
 
 type ToggleProps = {
   state: boolean;
@@ -10,5 +11,12 @@ export default function Toggle({
   onClick,
   children
 }: PropsWithChildren<ToggleProps>): JSX.Element {
-  return <button onClick={() => onClick(!state)}>{children}</button>;
+  return (
+    <button
+      className={state ? "toggle-on" : "toggle-off"}
+      onClick={() => onClick(!state)}
+    >
+      {children}
+    </button>
+  );
 }
