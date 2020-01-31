@@ -113,7 +113,9 @@ function ImageCanvas({
         canvasRef.current.height
       );
       drawImage(image);
-      drawGrid();
+      if (settings.grid) {
+        drawGrid();
+      }
     }
   }, [image, context, scale, canvasSize, settings]);
 
