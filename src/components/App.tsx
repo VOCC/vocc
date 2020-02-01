@@ -2,18 +2,21 @@ import React, { useState } from "react";
 import ImportButton from "./buttons/ImportButton";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
+import PaletteDisplay from "./PaletteDisplay";
 import ImageObject, * as Loader from "./objects/ImageObject";
 import * as Exporter from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
 import { EditorSettings } from "../lib/interfaces";
 import "../styles/app.scss";
 import "../styles/toolbar.scss";
+import Palette from "./objects/Palette";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
 function App(): JSX.Element {
   const [image, setImage] = useState<ImageObject>(new ImageObject("img"));
+  const [palette, setPalette] = useState<Palette>(new Palette());
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8
@@ -24,6 +27,9 @@ function App(): JSX.Element {
     if (imageFile) {
       let image = await Loader.loadNewImage(imageFile);
       setImage(image);
+      //////////// might change input for Palette constructor later
+      setPalette(new Palette(image));
+      /////////////////////////////////////////////////////////////
     }
   };
 
@@ -67,6 +73,7 @@ function App(): JSX.Element {
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
+          <PaletteDisplay palette={palette}/>
         </div>
       </div>
     </div>
