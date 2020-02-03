@@ -32,14 +32,18 @@ function App(): JSX.Element {
     if (!image) {
       alertMsg();
     } else {
-      let fileName = image.getFileName();
-      let fileType = ".c";
-      let fullFileName =
-        fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      let blob = new Blob([Exporter.getGBAImageString(image)], {
-        type: "text/plain"
-      });
-      saveAs(blob, fullFileName);
+      var jpg = 
+
+      // Export as C file code
+      //-------------------------------------
+      // let fileName = image.getFileName();
+      // let fileType = ".c";
+      // let fullFileName =
+      //   fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
+      // let blob = new Blob([Exporter.getGBAImageString(image)], {
+      //   type: "text/plain"
+      // });
+      // saveAs(blob, fullFileName);
     }
   };
 
