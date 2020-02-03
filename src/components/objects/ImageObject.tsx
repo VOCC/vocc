@@ -1,4 +1,4 @@
-import { Color, Dimensions, ImageCoordinates } from "../lib/interfaces";
+import { Color, Dimensions, ImageCoordinates } from "../../lib/interfaces";
 
 export default class ImageObject {
   private fileName: string;

@@ -1,5 +1,5 @@
 import React, { useReducer, useState, useRef, useEffect } from "react";
-import ImageObject from "./ImageObject";
+import ImageObject from "./objects/ImageObject";
 import {
   Color,
   ImageCoordinates,
