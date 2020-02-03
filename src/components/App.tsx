@@ -27,23 +27,41 @@ function App(): JSX.Element {
     }
   };
 
-  const handleImageExport = (): void => {
+  const handleImageExport = (): void => {                             //will eventually add param in here to handle jpg/png/gba
     const alertMsg = () => alert("Please import an image first!");
     if (!image) {
       alertMsg();
     } else {
-      var jpg = 
+      let type = "PNG";       // this will later become the param
 
-      // Export as C file code
-      //-------------------------------------
-      // let fileName = image.getFileName();
-      // let fileType = ".c";
-      // let fullFileName =
-      //   fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      // let blob = new Blob([Exporter.getGBAImageString(image)], {
-      //   type: "text/plain"
-      // });
-      // saveAs(blob, fullFileName);
+      let gba = false;
+      let fileType = "";
+      switch(type) {
+        case "GBA": 
+          fileType = ".c";
+          gba = true;
+          break;
+        case "JPG": 
+          fileType = ".jpeg";
+          break;
+        case "PNG": 
+          fileType = ".png";
+          break;
+        default:
+          fileType = ".txt";
+      }
+      let fileName = image.getFileName();
+      let fullFileName =
+        fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
+      
+      if (true) {
+        let blob = new Blob([Exporter.exportGBAImage(image, type)]);
+        saveAs(blob, fullFileName);
+      }
+      else {
+        let data = Exporter.exportGBAImage(image, type);
+        saveAs(data, fullFileName);
+      }
     }
   };
 

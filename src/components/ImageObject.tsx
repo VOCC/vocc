@@ -64,6 +64,10 @@ export default class ImageObject {
   public getDimensions(): Dimensions {
     return this.dimensions;
   }
+
+  public getHiddenCanvasURL(type: string): string {
+    return this.hiddenCanvas.toDataURL("image/" + type);
+  }
 }
 
 export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {

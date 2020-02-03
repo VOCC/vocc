@@ -1,16 +1,31 @@
 import ImageObject from "../components/ImageObject";
-import {image2hex} from "./converter";
+import {
+  image2hex,
+  image2jpg,
+  image2png
+} from "./converter";
 
 export const ImageExporter = {
-  getGBAImageString: (image: ImageObject) => getGBAImageString(image)
+  exportGBAImage: (image: ImageObject, type: string) => exportGBAImage(image, type)
 };
 
-export function getGBAImageString(image: ImageObject): string {
-  let imageData = image.getImageData();
-  let imageName = image.getFileName();
-  return image2hex(imageData, imageName);
+export function exportGBAImage(image: ImageObject, type: string): string {
+  switch(type) {
+    case "GBA": return image2hex(image);
+    case "JPG": return image2jpg(image);
+    case "PNG": return image2png(image);
+    default:
+      return "Invalid file type";
+  }
 }
 
+
+// export function getGBAImageString(image: ImageObject): string {
+//   let imageData = image.getImageData();
+//   let imageName = image.getFileName();
+//   return image2hex(image);
+// }
+//
 // function image2hex(data: Uint8ClampedArray, imageName: string): string {
 //   let image_asHex =
 //     "const unsigned short " +

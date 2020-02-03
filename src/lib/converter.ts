@@ -1,4 +1,10 @@
-export function image2hex(data: Uint8ClampedArray, imageName: string): string {
+import ImageObject from "../components/ImageObject";
+import ImageCanvas from "../components/ImageCanvas";
+
+export function image2hex(image: ImageObject): string {
+
+  let data = image.getImageData();
+  let imageName = image.getFileName();
   let image_asHex =
     "const unsigned short " +
     imageName.slice(0, imageName.lastIndexOf(".")) +
@@ -39,4 +45,12 @@ function pixel2hex(bgr: number[]): string {
   }
   hex_value = hex_value.toUpperCase();
   return "0x" + hex_value;
+}
+
+export function image2jpg(img: ImageObject): string {
+  return img.getHiddenCanvasURL("jpeg");
+}
+
+export function image2png(img: ImageObject): string {
+  return img.getHiddenCanvasURL("png");
 }
