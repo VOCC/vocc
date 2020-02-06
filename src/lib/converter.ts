@@ -1,5 +1,4 @@
 import ImageObject from "../components/ImageObject";
-import ImageCanvas from "../components/ImageCanvas";
 
 export function image2hex(image: ImageObject): string {
 
@@ -45,6 +44,32 @@ function pixel2hex(bgr: number[]): string {
   }
   hex_value = hex_value.toUpperCase();
   return "0x" + hex_value;
+}
+
+/*
+    Eventually need to add palette params to generateHFile and image2hex
+    in order to match USENTI's export.
+
+    In order to export both a .h/.c file, I saw that we could zip them.
+    There are a few JS things you can do in order to download both but blocking pop-ups doesn't let you
+
+    Also I pixel2hex is returning a bitmap array when a tilemap array is needed
+*/
+
+
+export function generateHFile(img: ImageObject): string {
+  let imageName = img.getFileName().slice(0, img.getFileName().lastIndexOf("."));
+  let imageArea = img.getDimensions().height * img.getDimensions().width;
+  let toReturn = 
+      "#ifndef " + imageName.toUpperCase() + "_H\n"
+    + "#define " + imageName.toUpperCase() + "_H\n\n"
+    + "#define " + imageName + "TilesLen " + imageArea + "\n"
+    + "extern const unsigned short " + imageName + "Tiles[" + imageArea/2 + "];\n\n"
+    + "#define " + imageName + "PalLen " + "{palette length}" + "\n"
+    + "extern const unsigned short " + imageName + "Pal[" + "palette length / 2" + "];\n\n"
+    + "#endif";
+
+  return toReturn;
 }
 
 export function image2jpg(img: ImageObject): Blob {

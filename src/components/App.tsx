@@ -33,7 +33,7 @@ function App(): JSX.Element {
     if (!image) {
       alertMsg();
     } else {
-      let type = "JPG";       // this will later become the param
+      let type = "GBA";       // this will later become the param
 
       let gba = false;
       let fileType = "";
