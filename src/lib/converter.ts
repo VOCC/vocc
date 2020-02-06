@@ -48,9 +48,9 @@ function pixel2hex(bgr: number[]): string {
 }
 
 export function image2jpg(img: ImageObject): Blob {
-  return img.getImageURI();
+  return img.getImageFileBlob();
 }
 
 export function image2png(img: ImageObject): Blob {
-  return img.getImageURI();
+  return img.getImageFileBlob();
 }

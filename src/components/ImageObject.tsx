@@ -11,16 +11,16 @@ export default class ImageObject {
   private hiddenImage: HTMLImageElement;
   private imageData: Uint8ClampedArray;
 
-  private imageURI: Blob;
+  private imageFileBlob: Blob;
 
   constructor(
     fileName: string,
     imageData?: Uint8ClampedArray,
     dimensions?: Dimensions,
-    imageURI?: Blob
+    imageFileBlob?: Blob
   ) {
     this.fileName = fileName;
-    this.imageURI = imageURI? imageURI : new Blob();
+    this.imageFileBlob = imageFileBlob? imageFileBlob : new Blob();
     this.hiddenImage = document.createElement("img");
     this.hiddenImage.height = this.dimensions.height;
     this.hiddenImage.width = this.dimensions.width;
@@ -69,8 +69,8 @@ export default class ImageObject {
     return this.dimensions;
   }
 
-  public getImageURI(): Blob {
-    return this.imageURI;
+  public getImageFileBlob(): Blob {
+    return this.imageFileBlob;
   }
 }
 
@@ -80,14 +80,14 @@ export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
     height: hiddenImage.naturalHeight,
     width: hiddenImage.naturalWidth
   };
-  let imageURI = new Blob([imageFile]);
+  let imageFileBlob = new Blob([imageFile]);
   let hiddenCanvas = createHiddenCanvas(dimensions);
   const context = hiddenCanvas.getContext("2d");
   if (context != null) {
     context.drawImage(hiddenImage, 0, 0);
     let imageData = loadImageDataFromCanvas(hiddenCanvas, dimensions);
     if (imageData) {
-      return new ImageObject(imageFile.name, imageData, dimensions, imageURI);
+      return new ImageObject(imageFile.name, imageData, dimensions, imageFileBlob);
     }
   }
   console.warn("Couldn't load image - loaded blank image instead.");
