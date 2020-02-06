@@ -3,6 +3,7 @@ import ImportButton from "./buttons/ImportButton";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
 import ImageObject, * as Loader from "./ImageObject";
+import ToolsPanel from "./ToolsPanel";
 import * as Exporter from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
 import { EditorSettings } from "../lib/interfaces";
@@ -65,6 +66,10 @@ function App(): JSX.Element {
     }
   };
 
+  const handleSettingsChange = (newSettings: EditorSettings): void => {
+    setEditorSettings(newSettings);
+  };
+
   return (
     <div className="app-container">
       <div className="navbar">
@@ -78,7 +83,13 @@ function App(): JSX.Element {
       <div className="workspace-container">
         <div className="left-panel">
           <div className="panel-label">Tools</div>
-          <div className="tools-container">Scale: {scale.toFixed(2)}x</div>
+          <div className="tools-container">
+            <div> Scale: {scale.toFixed(2)}x </div>
+            <ToolsPanel
+              settings={editorSettings}
+              onSettingsChange={ns => handleSettingsChange(ns)}
+            ></ToolsPanel>
+          </div>
         </div>
         <div className="image-container">
           <ImageCanvas
