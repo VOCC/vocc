@@ -7,19 +7,19 @@ import {
 
 export const ImageExporter = {
   exportGBAFile: (image: ImageObject) => exportGBAFile(image),
-  exportGBAImage: (canvas: HTMLCanvasElement, type: string) => exportGBAImage(canvas, type)
+  exportGBAImage: (img: ImageObject, type: string) => exportImage(img, type)
 };
 
 export function exportGBAFile(image: ImageObject): string {
   return image2hex(image);
 }
 
-export function exportGBAImage(canvas: HTMLCanvasElement, type: string): string {
+export function exportImage(img: ImageObject, type: string): Blob {
   switch(type) {
-    case "JPG": return image2jpg(canvas);
-    case "PNG": return image2png(canvas);
+    case "JPG": return image2jpg(img);
+    case "PNG": return image2png(img);
     default:
-      return "Invalid file type";
+      return new Blob(["Invalid file type"]);
   }
 }
 

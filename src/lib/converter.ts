@@ -47,10 +47,10 @@ function pixel2hex(bgr: number[]): string {
   return "0x" + hex_value;
 }
 
-export function image2jpg(canvas: HTMLCanvasElement): string {
-  return canvas.toDataURL("image/jpeg");
+export function image2jpg(img: ImageObject): Blob {
+  return img.getImageURI();
 }
 
-export function image2png(canvas: HTMLCanvasElement): string {
-  return canvas.toDataURL("image/png");
+export function image2png(img: ImageObject): Blob {
+  return img.getImageURI();
 }

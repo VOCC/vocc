@@ -32,7 +32,7 @@ function App(): JSX.Element {
     if (!image) {
       alertMsg();
     } else {
-      let type = "PNG";       // this will later become the param
+      let type = "JPG";       // this will later become the param
 
       let gba = false;
       let fileType = "";
@@ -59,7 +59,7 @@ function App(): JSX.Element {
         saveAs(blob, fullFileName);
       }
       else {
-        let data = Exporter.exportGBAImage(image.getHiddenCanvas(), type);
+        let data = Exporter.exportImage(image, type);
         saveAs(data, fullFileName);
       }
     }
