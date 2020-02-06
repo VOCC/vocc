@@ -54,12 +54,12 @@ function App(): JSX.Element {
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
       
-      if (true) {
-        let blob = new Blob([Exporter.exportGBAImage(image, type)]);
+      if (gba) {
+        let blob = new Blob([Exporter.exportGBAFile(image)]);
         saveAs(blob, fullFileName);
       }
       else {
-        let data = Exporter.exportGBAImage(image, type);
+        let data = Exporter.exportGBAImage(image.getHiddenCanvas(), type);
         saveAs(data, fullFileName);
       }
     }

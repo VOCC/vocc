@@ -65,8 +65,8 @@ export default class ImageObject {
     return this.dimensions;
   }
 
-  public getHiddenCanvasURL(type: string): string {
-    return this.hiddenCanvas.toDataURL("image/" + type);
+  public getHiddenCanvas(): HTMLCanvasElement {
+    return this.hiddenCanvas;
   }
 }
 

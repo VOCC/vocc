@@ -6,18 +6,23 @@ import {
 } from "./converter";
 
 export const ImageExporter = {
-  exportGBAImage: (image: ImageObject, type: string) => exportGBAImage(image, type)
+  exportGBAFile: (image: ImageObject) => exportGBAFile(image),
+  exportGBAImage: (canvas: HTMLCanvasElement, type: string) => exportGBAImage(canvas, type)
 };
 
-export function exportGBAImage(image: ImageObject, type: string): string {
+export function exportGBAFile(image: ImageObject): string {
+  return image2hex(image);
+}
+
+export function exportGBAImage(canvas: HTMLCanvasElement, type: string): string {
   switch(type) {
-    case "GBA": return image2hex(image);
-    case "JPG": return image2jpg(image);
-    case "PNG": return image2png(image);
+    case "JPG": return image2jpg(canvas);
+    case "PNG": return image2png(canvas);
     default:
       return "Invalid file type";
   }
 }
+
 
 
 // export function getGBAImageString(image: ImageObject): string {
