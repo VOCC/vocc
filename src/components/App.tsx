@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import ImportButton from "./buttons/ImportButton";
+import { Drawable, EditorSettings } from "../lib/interfaces";
+import { getGBAImageString } from "../lib/exportUtils";
+import { saveAs } from "file-saver";
+import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
 import ImageObject, * as Loader from "./ImageObject";
+import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
-import { getGBAImageString } from "../lib/exportUtils";
-import { saveAs } from "file-saver";
-import { Drawable, EditorSettings } from "../lib/interfaces";
 import "../styles/app.scss";
 import "../styles/toolbar.scss";
 
@@ -17,7 +18,8 @@ function App(): JSX.Element {
   const [image, setImage] = useState<Drawable>(new ImageObject("img"));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    startingScale: 8
+    startingScale: 8,
+    currentTool: Tools.PENCIL
   });
   const [scale, setScale] = useState<number>(editorSettings.startingScale);
 

@@ -1,10 +1,10 @@
-import React, { useReducer, useState, useRef, useEffect } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import {
   Color,
-  ImageCoordinates,
   Dimensions,
   Drawable,
-  EditorSettings
+  EditorSettings,
+  ImageCoordinates
 } from "../lib/interfaces";
 
 interface ImageCanvasProps {
