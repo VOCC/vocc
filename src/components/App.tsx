@@ -4,7 +4,7 @@ import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
 import ImageObject, * as Loader from "./ImageObject";
 import ToolsPanel from "./ToolsPanel";
-import * as Exporter from "../lib/ImageExporter";
+import { getGBAImageString } from "../lib/exportUtils";
 import { saveAs } from "file-saver";
 import { Drawable, EditorSettings } from "../lib/interfaces";
 import "../styles/app.scss";
@@ -37,7 +37,7 @@ function App(): JSX.Element {
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      let blob = new Blob([Exporter.getGBAImageString(image)], {
+      let blob = new Blob([getGBAImageString(image)], {
         type: "text/plain"
       });
       saveAs(blob, fullFileName);
