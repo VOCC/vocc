@@ -1,44 +1,70 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# VOCC: a Game Boy Advance Image Editor/Converter
 
-## Available Scripts
+**Authors**: Logan Bussell, Bennett Hillier, Rosie Blair, Jacob Lambert, John Beckner
 
-In the project directory, you can run:
+## Setting up the development environment
 
-### `yarn start`
+### Windows
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The recommended way to develop on Windows is to use the Windows Subsystem for Linux and then develop as if you were on a Linux machine.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+1. [Install WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10 "WSL installation instructions")
+2. Follow the Linux instructions inside WSL
 
-### `yarn test`
+I also recommend that you use [Visual Studio Code](https://code.visualstudio.com/ "VS Code website") as your text editor on Windows, as it provides first-class support for TypeScript and has the super handy [Remote - WSL](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl "Remote WSL extension webpage") extension.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### macOS
 
-### `yarn build`
+Coming soon (mostly the same as Linux though, just install Node without the package manager, or use [Homebrew](https://brew.sh/ "Homebrew website")).
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Linux
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+First, make sure your Linux installation is fully up to date (on Ubuntu, run `sudo apt update && upgrade`). Then, complete the following steps:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. [Install Node and NPM using the Ubuntu package manager](https://github.com/nodesource/distributions/blob/master/README.md#debinstall "Node github repository readme")  
+   Verify that they are properly installed by checking the versions using `node -v` and `npm -v`. If NPM isn't working, try starting a new terminal window/tab after installing Node.
+2. Install Yarn  
+   `npm i -g yarn` (you may need to use `sudo`)
+3. Clone the source code and move to the directory  
+   `git clone https://github.com/lbussell/vocc`  
+   `cd vocc`
+4. Install dependencies  
+   `yarn`
+5. Start the application  
+   `yarn start`
 
-### `yarn eject`
+## Making Changes
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+See https://help.github.com/en/articles/configuring-a-remote-for-a-fork to configure your own fork of this repo.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**To make changes:**
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+1. Update your fork's `master` branch  
+   The following sequence of commands will switch to your `master` branch, fetch the newest changes from this repo's `master` branch, and then uploads it to your fork's `master` branch.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```
+git checkout master
+git fetch upstream
+git pull upstream master
+git push origin master
+```
 
-## Learn More
+2. Always make changes on a development branch, not on the master branch.  
+   To make changes, create a new branch and then tell git to use your fork and the development branch whenever you push or pull.  
+   Note that git checkout -b bases the new branch on the branch that is currently checked out. You can base your new branch on an existing branch, or the master branch.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+git checkout -b [branch name]
+git push -u origin [branch name]
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. Commit your changes  
+   Once you have made changes and they work, you can move the modified files to
+   the staging area with `git add`, and then commit your changes with git commit. git add path/to/updated/file
+   git commit -m "change file"
+   Note: `git add .` adds all changed files in the current directory (including all
+   children directories).
+   Another note: When committing files, use present tense verbs. Ex. “add player class” “implement basic GUI” etc.
+
+4. Publish your changes  
+   To push your changes to your fork, use `git push`. From there, you can create a pull request to this repository to get your changes reviewed and potentially merged.
