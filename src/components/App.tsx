@@ -30,7 +30,7 @@ function App(): JSX.Element {
 
   const handleImageExport = (): void => {                             //will eventually add param in here to handle jpg/png/gba
     const alertMsg = () => alert("Please import an image first!");
-    if (!image) {
+    if (image.getDimensions().height == 0 && image.getDimensions().width == 0) {
       alertMsg();
     } else {
       let type = "GBA";       // this will later become the param
