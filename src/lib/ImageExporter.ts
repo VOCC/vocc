@@ -1,13 +1,14 @@
 import ImageObject from "../components/ImageObject";
-import {image2hex} from "./converter";
+import { image2hex } from "./converter";
+import { Drawable } from "../lib/interfaces";
 
 export const ImageExporter = {
   getGBAImageString: (image: ImageObject) => getGBAImageString(image)
 };
 
-export function getGBAImageString(image: ImageObject): string {
+export function getGBAImageString(image: Drawable): string {
   let imageData = image.getImageData();
-  let imageName = image.getFileName();
+  let imageName = image.fileName;
   return image2hex(imageData, imageName);
 }
 
