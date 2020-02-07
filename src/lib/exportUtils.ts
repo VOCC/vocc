@@ -1,3 +1,16 @@
+import ImageObject from "../components/ImageObject";
+import { Drawable } from "./interfaces";
+
+export const ImageExporter = {
+  getGBAImageString: (image: ImageObject) => getGBAImageString(image)
+};
+
+export function getGBAImageString(image: Drawable): string {
+  let imageData = image.getImageData();
+  let imageName = image.fileName;
+  return image2hex(imageData, imageName);
+}
+
 export function image2hex(data: Uint8ClampedArray, imageName: string): string {
   let image_asHex =
     "const unsigned short " +

@@ -1,3 +1,17 @@
+import { Tools } from "./consts";
+
+export interface Color {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+export interface Dimensions {
+  height: number;
+  width: number;
+}
+
 export interface Drawable {
   dimensions: Dimensions;
   fileName: string;
@@ -8,19 +22,10 @@ export interface Drawable {
   getImageData: () => Uint8ClampedArray;
 }
 
-export interface MouseCoordinate {
-  x: number;
-  y: number;
-}
-
-export interface ImageCoordinate {
-  x: number;
-  y: number;
-}
-
-export interface Dimensions {
-  height: number;
-  width: number;
+export interface EditorSettings {
+  grid: boolean;
+  startingScale: number;
+  currentTool: Tools;
 }
 
 export interface ImageCoordinates {
@@ -28,14 +33,7 @@ export interface ImageCoordinates {
   y: number;
 }
 
-export interface Color {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
-
-export interface EditorSettings {
-  grid: boolean;
-  startingScale: number;
+export interface MouseCoordinate {
+  x: number;
+  y: number;
 }
