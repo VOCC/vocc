@@ -14,7 +14,7 @@ import "../styles/toolbar.scss";
 type ImageFile = File | null;
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<ImageObject>(new ImageObject("img"));
+  const [image, setImage] = useState<ImageObject>(new ImageObject("img", true));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8
@@ -28,13 +28,11 @@ function App(): JSX.Element {
     }
   };
 
-  const handleImageExport = (): void => {                             //will eventually add param in here to handle jpg/png/gba
+  const handleImageExport = (type: string): void => {                             //will eventually add param in here to handle jpg/png/gba
     const alertMsg = () => alert("Please import an image first!");
-    if (image.getDimensions().height == 0 && image.getDimensions().width == 0) {
+    if (image.isBlankImage()) {
       alertMsg();
     } else {
-      let type = "GBA";       // this will later become the param
-
       let gba = false;
       let fileType = "";
       switch(type) {
@@ -78,7 +76,12 @@ function App(): JSX.Element {
           Game Boy Advance Image Editor and Converter
         </span>
         <ImportButton onImageChange={handleImageLoad} />
-        <ExportButton startImageExport={handleImageExport} />
+        GBA -> 
+        <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
+        PNG ->
+        <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} />
+        JPG ->
+        <ExportButton startImageExport={handleImageExport.bind(null, "JPG")} />
       </div>
       <div className="workspace-container">
         <div className="left-panel">
