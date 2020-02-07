@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { EditorSettings } from "../lib/interfaces";
 import Toggle from "./buttons/Toggle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

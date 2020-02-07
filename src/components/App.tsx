@@ -6,7 +6,7 @@ import ImageObject, * as Loader from "./ImageObject";
 import ToolsPanel from "./ToolsPanel";
 import * as Exporter from "../lib/ImageExporter";
 import { saveAs } from "file-saver";
-import { EditorSettings } from "../lib/interfaces";
+import { Drawable, EditorSettings } from "../lib/interfaces";
 import "../styles/app.scss";
 import "../styles/toolbar.scss";
 
@@ -14,7 +14,7 @@ import "../styles/toolbar.scss";
 type ImageFile = File | null;
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<ImageObject>(new ImageObject("img"));
+  const [image, setImage] = useState<Drawable>(new ImageObject("img"));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8
@@ -33,7 +33,7 @@ function App(): JSX.Element {
     if (!image) {
       alertMsg();
     } else {
-      let fileName = image.getFileName();
+      let fileName = image.fileName;
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
