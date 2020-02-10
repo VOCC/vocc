@@ -1,11 +1,11 @@
 import {
   Color,
   Dimensions,
-  Drawable,
+  ModifiableImage,
   ImageCoordinates
 } from "../lib/interfaces";
 
-export default class ImageObject implements Drawable {
+export default class ImageObject implements ModifiableImage {
   public fileName: string;
   public dimensions: Dimensions = {
     height: 32,
@@ -60,6 +60,12 @@ export default class ImageObject implements Drawable {
         a: this.imageData[offset(pos, this.dimensions) + 3]
       };
     }
+  }
+
+  public setPixelColor(pos: ImageCoordinates, paletteIndex: number) {
+    console.warn("Method setPixelColor in ImageObject not implemented yet. "
+      + "Returning the current image.");
+    return this;
   }
 }
 
