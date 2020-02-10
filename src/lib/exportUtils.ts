@@ -1,4 +1,4 @@
-import ImageObject from "../components/ImageObject";
+import ImageObject from "../components/objects/ImageObject";
 import { Drawable } from "./interfaces";
 
 export const ImageExporter = {

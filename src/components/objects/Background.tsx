@@ -10,12 +10,12 @@ export default class Background {
       this.dimensions = {
         height: 0,
         width: 0
-      }
+      };
     } else {
       this.dimensions = {
-        height: image.getDimensions().height,
-        width: image.getDimensions().width
-      }
+        height: image.dimensions.height,
+        width: image.dimensions.width
+      };
     }
     this.indexArray = new Array(this.dimensions.height * this.dimensions.width);
   }
