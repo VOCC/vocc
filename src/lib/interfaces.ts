@@ -22,6 +22,13 @@ export interface Drawable {
   getImageData: () => Uint8ClampedArray;
 }
 
+export interface ModifiableImage extends Drawable {
+  setPixelColor: (
+    pos: ImageCoordinates,
+    paletteIndex: number
+  ) => ModifiableImage;
+}
+
 export interface EditorSettings {
   grid: boolean;
   startingScale: number;

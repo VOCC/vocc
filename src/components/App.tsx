@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Drawable, EditorSettings } from "../lib/interfaces";
+import { ModifiableImage, EditorSettings } from "../lib/interfaces";
 import { getGBAImageString } from "../lib/exportUtils";
 import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
@@ -15,7 +15,7 @@ import "../styles/toolbar.scss";
 type ImageFile = File | null;
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<Drawable>(new ImageObject("img"));
+  const [image, setImage] = useState<ModifiableImage>(new ImageObject("img"));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8,
