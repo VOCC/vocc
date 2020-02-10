@@ -1,8 +1,13 @@
-import { Color, Dimensions, ImageCoordinates } from "../lib/interfaces";
+import {
+  Color,
+  Dimensions,
+  ModifiableImage,
+  ImageCoordinates
+} from "../lib/interfaces";
 
-export default class ImageObject {
-  private fileName: string;
-  private dimensions: Dimensions = {
+export default class ImageObject implements ModifiableImage {
+  public fileName: string;
+  public dimensions: Dimensions = {
     height: 32,
     width: 32
   };
@@ -41,6 +46,10 @@ export default class ImageObject {
     }
   }
 
+  public getImageData(): Uint8ClampedArray {
+    return this.imageData;
+  }
+
   public getPixelColorAt(pos: ImageCoordinates): Color {
     const context = this.hiddenCanvas.getContext("2d");
     if (context == null) {
@@ -60,16 +69,10 @@ export default class ImageObject {
     }
   }
 
-  public getImageData(): Uint8ClampedArray {
-    return this.imageData;
-  }
-
-  public getFileName(): string {
-    return this.fileName;
-  }
-
-  public getDimensions(): Dimensions {
-    return this.dimensions;
+  public setPixelColor(pos: ImageCoordinates, paletteIndex: number) {
+    console.warn("Method setPixelColor in ImageObject not implemented yet. "
+      + "Returning the current image.");
+    return this;
   }
 
   public getImageFileBlob(): Blob {
@@ -120,9 +123,7 @@ export const loadImageDataFromCanvas = (
 };
 
 // is async necessary here???? I don't think it is
-export const loadHiddenImage = ( 
-  imagefile: File
-): Promise<HTMLImageElement> => {
+export const loadHiddenImage = (imagefile: File): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     let image = new Image();
     image.hidden = true;

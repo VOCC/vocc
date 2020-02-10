@@ -1,4 +1,4 @@
-import React, { useState, PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 import "../../styles/buttons.scss";
 
 type ToggleProps = {

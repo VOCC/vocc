@@ -1,9 +1,19 @@
-import ImageObject from "../components/ImageObject";
+import { Drawable, ModifiableImage } from "./interfaces";
 
-export function image2hex(image: ImageObject): string {
+export const ImageExporter = {
+  getGBAImageString: (image: ModifiableImage) => getGBAImageString(image),
+  generateHFile: (image: ModifiableImage) => generateHFile(image),
+  image2png: (image: ModifiableImage) => image2png(image),
+  image2jpg: (image: ModifiableImage) => image2jpg(image)
+};
 
-  let data = image.getImageData();
-  let imageName = image.getFileName();
+export function getGBAImageString(image: Drawable): string {
+  let imageData = image.getImageData();
+  let imageName = image.fileName;
+  return image2hex(imageData, imageName);
+}
+
+export function image2hex(data: Uint8ClampedArray, imageName: string): string {
   let image_asHex =
     "const unsigned short " +
     imageName.slice(0, imageName.lastIndexOf(".")) +
@@ -57,25 +67,24 @@ function pixel2hex(bgr: number[]): string {
 */
 
 
-export function generateHFile(img: ImageObject): string {
-  let imageName = img.getFileName().slice(0, img.getFileName().lastIndexOf("."));
-  let imageArea = img.getDimensions().height * img.getDimensions().width;
-  let toReturn = 
-      "#ifndef " + imageName.toUpperCase() + "_H\n"
-    + "#define " + imageName.toUpperCase() + "_H\n\n"
-    + "#define " + imageName + "TilesLen " + imageArea + "\n"
-    + "extern const unsigned short " + imageName + "Tiles[" + imageArea/2 + "];\n\n"
-    + "#define " + imageName + "PalLen " + "{palette length}" + "\n"
-    + "extern const unsigned short " + imageName + "Pal[" + "palette length / 2" + "];\n\n"
-    + "#endif";
+export function generateHFile(img: ModifiableImage): string {
+  let imageName = img.fileName.slice(0, img.fileName.lastIndexOf("."));
+  let imageArea = img.dimensions.height * img.dimensions.width;
+  let toReturn = "#ifndef " + imageName.toUpperCase() + "_H\n"
+  toReturn += "#define " + imageName.toUpperCase() + "_H\n\n"
+  toReturn += "#define " + imageName + "TilesLen " + imageArea + "\n"
+  toReturn += "extern const unsigned short " + imageName + "Tiles[" + imageArea/2 + "];\n\n"
+  toReturn += "#define " + imageName + "PalLen {palette length}\n"
+  toReturn += "extern const unsigned short " + imageName + "Pal[palette length / 2];\n\n"
+  toReturn += "#endif";
 
   return toReturn;
 }
 
-export function image2jpg(img: ImageObject): Blob {
+export function image2jpg(img: ModifiableImage): Blob {
   return img.getImageFileBlob();
 }
 
-export function image2png(img: ImageObject): Blob {
+export function image2png(img: ModifiableImage): Blob {
   return img.getImageFileBlob();
 }

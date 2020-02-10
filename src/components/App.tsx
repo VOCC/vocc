@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import ImportButton from "./buttons/ImportButton";
+import { ModifiableImage, EditorSettings } from "../lib/interfaces";
+import { ImageExporter } from "../lib/ImageExporter";
+import { saveAs } from "file-saver";
+import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
 import ImageObject, * as Loader from "./ImageObject";
+import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
-import * as Exporter from "../lib/ImageExporter";
-import { saveAs } from "file-saver";
-import { EditorSettings } from "../lib/interfaces";
 import "../styles/app.scss";
 import "../styles/toolbar.scss";
 
@@ -14,10 +15,11 @@ import "../styles/toolbar.scss";
 type ImageFile = File | null;
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<ImageObject>(new ImageObject("img", true));
+  const [image, setImage] = useState<ModifiableImage>(new ImageObject("img", true));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    startingScale: 8
+    startingScale: 8,
+    currentTool: Tools.PENCIL
   });
   const [scale, setScale] = useState<number>(editorSettings.startingScale);
 
@@ -49,16 +51,22 @@ function App(): JSX.Element {
         default:
           fileType = ".txt";
       }
-      let fileName = image.getFileName();
+      let fileName = image.fileName;
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
       
       if (gba) {
-        let blob = new Blob([Exporter.exportGBAFile(image)]);
+        //.c file
+        let blob = new Blob([ImageExporter.exportCFile(image)]);
+        saveAs(blob, fullFileName);
+        //.h file
+        fullFileName = 
+          fileName.slice(0, fileName.lastIndexOf(".")) + ".h";
+        blob = new Blob ([ImageExporter.exportHFile(image)]);
         saveAs(blob, fullFileName);
       }
       else {
-        let data = Exporter.exportImage(image, type);
+        let data = ImageExporter.exportImage(image, type);
         saveAs(data, fullFileName);
       }
     }
