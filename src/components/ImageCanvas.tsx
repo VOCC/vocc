@@ -1,14 +1,14 @@
-import React, { useReducer, useState, useRef, useEffect } from "react";
-import ImageObject from "./objects/ImageObject";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import {
   Color,
-  ImageCoordinates,
   Dimensions,
-  EditorSettings
+  ModifiableImage,
+  EditorSettings,
+  ImageCoordinates
 } from "../lib/interfaces";
 
 interface ImageCanvasProps {
-  imageObject: ImageObject;
+  imageObject: ModifiableImage;
   settings: EditorSettings;
   onChangeScale: (newScale: number) => void;
 }
@@ -24,7 +24,7 @@ function ImageCanvas({
   settings,
   onChangeScale
 }: ImageCanvasProps): JSX.Element {
-  const [image, setImage] = useState<ImageObject>(imageObject);
+  const [image, setImage] = useState<ModifiableImage>(imageObject);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(
     canvasRef ? getContext(canvasRef) : null
@@ -72,7 +72,7 @@ function ImageCanvas({
   useEffect(() => {
     const drawGrid = () => {
       if (!context) return;
-      const { width, height } = image.getDimensions();
+      const { width, height } = image.dimensions;
       context.strokeStyle = "gray";
       context.beginPath();
 
@@ -96,10 +96,10 @@ function ImageCanvas({
       context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
     };
 
-    const drawImage = (image: ImageObject) => {
+    const drawImage = (image: ModifiableImage) => {
       console.log("drawing the image...");
-      for (let x = 0; x < image.getDimensions().width; x++) {
-        for (let y = 0; y < image.getDimensions().height; y++) {
+      for (let x = 0; x < image.dimensions.width; x++) {
+        for (let y = 0; y < image.dimensions.height; y++) {
           drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
         }
       }
@@ -113,7 +113,9 @@ function ImageCanvas({
         canvasRef.current.height
       );
       drawImage(image);
-      drawGrid();
+      if (settings.grid) {
+        drawGrid();
+      }
     }
   }, [image, context, scale, canvasSize, settings]);
 

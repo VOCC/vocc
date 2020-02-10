@@ -1,25 +1,28 @@
 import React, { useState } from "react";
-import ImportButton from "./buttons/ImportButton";
+import { ModifiableImage, EditorSettings } from "../lib/interfaces";
+import { getGBAImageString } from "../lib/exportUtils";
+import { saveAs } from "file-saver";
+import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
-import PaletteDisplay from "./PaletteDisplay";
 import ImageObject, * as Loader from "./objects/ImageObject";
-import * as Exporter from "../lib/ImageExporter";
-import { saveAs } from "file-saver";
-import { EditorSettings } from "../lib/interfaces";
+import ImportButton from "./buttons/ImportButton";
+import ToolsPanel from "./ToolsPanel";
 import "../styles/app.scss";
 import "../styles/toolbar.scss";
 import Palette from "./objects/Palette";
+import PaletteDisplay from "./PaletteDisplay";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<ImageObject>(new ImageObject("img"));
   const [palette, setPalette] = useState<Palette>(new Palette());
+  const [image, setImage] = useState<ModifiableImage>(new ImageObject("img"));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    startingScale: 8
+    startingScale: 8,
+    currentTool: Tools.PENCIL
   });
   const [scale, setScale] = useState<number>(editorSettings.startingScale);
 
@@ -38,15 +41,19 @@ function App(): JSX.Element {
     if (!image) {
       alertMsg();
     } else {
-      let fileName = image.getFileName();
+      let fileName = image.fileName;
       let fileType = ".c";
       let fullFileName =
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      let blob = new Blob([Exporter.getGBAImageString(image)], {
+      let blob = new Blob([getGBAImageString(image)], {
         type: "text/plain"
       });
       saveAs(blob, fullFileName);
     }
+  };
+
+  const handleSettingsChange = (newSettings: EditorSettings): void => {
+    setEditorSettings(newSettings);
   };
 
   return (
@@ -62,7 +69,13 @@ function App(): JSX.Element {
       <div className="workspace-container">
         <div className="left-panel">
           <div className="panel-label">Tools</div>
-          <div className="tools-container">Scale: {scale.toFixed(2)}x</div>
+          <div className="tools-container">
+            <div> Scale: {scale.toFixed(2)}x </div>
+            <ToolsPanel
+              settings={editorSettings}
+              onSettingsChange={ns => handleSettingsChange(ns)}
+            ></ToolsPanel>
+          </div>
         </div>
         <div className="image-container">
           <ImageCanvas
@@ -73,7 +86,7 @@ function App(): JSX.Element {
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
-          <PaletteDisplay palette={palette}/>
+          <PaletteDisplay palette={palette} />
         </div>
       </div>
     </div>
