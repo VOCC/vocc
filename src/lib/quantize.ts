@@ -94,8 +94,10 @@ export function quantize(image: ImageObject, depth: number) {
       a: 1
     };
     paletteColorArray[i] = center;
-    for (let j = 1; j < clusters[i][1].length; j++) {
+    console.log()
+    for (let j = 1; j < clusters[i].length; j++) {
       let imageIndex = getColorIndex(imageArr, clusters[i][j]);
+      console.log(imageIndex)
       if (imageIndex !== -1) {
         spriteIndexArray[imageIndex] = i;
       }
@@ -109,6 +111,8 @@ export function quantize(image: ImageObject, depth: number) {
   let sprite = new Sprite();
   sprite.setIndexArray(spriteIndexArray);
   sprite.setDimensions(image.getImageDimensions());
+
+  console.log(spriteIndexArray);
 
   let palette = new Palette(paletteColorArray);
   return palette;
