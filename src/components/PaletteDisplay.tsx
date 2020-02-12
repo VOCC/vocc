@@ -1,21 +1,23 @@
-import React, { useRef, useEffect } from 'react';
-import Palette from './objects/Palette';
+import React, { useRef, useEffect } from "react";
+import Palette from "./objects/Palette";
 
 interface IProps {
-  palette: Palette
+  palette: Palette;
 }
 
-function PaletteDisplay( {palette}: IProps): JSX.Element {
+function PaletteDisplay({ palette }: IProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const scale = 8;
     let context: CanvasRenderingContext2D | null = null;
-    if (canvasRef.current) {context = canvasRef.current.getContext('2d')}
+    if (canvasRef.current) {
+      context = canvasRef.current.getContext("2d");
+    }
 
     const drawGrid = () => {
       if (!context) return;
-      const {height, width} = palette.getDimensions();
+      const { height, width } = palette.dimensions;
       context.strokeStyle = "gray";
       context.beginPath();
 
@@ -31,10 +33,10 @@ function PaletteDisplay( {palette}: IProps): JSX.Element {
 
       context.stroke();
     };
-    
-    const fillPalette =() => {
+
+    const fillPalette = () => {
       const colorArray = palette.getColorArray();
-      console.log('filling palette ...')
+      console.log("filling palette ...");
       console.log(colorArray);
       colorArray.forEach((color, index) => {
         if (!context) return;
@@ -42,10 +44,10 @@ function PaletteDisplay( {palette}: IProps): JSX.Element {
           ${color.r}, ${color.g}, ${color.b}, ${color.a})`;
         context.fillStyle = colorString;
 
-        let x = index % palette.getDimensions().width;
-        let y = Math.floor(index / palette.getDimensions().width);
-        context.fillRect(x * scale, y * scale, scale, scale)
-      })
+        let x = index % palette.dimensions.width;
+        let y = Math.floor(index / palette.dimensions.width);
+        context.fillRect(x * scale, y * scale, scale, scale);
+      });
     };
 
     if (context && canvasRef.current) {
@@ -58,10 +60,9 @@ function PaletteDisplay( {palette}: IProps): JSX.Element {
       fillPalette();
       drawGrid();
     }
+  }, [palette]);
 
-  }, [palette])
-
-  return <canvas ref={canvasRef} className="palette-canvas" />
+  return <canvas ref={canvasRef} className="palette-canvas" />;
 }
 
 export default PaletteDisplay;

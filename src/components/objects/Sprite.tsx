@@ -1,38 +1,54 @@
 import ImageObject from "./ImageObject";
-import { Dimensions } from "../../lib/interfaces";
+import {
+  Color,
+  Dimensions,
+  ImageCoordinates,
+  ModifiableImage,
+  PaletteCoordinates
+} from "../../lib/interfaces";
+import Palette from "./Palette";
 
-export default class Sprite {
-  private indexArray: number[];
-  private dimensions: Dimensions;
+export default class Sprite implements ModifiableImage {
+  public dimensions: Dimensions;
+  public fileName: string;
 
-  constructor(image?: ImageObject) {
-    if (image === undefined) {
-      this.dimensions = {
-        height: 0,
-        width: 0
-      };
-    } else {
-      this.dimensions = {
-        height: image.dimensions.height,
-        width: image.dimensions.width
-      };
-    }
-    this.indexArray = new Array(this.dimensions.height * this.dimensions.width);
+  private data: number[][];
+  private palette: Palette;
+
+  /**
+   *
+   * @param indexArray (rows, columns) a 2D array that represents the colors in
+   *    the image as indices into the palette
+   * @param palette the color palette that the sprite should draw from
+   */
+  constructor(fileName: string, indexArray: number[][], palette: Palette) {
+    this.dimensions = {
+      height: indexArray.length,
+      width: indexArray[0].length
+    };
+    this.fileName = fileName;
+    this.data = indexArray;
+    this.palette = palette;
   }
 
-  public getIndexArray() {
-    return this.indexArray;
+  public getImageData(): Uint8ClampedArray {
+    return new Uint8ClampedArray();
   }
 
-  public setIndexArray(indexArray: number[]) {
-    this.indexArray = indexArray;
+  /**
+   * Returns the color at the specified index in the image by indexing into the
+   * color palette
+   * @param ImageCoordinates the index in the Sprite that you would like to get
+   *    the color at
+   */
+  public getPixelColorAt({ x, y }: ImageCoordinates): Color {
+    return this.palette.getColorAt(this.data[x][y]);
   }
 
-  public getDimensions() {
-    return this.dimensions;
-  }
-
-  public setDimensions(dimensions: Dimensions) {
-    this.dimensions = dimensions;
+  public setPixelColor({ x, y }: ImageCoordinates): ModifiableImage {
+    console.warn(
+      "Setting pixel colors not implemented yet! Returning unchanged image."
+    );
+    return this;
   }
 }

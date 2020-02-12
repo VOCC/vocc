@@ -1,46 +1,30 @@
-import { Color, Dimensions } from "../../lib/interfaces";
+import { Color, Dimensions, PaletteCoordinates } from "../../lib/interfaces";
 import ImageObject from "./ImageObject";
 
-const BLACK: Color = {
-  r: 0,
-  g: 0,
-  b: 0,
-  a: 1
-}
+const PALETTE_SIZE: Dimensions = { height: 16, width: 16 };
 
-const RED: Color = {
-  r: 255,
-  g: 0,
-  b: 0,
-  a: 1
-}
-
-const GREEN: Color = {
-  r: 0,
-  g: 255,
-  b: 0,
-  a: 1
-}
-
-const BLUE: Color = {
-  r: 0,
-  g: 0,
-  b: 255,
-  a: 1
-}
+const BLACK: Color = { r: 0, g: 0, b: 0, a: 1 };
+const RED: Color = { r: 255, g: 0, b: 0, a: 1 };
+const GREEN: Color = { r: 0, g: 255, b: 0, a: 1 };
+const BLUE: Color = { r: 0, g: 0, b: 255, a: 1 };
 
 export default class Palette {
-  private dimensions: Dimensions;
+  public dimensions: Dimensions;
   private colorArray: Color[];
 
   // constructor input will be the inputs needed for generatePalette() function
-  constructor(image?: ImageObject, colorArray?: Color[], dimensions?: Dimensions) { // currently only fills palette with black
+  constructor(
+    image?: ImageObject,
+    colorArray?: Color[],
+    dimensions?: Dimensions
+  ) {
+    // currently only fills palette with black
     if (dimensions === undefined) {
       if (image === undefined) {
         this.dimensions = {
           height: 16,
           width: 16
-        }
+        };
       } else {
         this.dimensions = image.getImageDimensions();
       }
@@ -63,9 +47,11 @@ export default class Palette {
         }
         if (i % 4 === 1) {
           this.colorArray[i] = GREEN;
-        }if (i % 4 === 2) {
+        }
+        if (i % 4 === 2) {
           this.colorArray[i] = BLUE;
-        }if (i % 4 === 3) {
+        }
+        if (i % 4 === 3) {
           this.colorArray[i] = BLACK;
         }
       }
@@ -73,17 +59,17 @@ export default class Palette {
     }
   }
 
-  public getColorArray() {
+  public getColorArray(): Color[] {
     return this.colorArray;
   }
 
-  public getDimensions() {
-    return this.dimensions;
+  public getColorAt(pos: PaletteCoordinates | number): Color {
+    if (pos instanceof Number) {
+      return this.colorArray[pos as number];
+    } else {
+      const paletteOffset = ({ row, col }: PaletteCoordinates): number =>
+        row * PALETTE_SIZE.width + col;
+      return this.colorArray[paletteOffset(pos as PaletteCoordinates)];
+    }
   }
-
-  // public setColorArray(colorArray: Color[]) {
-  //   this.colorArray = colorArray;
-  // }
-  
-  // function edits array, do not mutate state, return new palette
 }

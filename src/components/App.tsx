@@ -30,12 +30,15 @@ function App(): JSX.Element {
   const handleImageLoad = async (imageFile: ImageFile) => {
     if (imageFile) {
       let image = await Loader.loadNewImage(imageFile);
-      setImage(image);
-      console.log("handleImageLoad")
-      //////////// might change input for Palette constructor later
-      var palette = quantize(image, 16);
+      console.log("handleImageLoad");
+
+      var { palette, sprite } = quantize(image, 16);
+
+      console.log("Palette:", palette);
+      console.log("Sprite:", sprite);
+
+      setImage(sprite);
       setPalette(palette);
-      /////////////////////////////////////////////////////////////
     }
   };
 
