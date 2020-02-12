@@ -3,7 +3,7 @@ import {
   Dimensions,
   ModifiableImage,
   ImageCoordinates
-} from "../lib/interfaces";
+} from "../../lib/interfaces";
 
 export default class ImageObject implements ModifiableImage {
   public fileName: string;
@@ -50,6 +50,10 @@ export default class ImageObject implements ModifiableImage {
     return this.imageData;
   }
 
+  public getImageDimensions() {
+    return this.dimensions;
+  }
+
   public getPixelColorAt(pos: ImageCoordinates): Color {
     const context = this.hiddenCanvas.getContext("2d");
     if (context == null) {
@@ -70,8 +74,10 @@ export default class ImageObject implements ModifiableImage {
   }
 
   public setPixelColor(pos: ImageCoordinates, paletteIndex: number) {
-    console.warn("Method setPixelColor in ImageObject not implemented yet. "
-      + "Returning the current image.");
+    console.warn(
+      "Method setPixelColor in ImageObject not implemented yet. " +
+        "Returning the current image."
+    );
     return this;
   }
 

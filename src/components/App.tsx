@@ -5,16 +5,20 @@ import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
-import ImageObject, * as Loader from "./ImageObject";
+import ImageObject, * as Loader from "./objects/ImageObject";
 import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
 import "../styles/app.scss";
 import "../styles/toolbar.scss";
+import Palette from "./objects/Palette";
+import PaletteDisplay from "./PaletteDisplay";
+import { quantize } from "../lib/quantize";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
 function App(): JSX.Element {
+  const [palette, setPalette] = useState<Palette>(new Palette());
   const [image, setImage] = useState<ModifiableImage>(new ImageObject("img", true));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
@@ -27,6 +31,11 @@ function App(): JSX.Element {
     if (imageFile) {
       let image = await Loader.loadNewImage(imageFile);
       setImage(image);
+      console.log("handleImageLoad")
+      //////////// might change input for Palette constructor later
+      var palette = quantize(image, 16);
+      setPalette(palette);
+      /////////////////////////////////////////////////////////////
     }
   };
 
@@ -111,6 +120,7 @@ function App(): JSX.Element {
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
+          <PaletteDisplay palette={palette} />
         </div>
       </div>
     </div>
