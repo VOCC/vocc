@@ -51,6 +51,10 @@ function App(): JSX.Element {
           fileType = ".c";
           gba = true;
           break;
+        case "PAL": 
+          fileType = ".pal";
+          gba = true;
+         break;
         case "JPG": 
           fileType = ".jpeg";
           break;
@@ -65,14 +69,20 @@ function App(): JSX.Element {
         fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
       
       if (gba) {
-        //.c file
-        let blob = new Blob([ImageExporter.exportCFile(image)]);
-        saveAs(blob, fullFileName);
-        //.h file
-        fullFileName = 
-          fileName.slice(0, fileName.lastIndexOf(".")) + ".h";
-        blob = new Blob ([ImageExporter.exportHFile(image)]);
-        saveAs(blob, fullFileName);
+        if (type === "GBA") {
+          //.c file
+          let blob = new Blob([ImageExporter.exportCFile(image)]);
+          saveAs(blob, fullFileName);
+          //.h file
+          fullFileName = 
+            fileName.slice(0, fileName.lastIndexOf(".")) + ".h";
+          blob = new Blob ([ImageExporter.exportHFile(image)]);
+          saveAs(blob, fullFileName);
+        } else {
+          //.pal file
+          let data = new Blob([ImageExporter.exportPalette(palette)]);
+          saveAs(data, fullFileName);
+        }
       }
       else {
         let data = ImageExporter.exportImage(image, type);
@@ -95,6 +105,8 @@ function App(): JSX.Element {
         <ImportButton onImageChange={handleImageLoad} />
         GBA -> 
         <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
+        Pal -> 
+        <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} />
         PNG ->
         <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} />
         JPG ->

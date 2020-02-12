@@ -1,8 +1,10 @@
-import { Drawable, ModifiableImage } from "./interfaces";
+import { Drawable, ModifiableImage, Color } from "./interfaces";
+import Palette from "../components/objects/Palette";
 
 export const ImageExporter = {
   getGBAImageString: (image: ModifiableImage) => getGBAImageString(image),
   generateHFile: (image: ModifiableImage) => generateHFile(image),
+  generatePalFile: (pal: Palette) => generatePalFile(pal),
   image2png: (image: ModifiableImage) => image2png(image),
   image2jpg: (image: ModifiableImage) => image2jpg(image)
 };
@@ -56,6 +58,11 @@ function pixel2hex(bgr: number[]): string {
   return "0x" + hex_value;
 }
 
+function color2hex(color: Color): string {
+  let bgr = [color.b, color.g, color.r];
+  return pixel2hex(bgr);
+}
+
 /*
     Eventually need to add palette params to generateHFile and image2hex
     in order to match USENTI's export.
@@ -64,6 +71,8 @@ function pixel2hex(bgr: number[]): string {
     There are a few JS things you can do in order to download both but blocking pop-ups doesn't let you
 
     Also I pixel2hex is returning a bitmap array when a tilemap array is needed
+
+    Need to add hex2color in order to import existing palette
 */
 
 
@@ -80,6 +89,24 @@ export function generateHFile(img: ModifiableImage): string {
 
   return toReturn;
 }
+
+
+export function generatePalFile(pal: Palette): string {
+  const colorArray = pal.getColorArray();
+  let palFile = "";
+  let count = 0;
+  colorArray.forEach(element => {
+    palFile += color2hex(element) + "\t";
+    if (count === 4) {                //this number can change depending
+      palFile += "\n";                //depending on how we want to format .pal
+      count = 0;
+    } else {
+      count++;
+    }
+  });
+  return palFile;
+}
+
 
 export function image2jpg(img: ModifiableImage): Blob {
   return img.getImageFileBlob();
