@@ -27,32 +27,47 @@ export function quantize(image: ImageObject, depth: number) {
         }
     }
 
+    //no point in trying to find more clusters than we have unique colors
     if (uniqueColors.length < colors) {
         colors = uniqueColors.length;
     }
-    // pick "depth" number of centroids randomly
+
     centroids = new Array();
-    for (i = 0; i < colors; i ++) {
-        centroids[i] = (uniqueColors[i]);
+
+    // pick first unique colors for centroids
+    // for (i = 0; i < colors; i ++) {
+    //     centroids[i] = (uniqueColors[i]);
+    // }
+
+    //pick random unique colors for centroids
+    var picked: number[] = []
+    var random: number;
+    var max = uniqueColors.length;
+    for (i = 0; i < depth; i ++) {
+        do {
+            random = Math.floor(Math.random() * max);
+        } while (picked.includes(random))
+        picked.push(random);
+    }
+    for (i = 0; i < picked.length; i++) {
+        centroids[i] = uniqueColors[picked[i]]
     }
 
-    //////////////////////////////////////// Hard delcaration of centroids and depth to test kmeans
-    // colors = 3;
-    // centroids = [[255,0,0], [0,255,0], [0,0,255]];
-    ////////////////////////////////////////
+    // use K-means to fit all colors in image to 'colors' clusters
+    var clusters = kmeans(JSON.parse(JSON.stringify(imageArr)), JSON.parse(JSON.stringify(centroids)), colors);
 
-    var clusters = kmeans(imageArr, centroids, colors);
-
+    //group centers and points in cluster for sorting
     for (i = 0; i < clusters[0].length; i++) {
         clusters[1][i].push(clusters[0][i]);
     }
-
     clusters = clusters[1]
 
+    // sort clusters from largest to smallest
     clusters.sort(function(a,b) {
         return b[3].length - a[3].length;
     });
 
+    // generate out sprite and palette based on k-means clusters
     var spriteIndexArray: number[] = [];
     var paletteColorArray: Color[] = [];
 
@@ -73,6 +88,9 @@ export function quantize(image: ImageObject, depth: number) {
         }
     }
 
+    console.log("paletteColorArray")
+    console.log(paletteColorArray)
+
     for (i; i < imageArr.length; i++) {
         paletteColorArray[i] = BLACK;
     }
@@ -85,16 +103,19 @@ export function quantize(image: ImageObject, depth: number) {
     return palette;
 }
 
+// Used to find index of colors for building sprite colorArray
+// This kills the imageArr (imageArr is destroyed by this function)
 function getColorIndex(imageArr: number[][], colorArr: number[]): number {
     for (var i = 0; i < imageArr.length; i++) {
         if (imageArr[i][0] === colorArr[0] && imageArr[i][1] === colorArr[1] && imageArr[i][2] === colorArr[2]) {
-            imageArr[i] = []
+            imageArr[i] = [-1, -1, -1]
             return i;
         }
     }
     return -1;
 }
 
+//converts imageObject into array of colors for k-means
 function imageToArr(image: ImageObject):number[][]  {
     var imageArr = [];
     for (let x = 0; x < image.dimensions.height; x++) {
@@ -108,6 +129,10 @@ function imageToArr(image: ImageObject):number[][]  {
     return imageArr
 }
 
+//used to find clusters of similar points for image depth reduction (quantization)
+//arrayToProcess: number array of colors; [[r, g, b], [r, g, b], ...]
+//centroids: center point of clusters;
+//clusters: number of clusters to generate
 function kmeans(arrayToProcess: number[][], centroids: number[][], clusters: number){	
 	
 	var Groups=[];
@@ -152,7 +177,7 @@ function kmeans(arrayToProcess: number[][], centroids: number[][], clusters: num
 			}
 
 			for(i=0; i < centroids[clusterIterate].length; i++){
-				centroids[clusterIterate][i]=(centroids[clusterIterate][i]/Groups[clusterIterate].length);
+                centroids[clusterIterate][i]=Math.round(Math.min(Math.max((centroids[clusterIterate][i]/Groups[clusterIterate].length), 0), 255));
 
 				if (centroids[clusterIterate][i]!==oldcentroids[clusterIterate][i]){
 					changed=true;
