@@ -99,7 +99,7 @@ export function quantize(image: ImageObject, depth: number) {
     sprite.setIndexArray(spriteIndexArray);
     sprite.setDimensions(image.getImageDimensions());
 
-    var palette = new Palette(image, paletteColorArray, image.getImageDimensions());
+    var palette = new Palette(paletteColorArray);
     return palette;
 }
 
