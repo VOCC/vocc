@@ -43,6 +43,10 @@ export default class ImageObject implements ModifiableImage {
     return this.imageData;
   }
 
+  public getImageDimensions() {
+    return this.dimensions;
+  }
+
   public getPixelColorAt(pos: ImageCoordinates): Color {
     const context = this.hiddenCanvas.getContext("2d");
     if (context == null) {

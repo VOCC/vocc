@@ -34,12 +34,25 @@ export default class Palette {
   private colorArray: Color[];
 
   // constructor input will be the inputs needed for generatePalette() function
-  constructor(image?: ImageObject) { // currently only fills palette with black
-    this.dimensions = {
-      height: 16,
-      width: 16
+  constructor(image?: ImageObject, colorArray?: Color[], dimensions?: Dimensions) { // currently only fills palette with black
+    if (dimensions === undefined) {
+      if (image === undefined) {
+        this.dimensions = {
+          height: 16,
+          width: 16
+        }
+      } else {
+        this.dimensions = image.getImageDimensions();
+      }
+    } else {
+      this.dimensions = dimensions;
     }
     this.colorArray = new Array(this.dimensions.height * this.dimensions.width);
+    if (colorArray !== undefined) {
+      this.colorArray = colorArray;
+      return;
+    }
+
     if (image === undefined) {
       this.colorArray.fill(BLACK);
     } else {

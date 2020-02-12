@@ -12,6 +12,7 @@ import "../styles/app.scss";
 import "../styles/toolbar.scss";
 import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
+import { quantize } from "../lib/quantize";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
@@ -30,8 +31,10 @@ function App(): JSX.Element {
     if (imageFile) {
       let image = await Loader.loadNewImage(imageFile);
       setImage(image);
+      console.log("handleImageLoad")
       //////////// might change input for Palette constructor later
-      setPalette(new Palette(image));
+      var palette = quantize(image, 16);
+      setPalette(palette);
       /////////////////////////////////////////////////////////////
     }
   };

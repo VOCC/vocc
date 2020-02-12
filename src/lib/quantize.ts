@@ -1,6 +1,14 @@
 import ImageObject from "../components/objects/ImageObject";
 import Sprite from "../components/objects/Sprite";
 import Palette from "../components/objects/Palette";
+import { Color } from "./interfaces";
+
+const BLACK: Color = {
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 1
+  }
 
 export function quantize(image: ImageObject, depth: number) {
 
@@ -22,24 +30,69 @@ export function quantize(image: ImageObject, depth: number) {
     if (uniqueColors.length < colors) {
         colors = uniqueColors.length;
     }
-    console.log(uniqueColors.length);
-    console.log(uniqueColors);
-    //pick "depth" number of centroids randomly
-    // centroids = new Array();
-    // for (i = 0; i < colors; i ++) {
-    //     console.log(uniqueColors[i]);
-    //     centroids[i] = (uniqueColors[i]);
-    // }
+    // pick "depth" number of centroids randomly
+    centroids = new Array();
+    for (i = 0; i < colors; i ++) {
+        centroids[i] = (uniqueColors[i]);
+    }
 
     //////////////////////////////////////// Hard delcaration of centroids and depth to test kmeans
-    colors = 3;
-    centroids = [[255,0,0], [0,255,0], [0,0,255]];
+    // colors = 3;
+    // centroids = [[255,0,0], [0,255,0], [0,0,255]];
     ////////////////////////////////////////
 
-    kmeans(imageArr, centroids, colors);
+    var clusters = kmeans(imageArr, centroids, colors);
 
-    //ToDo: sort clusters from largest to smallest
-    //ToDo: generate sprite & palette (maybe create helper functions?)
+    for (i = 0; i < clusters[0].length; i++) {
+        clusters[1][i].push(clusters[0][i]);
+    }
+
+    clusters = clusters[1]
+
+    clusters.sort(function(a,b) {
+        return b[3].length - a[3].length;
+    });
+
+    var spriteIndexArray: number[] = [];
+    var paletteColorArray: Color[] = [];
+
+    for (i = 0; i < clusters.length; i++) {
+        let center: Color = {
+            r: Math.round(Number(clusters[i][0])),
+            g: Math.round(Number(clusters[i][1])),
+            b: Math.round(Number(clusters[i][2])),
+            a: 1
+        };
+        paletteColorArray[i] = center;
+
+        for (var j = 0; j < clusters[i][3].length; j++) {
+            var imageIndex = getColorIndex(imageArr, clusters[i][3][j]);
+            if (imageIndex !== -1) {
+                spriteIndexArray[imageIndex] = i;
+            }
+        }
+    }
+
+    for (i; i < imageArr.length; i++) {
+        paletteColorArray[i] = BLACK;
+    }
+
+    var sprite = new Sprite();
+    sprite.setIndexArray(spriteIndexArray);
+    sprite.setDimensions(image.getImageDimensions());
+
+    var palette = new Palette(image, paletteColorArray, image.getImageDimensions());
+    return palette;
+}
+
+function getColorIndex(imageArr: number[][], colorArr: number[]): number {
+    for (var i = 0; i < imageArr.length; i++) {
+        if (imageArr[i][0] === colorArr[0] && imageArr[i][1] === colorArr[1] && imageArr[i][2] === colorArr[2]) {
+            imageArr[i] = []
+            return i;
+        }
+    }
+    return -1;
 }
 
 function imageToArr(image: ImageObject):number[][]  {
@@ -111,13 +164,13 @@ function kmeans(arrayToProcess: number[][], centroids: number[][], clusters: num
 		iterations++;
 	}while(changed===true && iterations < 1000);
 
-    console.log("kmeans output:")
-    console.log(iterations);
-    console.log(Groups.length);
-    console.log(Groups);
-    console.log("..........")
+    // console.log("kmeans output:")
+    // console.log(iterations);
+    // console.log(Groups.length);
+    // console.log(Groups);
+    // console.log("..........")
 
     var ret = [Groups, centroids];
-    console.log(ret);
+    // console.log(ret);
 	return ret;
 }

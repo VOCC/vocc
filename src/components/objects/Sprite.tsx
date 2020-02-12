@@ -27,4 +27,12 @@ export default class Sprite {
   public setIndexArray(indexArray: number[]) {
     this.indexArray = indexArray;
   }
+
+  public getDimensions() {
+    return this.dimensions;
+  }
+
+  public setDimensions(dimensions: Dimensions) {
+    this.dimensions = dimensions;
+  }
 }
