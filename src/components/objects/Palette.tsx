@@ -1,31 +1,9 @@
 import { Color, Dimensions } from "../../lib/interfaces";
-import ImageObject from "./ImageObject";
 
 const BLACK: Color = {
   r: 0,
   g: 0,
   b: 0,
-  a: 1
-}
-
-const RED: Color = {
-  r: 255,
-  g: 0,
-  b: 0,
-  a: 1
-}
-
-const GREEN: Color = {
-  r: 0,
-  g: 255,
-  b: 0,
-  a: 1
-}
-
-const BLUE: Color = {
-  r: 0,
-  g: 0,
-  b: 255,
   a: 1
 }
 
