@@ -18,6 +18,7 @@ export function quantize(image: ImageObject, depth: number) {
     const MaxPalSize = 256;
 
     //start by checking that there are at least 'depth' unique colors in image
+    // console.log("find colors")
     let uniqueColors = [];
     let uniqueColorsString: String[] = [];
     for (let i = 0; i < imageArr.length; i++) {
@@ -44,7 +45,7 @@ export function quantize(image: ImageObject, depth: number) {
     let picked: number[] = []
     let random: number;
     let max = uniqueColors.length;
-    for (let i = 0; i < depth; i ++) {
+    for (let i = 0; i < colors; i ++) {
         do {
             random = Math.floor(Math.random() * max);
         } while (picked.includes(random))
