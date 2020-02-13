@@ -37,7 +37,6 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     const fillPalette = () => {
       const colorArray = palette.getColorArray();
       console.log("filling palette ...");
-      console.log(colorArray);
       colorArray.forEach((color, index) => {
         if (!context) return;
         let colorString = `rgba(

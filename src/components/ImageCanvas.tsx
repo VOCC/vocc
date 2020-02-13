@@ -97,7 +97,6 @@ function ImageCanvas({
     };
 
     const drawImage = (image: ModifiableImage) => {
-      console.log("drawing the image...");
       for (let x = 0; x < image.dimensions.width; x++) {
         for (let y = 0; y < image.dimensions.height; y++) {
           drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
