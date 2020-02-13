@@ -1,13 +1,17 @@
 import { Drawable, ModifiableImage, Color } from "./interfaces";
 import Palette from "../components/objects/Palette";
 
-export const ImageExporter = {
-  getGBAImageString: (image: ModifiableImage, pal: Palette) => getGBAImageString(image, pal),
-  generateHFile: (image: ModifiableImage, pal: Palette) => generateHFile(image, pal),
-  pal2Hex: (pal: Palette) => pal2Hex(pal),
-  image2png: (image: ModifiableImage) => image2png(image),
-  image2jpg: (image: ModifiableImage) => image2jpg(image)
-};
+// export const ImageExporter = {
+//   getGBAImageString: (image: ModifiableImage, pal: Palette) => getGBAImageString(image, pal),
+//   generateHFile: (image: ModifiableImage, pal: Palette) => generateHFile(image, pal),
+//   pal2Hex: (pal: Palette) => pal2Hex(pal),
+//   image2png: (image: ModifiableImage) => image2png(image),
+//   image2jpg: (image: ModifiableImage) => image2jpg(image),
+//   exportCFile: (image: ModifiableImage, pal: Palette) => exportCFile(image, pal),
+//   exportHFile: (image: ModifiableImage, pal: Palette) => exportHFile(image, pal),
+//   exportPalette: (pal: Palette) => exportPalette(pal),
+//   exportImage: (img: ModifiableImage, type: string) => exportImage(img, type)
+// };
 
 export function getGBAImageString(image: Drawable, pal: Palette): string {
   const imageData = image.getImageData();
@@ -75,31 +79,35 @@ function color2hex(color: Color): string {
     Need to add hex2color in order to import existing palette
 */
 
-
 export function generateHFile(img: ModifiableImage, pal: Palette): string {
   const imageName = img.fileName.slice(0, img.fileName.lastIndexOf("."));
   const imageArea = img.dimensions.height * img.dimensions.width;
   const palArea = pal.dimensions.height * pal.dimensions.width;
-  let toReturn = "#ifndef " + imageName.toUpperCase() + "_H\n"
-  toReturn += "#define " + imageName.toUpperCase() + "_H\n\n"
-  toReturn += "#define " + imageName + "TilesLen " + imageArea + "\n"
-  toReturn += "extern const unsigned short " + imageName + "Tiles[" + imageArea / 2 + "];\n\n"
-  toReturn += "#define " + imageName + "PalLen " + palArea * 2 + "\n"
-  toReturn += "extern const unsigned short " + imageName + "Pal[" + palArea + "];\n\n"
+  let toReturn = "#ifndef " + imageName.toUpperCase() + "_H\n";
+  toReturn += "#define " + imageName.toUpperCase() + "_H\n\n";
+  toReturn += "#define " + imageName + "TilesLen " + imageArea + "\n";
+  toReturn +=
+    "extern const unsigned short " +
+    imageName +
+    "Tiles[" +
+    imageArea / 2 +
+    "];\n\n";
+  toReturn += "#define " + imageName + "PalLen " + palArea * 2 + "\n";
+  toReturn +=
+    "extern const unsigned short " + imageName + "Pal[" + palArea + "];\n\n";
   toReturn += "#endif";
 
   return toReturn;
 }
 
-
 export function pal2Hex(pal: Palette): string {
   const colorArray = pal.getColorArray();
   let palFile = "";
   let count = 0;
-  const alignment = 8;                //this number can change depending depending on how we want to format .pal
+  const alignment = 8; //this number can change depending depending on how we want to format .pal
   colorArray.forEach(element => {
     palFile += color2hex(element) + ",";
-    if (count === alignment) {                
+    if (count === alignment) {
       palFile += "\n";
       count = 0;
     } else {
@@ -111,15 +119,35 @@ export function pal2Hex(pal: Palette): string {
 
 function pal2C(pal: Palette): string {
   const palArea = pal.dimensions.height * pal.dimensions.width;
-  let palC = "const unsigned short powPal[" + palArea + "] __attribute__((aligned(4)))=\n{\n";
+  let palC =
+    "const unsigned short powPal[" +
+    palArea +
+    "] __attribute__((aligned(4)))=\n{\n";
   palC += pal2Hex(pal) + "\n};";
   return palC;
 }
 
-export function image2jpg(img: ModifiableImage): Blob {
-  return img.getImageFileBlob();
+export async function exportImage(
+  img: ModifiableImage,
+  type: string
+): Promise<Blob | null> {
+  switch (type) {
+    case "JPG":
+    case "PNG":
+      return await img.getImageFileBlob();
+    default:
+      return new Blob(["Invalid file type"]);
+  }
 }
 
-export function image2png(img: ModifiableImage): Blob {
-  return img.getImageFileBlob();
+export function exportCFile(image: ModifiableImage, pal: Palette): string {
+  return getGBAImageString(image, pal);
+}
+
+export function exportHFile(image: ModifiableImage, pal: Palette): string {
+  return generateHFile(image, pal);
+}
+
+export function exportPalette(pal: Palette): string {
+  return pal2Hex(pal);
 }

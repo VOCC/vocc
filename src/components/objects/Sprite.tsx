@@ -4,6 +4,7 @@ import {
   ImageCoordinates,
   ModifiableImage
 } from "../../lib/interfaces";
+import * as Loader from "../../lib/imageLoadUtils";
 import Palette from "./Palette";
 
 export default class Sprite implements ModifiableImage {
@@ -12,7 +13,6 @@ export default class Sprite implements ModifiableImage {
 
   private data: number[];
   private palette: Palette;
-  private fileBlob: Blob;               //this parameter was added in order to export as png/jpg
 
   /**
    *
@@ -24,26 +24,53 @@ export default class Sprite implements ModifiableImage {
     fileName: string,
     indexArray: number[],
     palette: Palette,
-    dimensions: Dimensions,
-    fileBlob: Blob
+    dimensions: Dimensions
   ) {
     this.dimensions = dimensions;
     this.fileName = fileName;
     this.data = indexArray;
     this.palette = palette;
-    this.fileBlob = fileBlob;
   }
 
   public getImageData(): Uint8ClampedArray {
     return new Uint8ClampedArray();
   }
 
-  public getImageFileBlob(): Blob {
-    return this.fileBlob;
+  public async getImageFileBlob(): Promise<Blob | null> {
+    const drawPixel = (
+      pos: ImageCoordinates,
+      color: Color,
+      ctx: CanvasRenderingContext2D
+    ) => {
+      const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+      ctx.fillStyle = colorString;
+      ctx.fillRect(pos.x, pos.y, 1, 1);
+    };
+
+    let hiddenCanvas = Loader.createHiddenCanvas(this.dimensions);
+    let context = hiddenCanvas.getContext("2d");
+
+    if (context) {
+      for (let r = 0; r < this.dimensions.height; r++) {
+        for (let c = 0; c < this.dimensions.width; c++) {
+          let pos = { x: c, y: r };
+          drawPixel(pos, this.getPixelColorAt(pos), context);
+        }
+      }
+    } else {
+      console.error(
+        "Failed to get hidden canvas context when constructing image file blob!"
+      );
+    }
+
+    return new Promise(resolve => {
+      hiddenCanvas.toBlob(blob => resolve(blob));
+    });
   }
 
-  public isBlankImage(): boolean {                // set to false because if a sprite is initialized,
-    return false;                                 // an image has been imported (i think this is the case)
+  public isBlankImage(): boolean {
+    // set to false because if a sprite is initialized,
+    return false; // an image has been imported (i think this is the case)
   }
 
   /**
