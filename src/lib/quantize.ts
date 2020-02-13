@@ -1,7 +1,7 @@
 import ImageObject from "../components/objects/ImageObject";
 import Sprite from "../components/objects/Sprite";
 import Palette from "../components/objects/Palette";
-import { Color, Dimensions } from "./interfaces";
+import { Color } from "./interfaces";
 
 const BLACK: Color = {
   r: 0,
@@ -80,9 +80,13 @@ export function quantize(image: ImageObject, depth: number) {
     return b.length - a.length;
   });
 
+  let spriteIndexArrayLength = image.dimensions.height * image.dimensions.width;
+
   // generate out sprite and palette based on k-means clusters
-  let spriteIndexArray: number[] = [];
-  let paletteColorArray: Color[] = [];
+  let spriteIndexArray: number[] = new Array(spriteIndexArrayLength);
+  spriteIndexArray.fill(0, 0, spriteIndexArrayLength);
+
+  let paletteColorArray: Color[] = new Array(256);
 
   //clusters: [center[r,g,b]], [point 1[r,g,b]], ...]
   let i = 0;
@@ -110,34 +114,11 @@ export function quantize(image: ImageObject, depth: number) {
   let palette = new Palette(paletteColorArray);
   let sprite = new Sprite(
     image.fileName,
-    unflattenArray(spriteIndexArray, image.dimensions),
-    palette
+    spriteIndexArray,
+    palette,
+    image.dimensions
   );
   return { sprite: sprite, palette: palette };
-}
-
-function unflattenArray<T>(array: T[], dimensions: Dimensions): T[][] {
-  const reverseOffset = (
-    i: number,
-    d: Dimensions
-  ): { row: number; col: number } => {
-    let row = Math.floor(i / d.width);
-    let col = i % d.width;
-    return { row: row, col: col };
-  };
-
-  let newArray: T[][] = new Array(dimensions.height);
-
-  for (let i = 0; i < newArray.length; i++) {
-    newArray[i] = new Array(dimensions.width);
-  }
-
-  array.forEach((element, i) => {
-    let { row, col } = reverseOffset(i, dimensions);
-    newArray[row][col] = element;
-  });
-
-  return newArray;
 }
 
 // Used to find index of colors for building sprite colorArray
@@ -159,8 +140,8 @@ function getColorIndex(imageArr: number[][], colorArr: number[]): number {
 //converts imageObject into array of colors for k-means
 function imageToArr(image: ImageObject): number[][] {
   let imageArr = [];
-  for (let x = 0; x < image.dimensions.height; x++) {
-    for (let y = 0; y < image.dimensions.width; y++) {
+  for (let y = 0; y < image.dimensions.height; y++) {
+    for (let x = 0; x < image.dimensions.width; x++) {
       let color = image.getPixelColorAt({ x, y });
       imageArr.push([
         Math.round(Math.min(Math.max(color.r, 0), 255)),
@@ -181,7 +162,7 @@ function kmeans(
   centroids: number[][],
   clusters: number
 ): { groups: number[][][]; centers: number[][] } {
-  let Groups = [];
+  let Groups: any[] = [];
   let iterations = 0;
   let tempdistance = 0;
   let oldcentroids: number[][] = JSON.parse(JSON.stringify(centroids));
@@ -189,7 +170,7 @@ function kmeans(
 
   do {
     for (let reset = 0; reset < clusters; reset++) {
-      Groups[reset] = new Array();
+      Groups[reset] = [];
     }
 
     for (let i = 0; i < arrayToProcess.length; i++) {

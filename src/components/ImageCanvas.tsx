@@ -97,8 +97,10 @@ function ImageCanvas({
     };
 
     const drawImage = (image: ModifiableImage) => {
+      // console.log("drawing image of size", image.dimensions);
       for (let x = 0; x < image.dimensions.width; x++) {
         for (let y = 0; y < image.dimensions.height; y++) {
+          // console.log("trying to get color at", x, y);
           drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
         }
       }

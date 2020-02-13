@@ -1,7 +1,8 @@
 import { Color, Dimensions } from "../../lib/interfaces";
 
-const PALETTE_SIZE: Dimensions = { height: 16, width: 16 };
 const BLACK: Color = { r: 0, g: 0, b: 0, a: 1 };
+const PALETTE_SIZE: Dimensions = { height: 16, width: 16 };
+const PALETTE_LENGTH = PALETTE_SIZE.height * PALETTE_SIZE.width;
 
 export default class Palette {
   public dimensions: Dimensions;
@@ -63,6 +64,14 @@ export default class Palette {
   }
 
   public getColorAt(i: number): Color {
+    if (i >= PALETTE_LENGTH) {
+      console.error(
+        "Attempting to access palette at index greater than " +
+          PALETTE_LENGTH +
+          "."
+      );
+    }
+    // console.log("Palette index", i, "Color at index", this.colorArray[i]);
     return this.colorArray[i];
   }
 }

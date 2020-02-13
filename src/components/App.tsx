@@ -29,14 +29,9 @@ function App(): JSX.Element {
 
   const handleImageLoad = async (imageFile: ImageFile) => {
     if (imageFile) {
+      console.log("Loading image...");
       let image = await Loader.loadNewImage(imageFile);
-      console.log("handleImageLoad");
-
-      var { palette, sprite } = quantize(image, 16);
-
-      console.log("Palette:", palette);
-      console.log("Sprite:", sprite);
-
+      let { palette, sprite } = quantize(image, 16);
       setImage(sprite);
       setPalette(palette);
     }
