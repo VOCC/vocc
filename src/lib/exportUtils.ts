@@ -13,13 +13,29 @@ import Palette from "../components/objects/Palette";
 //   exportImage: (img: ModifiableImage, type: string) => exportImage(img, type)
 // };
 
+/*
+  getGBAImageString
+
+  take in ImageObject and Palette
+  get the image array from image2GBA
+  get the palette array from pal2GBA
+  returns the combination of them into one string
+*/
 export function getGBAImageString(image: Drawable, pal: Palette): string {
   const imageData = image.getImageData();
   const imageName = image.fileName;
-  return image2hex(imageData, imageName) + "\n\n" + pal2C(pal);
+  return image2GBA(imageData, imageName) + "\n\n" + pal2GBA(pal);
 }
 
-export function image2hex(data: Uint8ClampedArray, imageName: string): string {
+/*
+  image2GBA
+
+  take in imageData and imageName
+  adds a declaration for the image array in C
+  iterates and converts each pixel
+  returns declaration of array + hex values
+*/
+function image2GBA(data: Uint8ClampedArray, imageName: string): string {
   let image_asHex =
     "const unsigned short " +
     imageName.slice(0, imageName.lastIndexOf(".")) +
@@ -42,6 +58,13 @@ export function image2hex(data: Uint8ClampedArray, imageName: string): string {
   return image_asHex + "\n};";
 }
 
+/*
+  pixel2hex
+
+  takes in a number array [b: number, g: number, r: number]
+  convert each pixel to GBA compatible bgr hex format
+  return hex value of pixel
+*/
 function pixel2hex(bgr: number[]): string {
   // convert to 16-bit binary format: 0bbbbbgggggrrrrr
   let binary_value = "0";
@@ -68,17 +91,12 @@ function color2hex(color: Color): string {
 }
 
 /*
-    Eventually need to add palette params to generateHFile and image2hex
-    in order to match USENTI's export.
+  generateHFile
 
-    In order to export both a .h/.c file, I saw that we could zip them.
-    There are a few JS things you can do in order to download both but blocking pop-ups doesn't let you
-
-    Also I pixel2hex is returning a bitmap array when a tilemap array is needed
-
-    Need to add hex2color in order to import existing palette
+  takes an image and palette
+  formats a string to replicate the header file created by usenti
+  returns the string
 */
-
 export function generateHFile(img: ModifiableImage, pal: Palette): string {
   const imageName = img.fileName.slice(0, img.fileName.lastIndexOf("."));
   const imageArea = img.dimensions.height * img.dimensions.width;
@@ -100,16 +118,29 @@ export function generateHFile(img: ModifiableImage, pal: Palette): string {
   return toReturn;
 }
 
+/*
+  pal2Hex
+  
+  takes in a Palette and converts rgb into hex values 0x00rrggbb
+  outputs string of the converted Palette colorArray
+*/
 export function pal2Hex(pal: Palette): string {
   const colorArray = pal.getColorArray();
   let palFile = "";
-  let count = 0;
-  const alignment = 8; //this number can change depending depending on how we want to format .pal
+  let count = 1;
+  const alignment = 4; //this number can change depending on how we want to format
   colorArray.forEach(element => {
-    palFile += color2hex(element) + ",";
+    let hex = "0x00";
+    hex +=
+      element.r < 16 ? "0" + element.r.toString(16) : element.r.toString(16);
+    hex +=
+      element.g < 16 ? "0" + element.g.toString(16) : element.g.toString(16);
+    hex +=
+      element.b < 16 ? "0" + element.b.toString(16) : element.b.toString(16);
+    palFile += hex + "\t";
     if (count === alignment) {
       palFile += "\n";
-      count = 0;
+      count = 1;
     } else {
       count++;
     }
@@ -117,14 +148,37 @@ export function pal2Hex(pal: Palette): string {
   return palFile;
 }
 
-function pal2C(pal: Palette): string {
+/*
+  pal2GBA
+  
+  takes in a Palette and converts rgb into hex values (binary: 0bbbbbgggggrrrrr)
+  adds a declaration for the palette array in C
+  outputs string with the declaration and converted Palette colorArray
+*/
+function pal2GBA(pal: Palette): string {
   const palArea = pal.dimensions.height * pal.dimensions.width;
+  const colorArray = pal.getColorArray();
+  const colAlignment = 8; //these numbers can change depending depending on how we want to format
+  const rowAlignment = 8; //
+
   let palC =
     "const unsigned short powPal[" +
     palArea +
     "] __attribute__((aligned(4)))=\n{\n";
-  palC += pal2Hex(pal) + "\n};";
-  return palC;
+
+  for (let i = 1; i <= colorArray.length; i++) {
+    const element = colorArray[i - 1];
+    palC += color2hex(element) + ",";
+
+    if (i % colAlignment === 0) {
+      palC += "\n";
+    }
+    if (i % (colAlignment * rowAlignment) === 0) {
+      palC += "\n";
+    }
+  }
+
+  return palC + "};";
 }
 
 export async function exportImage(
