@@ -33,16 +33,10 @@ export function quantize(image: ImageObject, depth: number) {
     colors = uniqueColors.length;
   }
 
-  centroids = [];
-
-  // pick first unique colors for centroids
-  // for (i = 0; i < colors; i ++) {
-  //     centroids[i] = (uniqueColors[i]);
-  // }
-
   //pick unique colors for centroids using binary search to find points with
   //largest average distance
-  let {pickedCentroids, dist} = findCentroids(uniqueColors, colors);
+  let {pickedCentroids} = findCentroids(uniqueColors, colors);
+  // console.log(pickedCentroids)
   centroids = JSON.parse(JSON.stringify(pickedCentroids));
 
   // use K-means to fit all colors in image to 'colors' clusters
@@ -66,15 +60,20 @@ export function quantize(image: ImageObject, depth: number) {
     }
     clusters.push(newCluster);
   }
-
   // sort clusters from largest to smallest
   clusters.sort(function(a, b) {
     return b.length - a.length;
   });
 
+  console.log(clusters)
+
+  let spriteIndexArrayLength = image.dimensions.height * image.dimensions.width;
+
   // generate out sprite and palette based on k-means clusters
-  let spriteIndexArray: number[] = [];
-  let paletteColorArray: Color[] = [];
+  let spriteIndexArray: number[] = new Array(spriteIndexArrayLength);
+  spriteIndexArray.fill(0, 0, spriteIndexArrayLength);
+
+  let paletteColorArray: Color[] = new Array(256);
 
   //clusters: [center[r,g,b]], [point 1[r,g,b]], ...]
   let i = 0;
@@ -88,6 +87,7 @@ export function quantize(image: ImageObject, depth: number) {
     paletteColorArray[i] = center;
     for (let j = 1; j < clusters[i].length; j++) {
       let imageIndex = getColorIndex(imageArr, clusters[i][j]);
+      // console.log(imageIndex);
       if (imageIndex !== -1) {
         spriteIndexArray[imageIndex] = i;
       }
@@ -98,12 +98,14 @@ export function quantize(image: ImageObject, depth: number) {
     paletteColorArray[i] = BLACK;
   }
 
-  let sprite = new Sprite();
-  sprite.setIndexArray(spriteIndexArray);
-  sprite.setDimensions(image.getImageDimensions());
-
   let palette = new Palette(paletteColorArray);
-  return palette;
+  let sprite = new Sprite(
+    image.fileName,
+    spriteIndexArray,
+    palette,
+    image.dimensions
+  );
+  return { sprite: sprite, palette: palette };
 }
 
 // Used to find index of colors for building sprite colorArray
@@ -125,8 +127,8 @@ function getColorIndex(imageArr: number[][], colorArr: number[]): number {
 //converts imageObject into array of colors for k-means
 function imageToArr(image: ImageObject): number[][] {
   let imageArr = [];
-  for (let x = 0; x < image.dimensions.height; x++) {
-    for (let y = 0; y < image.dimensions.width; y++) {
+  for (let y = 0; y < image.dimensions.height; y++) {
+    for (let x = 0; x < image.dimensions.width; x++) {
       let color = image.getPixelColorAt({ x, y });
       imageArr.push([
         Math.round(Math.min(Math.max(color.r, 0), 255)),
@@ -147,7 +149,7 @@ function kmeans(
   centroids: number[][],
   clusters: number
 ): { groups: number[][][]; centers: number[][] } {
-  let Groups = [];
+  let Groups: any[] = [];
   let iterations = 0;
   let tempdistance = 0;
   let oldcentroids: number[][] = JSON.parse(JSON.stringify(centroids));
@@ -155,7 +157,7 @@ function kmeans(
 
   do {
     for (let reset = 0; reset < clusters; reset++) {
-      Groups[reset] = new Array();
+      Groups[reset] = [];
     }
 
     for (let i = 0; i < arrayToProcess.length; i++) {
@@ -275,7 +277,7 @@ function centroidPossible
 
 //binary search to find centroids, reutrn list of centroids with 
 // average largest distance between them
-function findCentroids(uniqueColors: number[][], depth: number):{pickedCentroids: number[][], dist: number} {
+function findCentroids(uniqueColors: number[][], depth: number):{pickedCentroids: number[][]} {
   let maxDist = 442;
   let minDist = 0;
   let midDist = ((maxDist + minDist) / 2);
@@ -298,5 +300,5 @@ function findCentroids(uniqueColors: number[][], depth: number):{pickedCentroids
       minDist = midDist + 1;
     }
   }
-  return {pickedCentroids, dist}
+  return {pickedCentroids}
 }
