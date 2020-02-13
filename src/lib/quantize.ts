@@ -40,19 +40,11 @@ export function quantize(image: ImageObject, depth: number) {
   //     centroids[i] = (uniqueColors[i]);
   // }
 
-  //pick random unique colors for centroids
-  let picked: number[] = [];
-  let random: number;
-  let max = uniqueColors.length;
-  for (let i = 0; i < colors; i++) {
-    do {
-      random = Math.floor(Math.random() * max);
-    } while (picked.includes(random));
-    picked.push(random);
-  }
-  for (let i = 0; i < picked.length; i++) {
-    centroids[i] = uniqueColors[picked[i]];
-  }
+  //pick unique colors for centroids using binary search to find points with
+  //largest average distance
+  let {pickedCentroids, dist} = findCentroids(uniqueColors, colors);
+  centroids = JSON.parse(JSON.stringify(pickedCentroids));
+
   // use K-means to fit all colors in image to 'colors' clusters
   let { groups, centers } = kmeans(
     JSON.parse(JSON.stringify(imageArr)),
@@ -94,10 +86,8 @@ export function quantize(image: ImageObject, depth: number) {
       a: 1
     };
     paletteColorArray[i] = center;
-    console.log()
     for (let j = 1; j < clusters[i].length; j++) {
       let imageIndex = getColorIndex(imageArr, clusters[i][j]);
-      console.log(imageIndex)
       if (imageIndex !== -1) {
         spriteIndexArray[imageIndex] = i;
       }
@@ -111,8 +101,6 @@ export function quantize(image: ImageObject, depth: number) {
   let sprite = new Sprite();
   sprite.setIndexArray(spriteIndexArray);
   sprite.setDimensions(image.getImageDimensions());
-
-  console.log(spriteIndexArray);
 
   let palette = new Palette(paletteColorArray);
   return palette;
@@ -241,4 +229,74 @@ function kmeans(
   // return ret;
 
   return { groups: Groups, centers: centroids };
+}
+
+//function to determine if there exists a group of centroids with specific 
+//average distance between them
+//points: list of points to search
+//midDist: desired average distance
+//numCentroids: number of points to find
+//
+//returns: 
+//possible (boolean)
+//centers (list of points with desired distance)
+function centroidPossible
+(points: number[][], midDist: number, numCentroids: number): 
+{possible: boolean, centers: number[][]} {
+  
+  let centroids = 1;
+  let currColor: number[] = points[0];
+  let possible = false;
+  let centers: number[][] = [];
+
+  centers.push(currColor);
+
+  for (let i = 0; i < points.length; i++) {
+    let dist = 0;
+
+    for (let j = 0; j < points[i].length; j++) {
+      dist += Math.pow(Math.abs(points[i][j] - currColor[j]), 2);
+    }
+    dist = Math.sqrt(dist)
+
+    if (dist >= midDist) {
+      centroids++
+      currColor = points[i];
+      centers.push(points[i]);
+
+      if (centroids >= numCentroids) {
+        possible = true;
+        return {possible, centers}
+      }
+    }
+  }
+  return {possible, centers};
+}
+
+//binary search to find centroids, reutrn list of centroids with 
+// average largest distance between them
+function findCentroids(uniqueColors: number[][], depth: number):{pickedCentroids: number[][], dist: number} {
+  let maxDist = 442;
+  let minDist = 0;
+  let midDist = ((maxDist + minDist) / 2);
+
+  let dist = 0;
+
+  let pickedCentroids: number[][] = [];
+
+  while (minDist <= maxDist) {
+    midDist = ((maxDist + minDist) / 2);
+    let {possible, centers} = centroidPossible(uniqueColors, midDist, depth);
+    
+    if (!possible) {
+      maxDist = midDist - 1;
+    } else {
+      if (dist < midDist) {
+        pickedCentroids = JSON.parse(JSON.stringify(centers));
+        dist = midDist;
+      }
+      minDist = midDist + 1;
+    }
+  }
+  return {pickedCentroids, dist}
 }
