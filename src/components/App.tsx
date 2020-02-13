@@ -42,49 +42,43 @@ function App(): JSX.Element {
     if (image.isBlankImage()) {
       alertMsg();
     } else {
-      let gba = false;
+      let fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
       let fileType = "";
+      let blob = new Blob();
       switch(type) {
-        case "GBA": 
+        case "GBA":
+          //.c file 
           fileType = ".c";
-          gba = true;
+          blob = new Blob([ImageExporter.exportCFile(image, palette)]);
+          saveAs(blob, fileName + fileType);
+          //.h file
+          fileType = ".h";
+          blob = new Blob ([ImageExporter.exportHFile(image, palette)]);
+          saveAs(blob, fileName + fileType);
           break;
         case "PAL": 
+          //.pal file
           fileType = ".pal";
-          gba = true;
+          blob = new Blob([ImageExporter.exportPalette(palette)]);
+          saveAs(blob, fileName + fileType);
          break;
         case "JPG": 
+          //.jpeg file
           fileType = ".jpeg";
-          break;
+          blob = ImageExporter.exportImage(image, type);
+          saveAs(blob, fileName + fileType);
+        break;
         case "PNG": 
+          //.png file
           fileType = ".png";
+          blob = ImageExporter.exportImage(image, type);
+          saveAs(blob, fileName + fileType);
           break;
         default:
+          //default as .txt if unrecognized type is selected
           fileType = ".txt";
-      }
-      let fileName = image.fileName;
-      let fullFileName =
-        fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      
-      if (gba) {
-        if (type === "GBA") {
-          //.c file
-          let blob = new Blob([ImageExporter.exportCFile(image)]);
-          saveAs(blob, fullFileName);
-          //.h file
-          fullFileName = 
-            fileName.slice(0, fileName.lastIndexOf(".")) + ".h";
-          blob = new Blob ([ImageExporter.exportHFile(image)]);
-          saveAs(blob, fullFileName);
-        } else {
-          //.pal file
-          let data = new Blob([ImageExporter.exportPalette(palette)]);
-          saveAs(data, fullFileName);
-        }
-      }
-      else {
-        let data = ImageExporter.exportImage(image, type);
-        saveAs(data, fullFileName);
+          blob = ImageExporter.exportImage(image, type);
+          saveAs(blob, fileName + fileType);
       }
     }
   };

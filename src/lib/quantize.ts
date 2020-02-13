@@ -116,7 +116,8 @@ export function quantize(image: ImageObject, depth: number) {
     image.fileName,
     spriteIndexArray,
     palette,
-    image.dimensions
+    image.dimensions,
+    image.getImageFileBlob()                          //this parameter was added in order to export as png/jpg
   );
   return { sprite: sprite, palette: palette };
 }

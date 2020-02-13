@@ -12,6 +12,7 @@ export default class Sprite implements ModifiableImage {
 
   private data: number[];
   private palette: Palette;
+  private fileBlob: Blob;               //this parameter was added in order to export as png/jpg
 
   /**
    *
@@ -23,16 +24,26 @@ export default class Sprite implements ModifiableImage {
     fileName: string,
     indexArray: number[],
     palette: Palette,
-    dimensions: Dimensions
+    dimensions: Dimensions,
+    fileBlob: Blob
   ) {
     this.dimensions = dimensions;
     this.fileName = fileName;
     this.data = indexArray;
     this.palette = palette;
+    this.fileBlob = fileBlob;
   }
 
   public getImageData(): Uint8ClampedArray {
     return new Uint8ClampedArray();
+  }
+
+  public getImageFileBlob(): Blob {
+    return this.fileBlob;
+  }
+
+  public isBlankImage(): boolean {                // set to false because if a sprite is initialized,
+    return false;                                 // an image has been imported (i think this is the case)
   }
 
   /**
