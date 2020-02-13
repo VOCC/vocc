@@ -1,10 +1,8 @@
-import ImageObject from "./ImageObject";
 import {
   Color,
   Dimensions,
   ImageCoordinates,
-  ModifiableImage,
-  PaletteCoordinates
+  ModifiableImage
 } from "../../lib/interfaces";
 import Palette from "./Palette";
 

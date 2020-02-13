@@ -36,8 +36,3 @@ export interface ImageCoordinates {
   x: number;
   y: number;
 }
-
-export interface PaletteCoordinates {
-  row: number;
-  col: number;
-}

@@ -1,7 +1,7 @@
 import ImageObject from "../components/objects/ImageObject";
 import Sprite from "../components/objects/Sprite";
 import Palette from "../components/objects/Palette";
-import { Color, Dimensions, ImageCoordinates } from "./interfaces";
+import { Color, Dimensions } from "./interfaces";
 
 const BLACK: Color = {
   r: 0,

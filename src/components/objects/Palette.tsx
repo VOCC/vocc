@@ -1,4 +1,4 @@
-import { Color, Dimensions, PaletteCoordinates } from "../../lib/interfaces";
+import { Color, Dimensions } from "../../lib/interfaces";
 
 const PALETTE_SIZE: Dimensions = { height: 16, width: 16 };
 const BLACK: Color = { r: 0, g: 0, b: 0, a: 1 };
@@ -9,16 +9,13 @@ export default class Palette {
 
   // constructor input will be the inputs needed for generatePalette() function
   constructor(colorArray?: Color[]) {
-    this.dimensions = {
-      height: 16,
-      width: 16
-    };
+    this.dimensions = PALETTE_SIZE;
 
     this.colorArray = new Array(this.dimensions.width * this.dimensions.height);
     if (colorArray === undefined) {
       this.colorArray.fill(BLACK);
     } else {
-      if (colorArray.length > 256) {
+      if (colorArray.length > PALETTE_SIZE.height * PALETTE_SIZE.width) {
         console.warn(
           "why would you ever try to make a palette bigger than 16x16 -_-"
         );
