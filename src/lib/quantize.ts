@@ -28,16 +28,16 @@ export function quantize(image: ImageObject, depth: number) {
     }
   }
 
-  //no point in trying to find more clusters than we have unique colors
-  if (uniqueColors.length < colors) {
-    colors = uniqueColors.length;
-  }
-
   //pick unique colors for centroids using binary search to find points with
   //largest average distance
-  let {pickedCentroids} = findCentroids(uniqueColors, colors);
-  // console.log(pickedCentroids)
-  centroids = JSON.parse(JSON.stringify(pickedCentroids));
+  if (colors == 1 || uniqueColors.length < colors) {
+    centroids = uniqueColors;
+    colors = uniqueColors.length;
+  } else {
+    let {pickedCentroids} = findCentroids(uniqueColors, colors);
+    console.log(pickedCentroids)
+    centroids = JSON.parse(JSON.stringify(pickedCentroids));
+  }
 
   // use K-means to fit all colors in image to 'colors' clusters
   let { groups, centers } = kmeans(
@@ -221,7 +221,7 @@ function kmeans(
   } while (changed === true && iterations < 1000);
 
   // console.log("kmeans output:")
-  // console.log(iterations);
+  console.log(iterations);
   // console.log(Groups.length);
   // console.log(Groups);
   // console.log("..........")
