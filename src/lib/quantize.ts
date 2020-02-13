@@ -30,12 +30,12 @@ export function quantize(image: ImageObject, depth: number) {
 
   //pick unique colors for centroids using binary search to find points with
   //largest average distance
-  if (colors == 1 || uniqueColors.length < colors) {
+  if (colors === 1 || uniqueColors.length < colors) {
     centroids = uniqueColors;
     colors = uniqueColors.length;
   } else {
     let {pickedCentroids} = findCentroids(uniqueColors, colors);
-    console.log(pickedCentroids)
+    // console.log(pickedCentroids)
     centroids = JSON.parse(JSON.stringify(pickedCentroids));
   }
 
@@ -79,9 +79,9 @@ export function quantize(image: ImageObject, depth: number) {
   let i = 0;
   for (i; i < clusters.length && i < MaxPalSize; i++) {
     let center: Color = {
-      r: Math.round(Math.min(Math.max(clusters[i][0][0], 0), 255)),
-      g: Math.round(Math.min(Math.max(clusters[i][0][1], 0), 255)),
-      b: Math.round(Math.min(Math.max(clusters[i][0][2], 0), 255)),
+      r: clusters[i][0][0],
+      g: clusters[i][0][1],
+      b: clusters[i][0][2],
       a: 1
     };
     paletteColorArray[i] = center;
@@ -93,7 +93,7 @@ export function quantize(image: ImageObject, depth: number) {
       }
     }
   }
-
+  // console.log(paletteColorArray)
   for (i; i < MaxPalSize; i++) {
     paletteColorArray[i] = BLACK;
   }
@@ -156,9 +156,12 @@ function kmeans(
   let changed = false;
 
   do {
+
     for (let reset = 0; reset < clusters; reset++) {
       Groups[reset] = [];
     }
+    
+    changed = false;
 
     for (let i = 0; i < arrayToProcess.length; i++) {
       let minDist = -1;
@@ -188,20 +191,17 @@ function kmeans(
     }
 
     for (let clusterIterate = 0; clusterIterate < clusters; clusterIterate++) {
-      let totalGroups = Groups[clusterIterate].length;
-      for (let i = 0; i < totalGroups; i++) {
-        let totalGroupsSize = Groups[clusterIterate][i].length;
-        for (let j = 0; j < totalGroupsSize; j++) {
+      for (let i = 0; i < Groups[clusterIterate].length; i++) {
+        for (let j = 0; j < Groups[clusterIterate][i].length; j++) {
           centroids[clusterIterate][j] += Groups[clusterIterate][i][j];
         }
       }
-
       for (let i = 0; i < centroids[clusterIterate].length; i++) {
         centroids[clusterIterate][i] = Math.round(
           Math.min(
             Math.max(
               centroids[clusterIterate][i] /
-                (Groups[clusterIterate].length <= 0
+                (Groups[clusterIterate].length <= 1
                   ? 1
                   : Groups[clusterIterate].length),
               0
@@ -209,7 +209,7 @@ function kmeans(
             255
           )
         );
-
+        
         if (centroids[clusterIterate][i] !== oldcentroids[clusterIterate][i]) {
           changed = true;
           oldcentroids = [];
@@ -220,11 +220,11 @@ function kmeans(
     iterations++;
   } while (changed === true && iterations < 1000);
 
-  // console.log("kmeans output:")
+  console.log("kmeans output:")
   console.log(iterations);
   // console.log(Groups.length);
   // console.log(Groups);
-  // console.log("..........")
+  console.log("..........")
 
   // let ret = [Groups, centroids];
   // console.log(ret);
@@ -277,7 +277,12 @@ function centroidPossible
 
 //binary search to find centroids, reutrn list of centroids with 
 // average largest distance between them
-function findCentroids(uniqueColors: number[][], depth: number):{pickedCentroids: number[][]} {
+function findCentroids(
+   uniqueColors: number[][], 
+   depth: number
+  ):
+   {pickedCentroids: number[][]} 
+  {
   let maxDist = 442;
   let minDist = 0;
   let midDist = ((maxDist + minDist) / 2);
