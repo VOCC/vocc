@@ -15,6 +15,9 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scale = 8;
 
+  /**
+   * method to draw the palette grid
+   */
   const drawGrid = () => {
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
@@ -36,6 +39,10 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     context.stroke();
   };
 
+  /**
+   * method to populate the palette with colors
+   * fills palette index with proper color using palette colorArray
+   */
   const fillPalette = () => {
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
@@ -53,6 +60,10 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     });
   };
 
+  /**
+   * gets mouse position on the palette canvas
+   * @param e MouseEvent
+   */
   const getMousePos = (e: React.MouseEvent): MousePos => {
     if (canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
@@ -67,6 +78,10 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     };
   }
 
+  /**
+   * highlights the palette row with a transparent light blue color
+   * @param row row of palette to select/highlight
+   */
   const highlightRow = (row: number): void => {
     if (row === -1) return;
     if (!canvasRef.current) return;
@@ -80,6 +95,11 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     context.strokeRect(0, row * scale, scale * palette.dimensions.width, scale);
   }
 
+  /**
+   * handles mouse click event
+   * selects the proper row on the palette
+   * @param e MouseEvent
+   */
   const handleClick = (e: React.MouseEvent): void => {
     let mousePos = getMousePos(e);
     if (mousePos.y >= 0 && mousePos.y <= scale * palette.dimensions.width) {
@@ -88,14 +108,18 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     }
   }
 
-  // fills palette on any change
+  /**
+   * fills palette on any change
+  */ 
   useEffect(() => {
     fillPalette();
     drawGrid();
     highlightRow(selected);
   }, [selected]);
 
-  // refills palette when a new image is imported
+  /**
+   * refills palette when a new image is imported
+   */
   useEffect(() => {
     let context: CanvasRenderingContext2D | null = null;
     if (canvasRef.current) {
@@ -113,7 +137,9 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     }
   }, [palette]);
 
-  // initializes an empty palette
+  /**
+   * initializes an empty palette
+   */
   useEffect(() => {
     fillPalette();
     drawGrid();
