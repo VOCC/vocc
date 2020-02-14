@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import Palette from "./objects/Palette";
-import { faPallet } from "@fortawesome/free-solid-svg-icons";
 
 interface IProps {
   palette: Palette
@@ -54,7 +53,7 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     });
   };
 
-  function getMousePos(e: React.MouseEvent): MousePos {
+  const getMousePos = (e: React.MouseEvent): MousePos => {
     if (canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
       return {
@@ -68,7 +67,7 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     };
   }
 
-  function highlightRow(row: number): void {
+  const highlightRow = (row: number): void => {
     if (row === -1) return;
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
@@ -81,7 +80,7 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     context.strokeRect(0, row * scale, scale * palette.dimensions.width, scale);
   }
 
-  function handleClick(e: React.MouseEvent): void {
+  const handleClick = (e: React.MouseEvent): void => {
     let mousePos = getMousePos(e);
     if (mousePos.y >= 0 && mousePos.y <= scale * palette.dimensions.width) {
       const row = Math.floor(mousePos.y / scale);
@@ -120,7 +119,11 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     drawGrid();
   }, []);
 
-  return <canvas ref={canvasRef} onClick={handleClick} className="palette-canvas" />;
+  return <canvas
+    ref={canvasRef}
+    onClick={handleClick}
+    className="palette-canvas"
+  />;
 }
 
 export default PaletteDisplay;
