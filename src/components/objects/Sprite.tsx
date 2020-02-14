@@ -4,6 +4,10 @@ import {
   ImageCoordinates,
   ImageInterface
 } from "../../lib/interfaces";
+import {
+  generateHeaderString,
+  generateCSourceFileString
+} from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
 import Palette from "./Palette";
 
@@ -33,7 +37,22 @@ export default class Sprite implements ImageInterface {
   }
 
   public getImageData(): Uint8ClampedArray {
-    return new Uint8ClampedArray();
+    return new Uint8ClampedArray(this.data);
+  }
+
+  public getHeaderData(): string {
+    return generateHeaderString(
+      {
+        fileName: this.fileName,
+        imageDimensions: this.dimensions,
+        palette: this.palette
+      },
+      4
+    );
+  }
+
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 4, this.palette);
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {

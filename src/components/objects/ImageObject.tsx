@@ -4,6 +4,7 @@ import {
   ImageInterface,
   ImageCoordinates
 } from "../../lib/interfaces";
+import { generateHeaderString } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
 
 export default class ImageObject implements ImageInterface {
@@ -38,6 +39,17 @@ export default class ImageObject implements ImageInterface {
         this.dimensions.height * this.dimensions.width
       );
     }
+  }
+
+  public getHeaderData(): string {
+    return generateHeaderString(
+      { fileName: this.fileName, imageDimensions: this.dimensions },
+      3
+    );
+  }
+
+  public getCSourceData(): string {
+    return "";
   }
 
   public getImageData(): Uint8ClampedArray {
@@ -86,22 +98,3 @@ export default class ImageObject implements ImageInterface {
     return blob;
   }
 }
-
-export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
-  let hiddenImage = await Loader.loadHiddenImage(imageFile);
-  let dimensions = {
-    height: hiddenImage.naturalHeight,
-    width: hiddenImage.naturalWidth
-  };
-  let hiddenCanvas = Loader.createHiddenCanvas(dimensions);
-  const context = hiddenCanvas.getContext("2d");
-  if (context != null) {
-    context.drawImage(hiddenImage, 0, 0);
-    let imageData = Loader.loadImageDataFromCanvas(hiddenCanvas, dimensions);
-    if (imageData) {
-      return new ImageObject(imageFile.name, imageData, dimensions);
-    }
-  }
-  console.warn("Couldn't load image - loaded blank image instead.");
-  return new ImageObject("img");
-};

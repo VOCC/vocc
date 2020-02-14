@@ -1,17 +1,5 @@
-import { ImageInterface, Color } from "./interfaces";
+import { ImageInterface, Color, Dimensions, Mode } from "./interfaces";
 import Palette from "../components/objects/Palette";
-
-// export const ImageExporter = {
-//   getGBAImageString: (image: ModifiableImage, pal: Palette) => getGBAImageString(image, pal),
-//   generateHFile: (image: ModifiableImage, pal: Palette) => generateHFile(image, pal),
-//   pal2Hex: (pal: Palette) => pal2Hex(pal),
-//   image2png: (image: ModifiableImage) => image2png(image),
-//   image2jpg: (image: ModifiableImage) => image2jpg(image),
-//   exportCFile: (image: ModifiableImage, pal: Palette) => exportCFile(image, pal),
-//   exportHFile: (image: ModifiableImage, pal: Palette) => exportHFile(image, pal),
-//   exportPalette: (pal: Palette) => exportPalette(pal),
-//   exportImage: (img: ModifiableImage, type: string) => exportImage(img, type)
-// };
 
 /*
   getGBAImageString
@@ -21,41 +9,120 @@ import Palette from "../components/objects/Palette";
   get the palette array from pal2GBA
   returns the combination of them into one string
 */
-export function getGBAImageString(image: ImageInterface, pal: Palette): string {
-  const imageData = image.getImageData();
-  const imageName = image.fileName;
-  return image2GBA(imageData, imageName) + "\n\n" + pal2GBA(pal);
+export function generateCSourceFileString(
+  image: ImageInterface,
+  mode: Mode,
+  palette?: Palette
+): string {
+  switch (mode) {
+    case 3:
+      return generateMode3CSourceFileString(image);
+    case 4:
+      return generateMode4CSourceFileString(image, palette);
+    default:
+      return generateMode3CSourceFileString(image);
+  }
 }
 
-/*
-  image2GBA
+function generateMode3CSourceFileString(image: ImageInterface): string {
+  // let image_asHex =
+  //   "const unsigned short " +
+  //   imageName.slice(0, imageName.lastIndexOf(".")) +
+  //   "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
+  // let pixelCount = 0;
+  // for (var i = 0, j = data.length; i < j; i += 4) {
+  //   let bgr = [data[i + 2], data[i + 1], data[i]]; // bgr for little endian
+  //   let hexcode = pixelToHex(bgr);
+  //   image_asHex += hexcode + ",";
+  //   pixelCount++;
+  //   if (pixelCount % 8 === 0 && pixelCount < 256) {
+  //     image_asHex += "\n";
+  //     if (pixelCount % 64 === 0) {
+  //       image_asHex += "\n\t";
+  //     } else {
+  //       image_asHex += "\t";
+  //     }
+  //   }
+  // }
+  // return image_asHex + "\n};";
+  return "mode 3 source string";
+}
 
-  take in imageData and imageName
-  adds a declaration for the image array in C
-  iterates and converts each pixel
-  returns declaration of array + hex values
-*/
-function image2GBA(data: Uint8ClampedArray, imageName: string): string {
-  let image_asHex =
-    "const unsigned short " +
-    imageName.slice(0, imageName.lastIndexOf(".")) +
-    "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
-  let pixelCount = 0;
-  for (var i = 0, j = data.length; i < j; i += 4) {
-    let bgr = [data[i + 2], data[i + 1], data[i]]; // bgr for little endian
-    let hexcode = pixel2hex(bgr);
-    image_asHex += hexcode + ",";
-    pixelCount++;
-    if (pixelCount % 8 === 0 && pixelCount < 256) {
-      image_asHex += "\n";
-      if (pixelCount % 64 === 0) {
-        image_asHex += "\n\t";
-      } else {
-        image_asHex += "\t";
-      }
-    }
+function generateMode4CSourceFileString(
+  image: ImageInterface,
+  palette?: Palette
+): string {
+  if (!palette) {
+    console.error(
+      "Tried to generate mode 4 header string with no palette! Falling back to mode 3..."
+    );
+    return generateMode3CSourceFileString(image);
   }
-  return image_asHex + "\n};";
+
+  // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
+  // into a short
+  const variableName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
+  const bitmapLength = image.dimensions.height * image.dimensions.width;
+  const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${bitmapLength /
+    2}]__attribute__((aligned(4)))=\n{\n`;
+
+  const imageData = image.getImageData();
+  let imageDataHexString = "";
+  for (let i = 0; i < imageData.length; i += 2) {
+    imageDataHexString += paletteIndicesToHex(imageData[i], imageData[i + 1]);
+    if ((i / 2 + 1) % 8 === 0) imageDataHexString += `\n`;
+  }
+  const imageDefinitionEnd = `};\n\n`;
+
+  // Palette length is uncompressed
+  const paletteCSourceString = PaletteToGBA(palette);
+
+  const CSourceString =
+    imageDefinitionString +
+    imageDataHexString +
+    imageDefinitionEnd +
+    paletteCSourceString;
+
+  return CSourceString;
+
+  // let image_asHex =
+  //   "const unsigned short " +
+  //   imageName.slice(0, imageName.lastIndexOf(".")) +
+  //   "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
+  // let pixelCount = 0;
+  // for (var i = 0, j = data.length; i < j; i += 4) {
+  //   let bgr = [data[i + 2], data[i + 1], data[i]]; // bgr for little endian
+  //   let hexcode = pixelToHex(bgr);
+  //   image_asHex += hexcode + ",";
+  //   pixelCount++;
+  //   if (pixelCount % 8 === 0 && pixelCount < 256) {
+  //     image_asHex += "\n";
+  //     if (pixelCount % 64 === 0) {
+  //       image_asHex += "\n\t";
+  //     } else {
+  //       image_asHex += "\t";
+  //     }
+  //   }
+  // }
+  // return image_asHex + "\n};";
+}
+
+function paletteIndicesToHex(index1: number, index2: number): string {
+  if (index1 > 255 || index2 > 255) {
+    console.error(
+      `Tried to convert palette indices ${index1} and ${index2}, but at least one is out of range! Truncating bitwise...`
+    );
+  }
+
+  index1 = index1 & 0xff; // Truncate in case the indices are too big
+  index2 = index2 & 0xff;
+
+  const combinedIndexString = (index2 | (index1 << 8))
+    .toString(16)
+    .toUpperCase()
+    .padStart(4, "0");
+
+  return `0x${combinedIndexString}, `;
 }
 
 /*
@@ -65,7 +132,7 @@ function image2GBA(data: Uint8ClampedArray, imageName: string): string {
   convert each pixel to GBA compatible bgr hex format
   return hex value of pixel
 */
-function pixel2hex(bgr: number[]): string {
+function pixelToHex(bgr: number[]): string {
   // convert to 16-bit binary format: 0bbbbbgggggrrrrr
   let binary_value = "0";
   bgr.forEach(element => {
@@ -85,37 +152,86 @@ function pixel2hex(bgr: number[]): string {
   return "0x" + hex_value;
 }
 
-function color2hex(color: Color): string {
+function colorToHex(color: Color): string {
   let bgr = [color.b, color.g, color.r];
-  return pixel2hex(bgr);
+  return pixelToHex(bgr);
 }
 
-/*
-  generateHFile
+interface headerFileParams {
+  fileName: string;
+  imageDimensions: Dimensions;
+  palette?: Palette;
+}
 
-  takes an image and palette
-  formats a string to replicate the header file created by usenti
-  returns the string
-*/
-export function generateHFile(img: ImageInterface, pal: Palette): string {
-  const imageName = img.fileName.slice(0, img.fileName.lastIndexOf("."));
-  const imageArea = img.dimensions.height * img.dimensions.width;
-  const palArea = pal.dimensions.height * pal.dimensions.width;
-  let toReturn = "#ifndef " + imageName.toUpperCase() + "_H\n";
-  toReturn += "#define " + imageName.toUpperCase() + "_H\n\n";
-  toReturn += "#define " + imageName + "TilesLen " + imageArea + "\n";
-  toReturn +=
-    "extern const unsigned short " +
-    imageName +
-    "Tiles[" +
-    imageArea / 2 +
-    "];\n\n";
-  toReturn += "#define " + imageName + "PalLen " + palArea * 2 + "\n";
-  toReturn +=
-    "extern const unsigned short " + imageName + "Pal[" + palArea + "];\n\n";
-  toReturn += "#endif";
+export function generateHeaderString(
+  params: headerFileParams,
+  mode: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+): string {
+  switch (mode) {
+    case 3:
+      return generateMode3HeaderString(params);
+    case 4:
+      return generateMode4HeaderString(params);
+    default:
+      console.warn(
+        `Attempting to generate header file for mode ${mode}, but it's unsupported for now. Defaulting to mode 3.`
+      );
+      return generateMode3HeaderString(params);
+  }
+}
 
-  return toReturn;
+export function generateMode3HeaderString({
+  fileName,
+  imageDimensions,
+  palette
+}: headerFileParams): string {
+  return "mode 3 header string";
+}
+
+export function generateMode4HeaderString({
+  fileName,
+  imageDimensions,
+  palette
+}: headerFileParams): string {
+  if (!palette) {
+    console.error(
+      "Tried to generate mode 4 header string with no palette! Falling back to mode 3..."
+    );
+    return generateMode3HeaderString({
+      fileName: fileName,
+      imageDimensions: imageDimensions
+    });
+  }
+
+  // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
+  // into a short
+  const variableName = fileName.slice(0, fileName.lastIndexOf("."));
+  const bitmapLength = imageDimensions.height * imageDimensions.width;
+  const bitmapLengthDefinition = `#define ${variableName.toUpperCase()}_SIZE ${bitmapLength}\n`;
+  const imageHeightDefinition = `#define ${variableName.toUpperCase()}_HEIGHT ${
+    imageDimensions.height
+  }\n`;
+  const imageWidthDefinition = `#define ${variableName.toUpperCase()}_WIDTH ${
+    imageDimensions.width
+  }\n`;
+  const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${bitmapLength /
+    2}];\n\n`;
+
+  // Palette length is uncompressed
+  const paletteLength = palette.dimensions.height * palette.dimensions.width;
+  const paletteLengthDefinition = `#define ${variableName.toUpperCase()}_PAL_SIZE ${paletteLength *
+    2}\n`;
+  const paletteDefinitionString = `extern const unsigned short ${variableName}Palette[${paletteLength}];\n\n`;
+
+  const headerString =
+    bitmapLengthDefinition +
+    imageHeightDefinition +
+    imageWidthDefinition +
+    imageDefinitionString +
+    paletteLengthDefinition +
+    paletteDefinitionString;
+
+  return headerString;
 }
 
 /*
@@ -124,7 +240,7 @@ export function generateHFile(img: ImageInterface, pal: Palette): string {
   takes in a Palette and converts rgb into hex values 0x00rrggbb
   outputs string of the converted Palette colorArray
 */
-export function pal2Hex(pal: Palette): string {
+export function paletteToHex(pal: Palette): string {
   const colorArray = pal.getColorArray();
   let palFile = "";
   let count = 1;
@@ -155,7 +271,7 @@ export function pal2Hex(pal: Palette): string {
   adds a declaration for the palette array in C
   outputs string with the declaration and converted Palette colorArray
 */
-function pal2GBA(pal: Palette): string {
+function PaletteToGBA(pal: Palette): string {
   const palArea = pal.dimensions.height * pal.dimensions.width;
   const colorArray = pal.getColorArray();
   const colAlignment = 8; //these numbers can change depending depending on how we want to format
@@ -168,7 +284,7 @@ function pal2GBA(pal: Palette): string {
 
   for (let i = 1; i <= colorArray.length; i++) {
     const element = colorArray[i - 1];
-    palC += color2hex(element) + ",";
+    palC += colorToHex(element) + ",";
 
     if (i % colAlignment === 0) {
       palC += "\n";
@@ -194,14 +310,6 @@ export async function exportImage(
   }
 }
 
-export function exportCFile(image: ImageInterface, pal: Palette): string {
-  return getGBAImageString(image, pal);
-}
-
-export function exportHFile(image: ImageInterface, pal: Palette): string {
-  return generateHFile(image, pal);
-}
-
 export function exportPalette(pal: Palette): string {
-  return pal2Hex(pal);
+  return paletteToHex(pal);
 }

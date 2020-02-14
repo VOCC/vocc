@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import { ImageInterface, EditorSettings } from "../lib/interfaces";
-import {
-  exportCFile,
-  exportHFile,
-  exportImage,
-  exportPalette
-} from "../lib/exportUtils";
+import { exportImage, exportPalette } from "../lib/exportUtils";
+import { loadNewImage } from "../lib/imageLoadUtils";
 import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
-import ImageObject, * as Loader from "./objects/ImageObject";
+import ImageObject from "./objects/ImageObject";
 import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
 import "../styles/app.scss";
@@ -35,7 +31,7 @@ function App(): JSX.Element {
   const handleImageLoad = async (imageFile: ImageFile) => {
     if (imageFile) {
       console.log("Loading image...");
-      let image = await Loader.loadNewImage(imageFile);
+      let image = await loadNewImage(imageFile);
       let { palette, sprite } = quantize(image, 16);
       setImage(sprite);
       setPalette(palette);
@@ -54,11 +50,11 @@ function App(): JSX.Element {
       case "GBA":
         //.c file
         fileType = ".c";
-        let cBlob = new Blob([exportCFile(image, palette)]);
+        let cBlob = new Blob([image.getCSourceData()]);
         saveAs(cBlob, fileName + fileType);
         //.h file
         fileType = ".h";
-        let hBlob = new Blob([exportHFile(image, palette)]);
+        let hBlob = new Blob([image.getHeaderData()]);
         saveAs(hBlob, fileName + fileType);
         return;
       case "PAL":
