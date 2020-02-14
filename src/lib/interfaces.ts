@@ -17,8 +17,7 @@ export interface Drawable {
   fileName: string;
   getPixelColorAt: (pos: ImageCoordinates) => Color;
   getImageData: () => Uint8ClampedArray;
-  getImageFileBlob: () => Blob;
-  isBlankImage: () => boolean;
+  getImageFileBlob: () => Promise<Blob | null>;
 }
 
 export interface ModifiableImage extends Drawable {

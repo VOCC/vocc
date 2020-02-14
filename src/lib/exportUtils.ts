@@ -1,14 +1,17 @@
 import { Drawable, ModifiableImage, Color } from "./interfaces";
 import Palette from "../components/objects/Palette";
 
-export const ImageExporter = {
-  getGBAImageString: (image: ModifiableImage, pal: Palette) => getGBAImageString(image, pal),
-  generateHFile: (image: ModifiableImage, pal: Palette) => generateHFile(image, pal),
-  pal2Hex: (pal: Palette) => pal2Hex(pal),
-  image2png: (image: ModifiableImage) => image2png(image),
-  image2jpg: (image: ModifiableImage) => image2jpg(image)
-};
-
+// export const ImageExporter = {
+//   getGBAImageString: (image: ModifiableImage, pal: Palette) => getGBAImageString(image, pal),
+//   generateHFile: (image: ModifiableImage, pal: Palette) => generateHFile(image, pal),
+//   pal2Hex: (pal: Palette) => pal2Hex(pal),
+//   image2png: (image: ModifiableImage) => image2png(image),
+//   image2jpg: (image: ModifiableImage) => image2jpg(image),
+//   exportCFile: (image: ModifiableImage, pal: Palette) => exportCFile(image, pal),
+//   exportHFile: (image: ModifiableImage, pal: Palette) => exportHFile(image, pal),
+//   exportPalette: (pal: Palette) => exportPalette(pal),
+//   exportImage: (img: ModifiableImage, type: string) => exportImage(img, type)
+// };
 
 /*
   getGBAImageString
@@ -98,17 +101,22 @@ export function generateHFile(img: ModifiableImage, pal: Palette): string {
   const imageName = img.fileName.slice(0, img.fileName.lastIndexOf("."));
   const imageArea = img.dimensions.height * img.dimensions.width;
   const palArea = pal.dimensions.height * pal.dimensions.width;
-  let toReturn = "#ifndef " + imageName.toUpperCase() + "_H\n"
-  toReturn += "#define " + imageName.toUpperCase() + "_H\n\n"
-  toReturn += "#define " + imageName + "TilesLen " + imageArea + "\n"
-  toReturn += "extern const unsigned short " + imageName + "Tiles[" + imageArea / 2 + "];\n\n"
-  toReturn += "#define " + imageName + "PalLen " + palArea * 2 + "\n"
-  toReturn += "extern const unsigned short " + imageName + "Pal[" + palArea + "];\n\n"
+  let toReturn = "#ifndef " + imageName.toUpperCase() + "_H\n";
+  toReturn += "#define " + imageName.toUpperCase() + "_H\n\n";
+  toReturn += "#define " + imageName + "TilesLen " + imageArea + "\n";
+  toReturn +=
+    "extern const unsigned short " +
+    imageName +
+    "Tiles[" +
+    imageArea / 2 +
+    "];\n\n";
+  toReturn += "#define " + imageName + "PalLen " + palArea * 2 + "\n";
+  toReturn +=
+    "extern const unsigned short " + imageName + "Pal[" + palArea + "];\n\n";
   toReturn += "#endif";
 
   return toReturn;
 }
-
 
 /*
   pal2Hex
@@ -120,12 +128,15 @@ export function pal2Hex(pal: Palette): string {
   const colorArray = pal.getColorArray();
   let palFile = "";
   let count = 1;
-  const alignment = 4;                //this number can change depending on how we want to format
+  const alignment = 4; //this number can change depending on how we want to format
   colorArray.forEach(element => {
     let hex = "0x00";
-    hex += (element.r < 16)? "0" + element.r.toString(16): element.r.toString(16);
-    hex += (element.g < 16)? "0" + element.g.toString(16): element.g.toString(16);
-    hex += (element.b < 16)? "0" + element.b.toString(16): element.b.toString(16);
+    hex +=
+      element.r < 16 ? "0" + element.r.toString(16) : element.r.toString(16);
+    hex +=
+      element.g < 16 ? "0" + element.g.toString(16) : element.g.toString(16);
+    hex +=
+      element.b < 16 ? "0" + element.b.toString(16) : element.b.toString(16);
     palFile += hex + "\t";
     if (count === alignment) {
       palFile += "\n";
@@ -147,17 +158,19 @@ export function pal2Hex(pal: Palette): string {
 function pal2GBA(pal: Palette): string {
   const palArea = pal.dimensions.height * pal.dimensions.width;
   const colorArray = pal.getColorArray();
-  const colAlignment = 8;                             //these numbers can change depending depending on how we want to format
-  const rowAlignment = 8;                             //
+  const colAlignment = 8; //these numbers can change depending depending on how we want to format
+  const rowAlignment = 8; //
 
-  let palC = "const unsigned short powPal[" + palArea + "] __attribute__((aligned(4)))=\n{\n";
-  
+  let palC =
+    "const unsigned short powPal[" +
+    palArea +
+    "] __attribute__((aligned(4)))=\n{\n";
+
   for (let i = 1; i <= colorArray.length; i++) {
-    
     const element = colorArray[i - 1];
     palC += color2hex(element) + ",";
-    
-    if (i % colAlignment === 0) {                
+
+    if (i % colAlignment === 0) {
       palC += "\n";
     }
     if (i % (colAlignment * rowAlignment) === 0) {
@@ -168,10 +181,27 @@ function pal2GBA(pal: Palette): string {
   return palC + "};";
 }
 
-export function image2jpg(img: ModifiableImage): Blob {
-  return img.getImageFileBlob();
+export async function exportImage(
+  img: ModifiableImage,
+  type: string
+): Promise<Blob | null> {
+  switch (type) {
+    case "JPG":
+    case "PNG":
+      return await img.getImageFileBlob();
+    default:
+      return new Blob(["Invalid file type"]);
+  }
 }
 
-export function image2png(img: ModifiableImage): Blob {
-  return img.getImageFileBlob();
+export function exportCFile(image: ModifiableImage, pal: Palette): string {
+  return getGBAImageString(image, pal);
+}
+
+export function exportHFile(image: ModifiableImage, pal: Palette): string {
+  return generateHFile(image, pal);
+}
+
+export function exportPalette(pal: Palette): string {
+  return pal2Hex(pal);
 }

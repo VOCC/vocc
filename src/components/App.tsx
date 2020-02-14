@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { ModifiableImage, EditorSettings } from "../lib/interfaces";
-import { ImageExporter } from "../lib/ImageExporter";
+import {
+  exportCFile,
+  exportHFile,
+  exportImage,
+  exportPalette
+} from "../lib/exportUtils";
 import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
@@ -19,7 +24,7 @@ type ImageFile = File | null;
 
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(new Palette());
-  const [image, setImage] = useState<ModifiableImage>(new ImageObject("img", true));
+  const [image, setImage] = useState<ModifiableImage>(new ImageObject("img"));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8,
@@ -37,49 +42,49 @@ function App(): JSX.Element {
     }
   };
 
-  const handleImageExport = (type: string): void => {                             //will eventually add param in here to handle jpg/png/gba
-    const alertMsg = () => alert("Please import an image first!");
-    if (image.isBlankImage()) {
-      alertMsg();
-    } else {
-      let fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
-      let fileType = "";
-      let blob = new Blob();
-      switch(type) {
-        case "GBA":
-          //.c file 
-          fileType = ".c";
-          blob = new Blob([ImageExporter.exportCFile(image, palette)]);
-          saveAs(blob, fileName + fileType);
-          //.h file
-          fileType = ".h";
-          blob = new Blob ([ImageExporter.exportHFile(image, palette)]);
-          saveAs(blob, fileName + fileType);
-          break;
-        case "PAL": 
-          //.pal file
-          fileType = ".pal";
-          blob = new Blob([ImageExporter.exportPalette(palette)]);
-          saveAs(blob, fileName + fileType);
-         break;
-        case "JPG": 
-          //.jpeg file
-          fileType = ".jpeg";
-          blob = ImageExporter.exportImage(image, type);
-          saveAs(blob, fileName + fileType);
+  const handleImageExport = async (type: string) => {
+    let fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
+    let fileType = "";
+    let blob: Blob | null;
+
+    const exportFailAlert = () =>
+      alert("Failed to export image! Check console for more information.");
+
+    switch (type) {
+      case "GBA":
+        //.c file
+        fileType = ".c";
+        let cBlob = new Blob([exportCFile(image, palette)]);
+        saveAs(cBlob, fileName + fileType);
+        //.h file
+        fileType = ".h";
+        let hBlob = new Blob([exportHFile(image, palette)]);
+        saveAs(hBlob, fileName + fileType);
+        return;
+      case "PAL":
+        //.pal file
+        fileType = ".pal";
+        blob = new Blob([exportPalette(palette)]);
         break;
-        case "PNG": 
-          //.png file
-          fileType = ".png";
-          blob = ImageExporter.exportImage(image, type);
-          saveAs(blob, fileName + fileType);
-          break;
-        default:
-          //default as .txt if unrecognized type is selected
-          fileType = ".txt";
-          blob = ImageExporter.exportImage(image, type);
-          saveAs(blob, fileName + fileType);
-      }
+      case "JPG":
+        //.jpeg file
+        fileType = ".jpg";
+        blob = await exportImage(image, type);
+        break;
+      case "PNG":
+        //.png file
+        fileType = ".png";
+        blob = await exportImage(image, type);
+        break;
+      default:
+        //default as .txt if unrecognized type is selected
+        fileType = ".txt";
+        blob = await exportImage(image, type);
+    }
+    if (!blob) {
+      exportFailAlert();
+    } else {
+      saveAs(blob, fileName + fileType);
     }
   };
 
@@ -95,9 +100,9 @@ function App(): JSX.Element {
           Game Boy Advance Image Editor and Converter
         </span>
         <ImportButton onImageChange={handleImageLoad} />
-        GBA -> 
+        GBA ->
         <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
-        Pal -> 
+        Pal ->
         <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} />
         PNG ->
         <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} />
