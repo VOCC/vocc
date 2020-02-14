@@ -83,8 +83,8 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
 
   function handleClick(e: React.MouseEvent): void {
     let mousePos = getMousePos(e);
-    if (mousePos.y >= 0 && mousePos.y <= 128) {
-      const row = Math.floor(mousePos.y / 8);
+    if (mousePos.y >= 0 && mousePos.y <= scale * palette.dimensions.width) {
+      const row = Math.floor(mousePos.y / scale);
       setSelected(row);
     }
   }
