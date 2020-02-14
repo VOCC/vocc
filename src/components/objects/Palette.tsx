@@ -64,7 +64,7 @@ export default class Palette {
   }
 
   public getColorAt(i: number): Color {
-    if (i >= PALETTE_LENGTH) {
+    if (i >= PALETTE_LENGTH || i < 0) {
       console.error(
         "Attempting to access palette at index greater than " +
           PALETTE_LENGTH +
