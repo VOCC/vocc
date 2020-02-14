@@ -1,4 +1,4 @@
-import { Drawable, ModifiableImage, Color } from "./interfaces";
+import { ImageInterface, Color } from "./interfaces";
 import Palette from "../components/objects/Palette";
 
 // export const ImageExporter = {
@@ -21,7 +21,7 @@ import Palette from "../components/objects/Palette";
   get the palette array from pal2GBA
   returns the combination of them into one string
 */
-export function getGBAImageString(image: Drawable, pal: Palette): string {
+export function getGBAImageString(image: ImageInterface, pal: Palette): string {
   const imageData = image.getImageData();
   const imageName = image.fileName;
   return image2GBA(imageData, imageName) + "\n\n" + pal2GBA(pal);
@@ -97,7 +97,7 @@ function color2hex(color: Color): string {
   formats a string to replicate the header file created by usenti
   returns the string
 */
-export function generateHFile(img: ModifiableImage, pal: Palette): string {
+export function generateHFile(img: ImageInterface, pal: Palette): string {
   const imageName = img.fileName.slice(0, img.fileName.lastIndexOf("."));
   const imageArea = img.dimensions.height * img.dimensions.width;
   const palArea = pal.dimensions.height * pal.dimensions.width;
@@ -182,7 +182,7 @@ function pal2GBA(pal: Palette): string {
 }
 
 export async function exportImage(
-  img: ModifiableImage,
+  img: ImageInterface,
   type: string
 ): Promise<Blob | null> {
   switch (type) {
@@ -194,11 +194,11 @@ export async function exportImage(
   }
 }
 
-export function exportCFile(image: ModifiableImage, pal: Palette): string {
+export function exportCFile(image: ImageInterface, pal: Palette): string {
   return getGBAImageString(image, pal);
 }
 
-export function exportHFile(image: ModifiableImage, pal: Palette): string {
+export function exportHFile(image: ImageInterface, pal: Palette): string {
   return generateHFile(image, pal);
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ModifiableImage, EditorSettings } from "../lib/interfaces";
+import { ImageInterface, EditorSettings } from "../lib/interfaces";
 import {
   exportCFile,
   exportHFile,
@@ -24,7 +24,7 @@ type ImageFile = File | null;
 
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(new Palette());
-  const [image, setImage] = useState<ModifiableImage>(new ImageObject("img"));
+  const [image, setImage] = useState<ImageInterface>(new ImageObject("img"));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8,

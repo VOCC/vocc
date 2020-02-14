@@ -1,12 +1,12 @@
 import {
   Color,
   Dimensions,
-  ModifiableImage,
+  ImageInterface,
   ImageCoordinates
 } from "../../lib/interfaces";
 import * as Loader from "../../lib/imageLoadUtils";
 
-export default class ImageObject implements ModifiableImage {
+export default class ImageObject implements ImageInterface {
   public fileName: string;
   public dimensions: Dimensions = {
     height: 32,
@@ -70,7 +70,7 @@ export default class ImageObject implements ModifiableImage {
   public setPixelColor(
     pos: ImageCoordinates,
     paletteIndex: number
-  ): ModifiableImage {
+  ): ImageInterface {
     console.warn(
       "Method setPixelColor in ImageObject not implemented yet. " +
         "Returning the current image."

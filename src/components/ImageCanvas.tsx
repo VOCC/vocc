@@ -2,13 +2,13 @@ import React, { useEffect, useReducer, useRef, useState } from "react";
 import {
   Color,
   Dimensions,
-  ModifiableImage,
+  ImageInterface,
   EditorSettings,
   ImageCoordinates
 } from "../lib/interfaces";
 
 interface ImageCanvasProps {
-  imageObject: ModifiableImage;
+  imageObject: ImageInterface;
   settings: EditorSettings;
   onChangeScale: (newScale: number) => void;
 }
@@ -24,7 +24,7 @@ function ImageCanvas({
   settings,
   onChangeScale
 }: ImageCanvasProps): JSX.Element {
-  const [image, setImage] = useState<ModifiableImage>(imageObject);
+  const [image, setImage] = useState<ImageInterface>(imageObject);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(
     canvasRef ? getContext(canvasRef) : null
@@ -96,7 +96,7 @@ function ImageCanvas({
       context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
     };
 
-    const drawImage = (image: ModifiableImage) => {
+    const drawImage = (image: ImageInterface) => {
       // console.log("drawing image of size", image.dimensions);
       for (let x = 0; x < image.dimensions.width; x++) {
         for (let y = 0; y < image.dimensions.height; y++) {

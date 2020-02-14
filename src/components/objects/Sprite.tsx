@@ -2,12 +2,12 @@ import {
   Color,
   Dimensions,
   ImageCoordinates,
-  ModifiableImage
+  ImageInterface
 } from "../../lib/interfaces";
 import * as Loader from "../../lib/imageLoadUtils";
 import Palette from "./Palette";
 
-export default class Sprite implements ModifiableImage {
+export default class Sprite implements ImageInterface {
   public dimensions: Dimensions;
   public fileName: string;
 
@@ -88,18 +88,12 @@ export default class Sprite implements ModifiableImage {
         this.dimensions
       );
     }
-    // console.log(
-    //   "Getting palette index at",
-    //   pos,
-    //   "index",
-    //   this.dimensions.width * pos.x + pos.y
-    // );
     return this.palette.getColorAt(
       this.data[this.dimensions.width * pos.y + pos.x]
     );
   }
 
-  public setPixelColor({ x, y }: ImageCoordinates): ModifiableImage {
+  public setPixelColor({ x, y }: ImageCoordinates): ImageInterface {
     console.warn(
       "Setting pixel colors not implemented yet! Returning unchanged image."
     );

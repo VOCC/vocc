@@ -14,18 +14,20 @@ export interface Dimensions {
 
 export interface Drawable {
   dimensions: Dimensions;
-  fileName: string;
   getPixelColorAt: (pos: ImageCoordinates) => Color;
+}
+
+export interface Exportable {
+  fileName: string;
   getImageData: () => Uint8ClampedArray;
   getImageFileBlob: () => Promise<Blob | null>;
 }
 
-export interface ModifiableImage extends Drawable {
-  setPixelColor: (
-    pos: ImageCoordinates,
-    paletteIndex: number
-  ) => ModifiableImage;
+export interface Modifiable {
+  setPixelColor: (pos: ImageCoordinates, paletteIndex: number) => Modifiable;
 }
+
+export interface ImageInterface extends Drawable, Exportable, Modifiable {}
 
 export interface EditorSettings {
   grid: boolean;
