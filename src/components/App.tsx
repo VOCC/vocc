@@ -5,7 +5,7 @@ import { loadNewImage } from "../lib/imageLoadUtils";
 import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
-import ImageCanvas from "./ImageCanvas";
+import EditorCanvas from "./EditorCanvas";
 import ImageObject from "./objects/ImageObject";
 import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
@@ -114,7 +114,7 @@ function App(): JSX.Element {
           </div>
         </div>
         <div className="image-container">
-          <ImageCanvas
+          <EditorCanvas
             imageObject={image}
             settings={editorSettings}
             onChangeScale={(newScale: number) => setScale(newScale)}

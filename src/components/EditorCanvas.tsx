@@ -19,7 +19,7 @@ function scaleReducer(state: number, e: WheelEvent) {
   return newScale < 1 ? 1 : newScale;
 }
 
-function ImageCanvas({
+function EditorCanvas({
   imageObject,
   settings,
   onChangeScale
@@ -146,4 +146,4 @@ const getContext = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
   return context;
 };
 
-export default ImageCanvas;
+export default EditorCanvas;
