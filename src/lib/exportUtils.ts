@@ -25,27 +25,33 @@ export function generateCSourceFileString(
 }
 
 function generateMode3CSourceFileString(image: ImageInterface): string {
-  // let image_asHex =
-  //   "const unsigned short " +
-  //   imageName.slice(0, imageName.lastIndexOf(".")) +
-  //   "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
-  // let pixelCount = 0;
-  // for (var i = 0, j = data.length; i < j; i += 4) {
-  //   let bgr = [data[i + 2], data[i + 1], data[i]]; // bgr for little endian
-  //   let hexcode = pixelToHex(bgr);
-  //   image_asHex += hexcode + ",";
-  //   pixelCount++;
-  //   if (pixelCount % 8 === 0 && pixelCount < 256) {
-  //     image_asHex += "\n";
-  //     if (pixelCount % 64 === 0) {
-  //       image_asHex += "\n\t";
-  //     } else {
-  //       image_asHex += "\t";
-  //     }
-  //   }
-  // }
-  // return image_asHex + "\n};";
-  return "mode 3 source string";
+  const variableName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
+  const bitmapLength = image.dimensions.height * image.dimensions.width;
+  const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${bitmapLength /
+    2}]__attribute__((aligned(4)))=\n{\n\t`;
+
+  const imageData = image.getImageData();
+  let imageDataHexString = ``;
+
+  let pixelCount = 0;
+  for (var i = 0, j = imageData.length; i < j; i += 4) {
+    let bgr = [imageData[i + 2], imageData[i + 1], imageData[i]]; // bgr for little endian
+    let hexcode = pixelToHex(bgr);
+    imageDataHexString += hexcode + ",";
+    pixelCount++;
+    if (pixelCount % 8 === 0 && pixelCount < 256) {
+      imageDataHexString += "\n";
+      if (pixelCount % 64 === 0) {
+        imageDataHexString += "\n\t";
+      } else {
+        imageDataHexString += "\t";
+      }
+    }
+  }
+
+  const imageDefinitionEnd = `\n};\n`;
+
+  return imageDefinitionString + imageDataHexString + imageDefinitionEnd;
 }
 
 function generateMode4CSourceFileString(
@@ -84,27 +90,106 @@ function generateMode4CSourceFileString(
     paletteCSourceString;
 
   return CSourceString;
+}
 
-  // let image_asHex =
-  //   "const unsigned short " +
-  //   imageName.slice(0, imageName.lastIndexOf(".")) +
-  //   "Bitmap[256] __attribute__((aligned(4)))=\n{\n\t";
-  // let pixelCount = 0;
-  // for (var i = 0, j = data.length; i < j; i += 4) {
-  //   let bgr = [data[i + 2], data[i + 1], data[i]]; // bgr for little endian
-  //   let hexcode = pixelToHex(bgr);
-  //   image_asHex += hexcode + ",";
-  //   pixelCount++;
-  //   if (pixelCount % 8 === 0 && pixelCount < 256) {
-  //     image_asHex += "\n";
-  //     if (pixelCount % 64 === 0) {
-  //       image_asHex += "\n\t";
-  //     } else {
-  //       image_asHex += "\t";
-  //     }
-  //   }
-  // }
-  // return image_asHex + "\n};";
+interface headerFileParams {
+  fileName: string;
+  imageDimensions: Dimensions;
+  palette?: Palette;
+}
+
+export function generateHeaderString(
+  params: headerFileParams,
+  mode: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+): string {
+  switch (mode) {
+    case 3:
+      return generateMode3HeaderString(params);
+    case 4:
+      return generateMode4HeaderString(params);
+    default:
+      console.warn(
+        `Attempting to generate header file for mode ${mode}, but it's unsupported for now. Defaulting to mode 3.`
+      );
+      return generateMode3HeaderString(params);
+  }
+}
+
+export function generateMode3HeaderString({
+  fileName,
+  imageDimensions,
+  palette
+}: headerFileParams): string {
+  const variableName = fileName.slice(0, fileName.lastIndexOf("."));
+  const bitmapLength = imageDimensions.height * imageDimensions.width;
+  const bitmapSize = bitmapLength * 2;
+  // TODO: Find out how to compute the size vs. the length of the bitmap
+  const bitmapSizeDefinition = `#define ${variableName.toUpperCase()}_SIZE ${bitmapSize}\n`;
+  const bitmapLengthDefinition = `#define ${variableName.toUpperCase()}_LENGTH ${bitmapLength}\n`;
+  const imageHeightDefinition = `#define ${variableName.toUpperCase()}_HEIGHT ${
+    imageDimensions.height
+  }\n`;
+  const imageWidthDefinition = `#define ${variableName.toUpperCase()}_WIDTH ${
+    imageDimensions.width
+  }\n`;
+  const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${bitmapLength}];\n\n`;
+
+  const headerString =
+    bitmapLengthDefinition +
+    bitmapSizeDefinition +
+    imageHeightDefinition +
+    imageWidthDefinition +
+    `\n` +
+    imageDefinitionString +
+    `\n`;
+
+  return headerString;
+}
+
+export function generateMode4HeaderString({
+  fileName,
+  imageDimensions,
+  palette
+}: headerFileParams): string {
+  if (!palette) {
+    console.error(
+      "Tried to generate mode 4 header string with no palette! Falling back to mode 3..."
+    );
+    return generateMode3HeaderString({
+      fileName: fileName,
+      imageDimensions: imageDimensions
+    });
+  }
+
+  // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
+  // into a short
+  const variableName = fileName.slice(0, fileName.lastIndexOf("."));
+  const bitmapLength = imageDimensions.height * imageDimensions.width;
+  const bitmapLengthDefinition = `#define ${variableName.toUpperCase()}_SIZE ${bitmapLength}\n`;
+  const imageHeightDefinition = `#define ${variableName.toUpperCase()}_HEIGHT ${
+    imageDimensions.height
+  }\n`;
+  const imageWidthDefinition = `#define ${variableName.toUpperCase()}_WIDTH ${
+    imageDimensions.width
+  }\n`;
+  const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${bitmapLength /
+    2}];\n\n`;
+
+  // Palette length is uncompressed
+  const paletteLength = palette.dimensions.height * palette.dimensions.width;
+  const paletteLengthDefinition = `#define ${variableName.toUpperCase()}_PAL_SIZE ${paletteLength *
+    2}\n`;
+  const paletteDefinitionString = `extern const unsigned short ${variableName}Palette[${paletteLength}];\n\n`;
+
+  const headerString =
+    bitmapLengthDefinition +
+    imageHeightDefinition +
+    imageWidthDefinition +
+    imageDefinitionString +
+    paletteLengthDefinition +
+    paletteDefinitionString;
+
+  return headerString;
 }
 
 function paletteIndicesToHex(index1: number, index2: number): string {
@@ -155,83 +240,6 @@ function pixelToHex(bgr: number[]): string {
 function colorToHex(color: Color): string {
   let bgr = [color.b, color.g, color.r];
   return pixelToHex(bgr);
-}
-
-interface headerFileParams {
-  fileName: string;
-  imageDimensions: Dimensions;
-  palette?: Palette;
-}
-
-export function generateHeaderString(
-  params: headerFileParams,
-  mode: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
-): string {
-  switch (mode) {
-    case 3:
-      return generateMode3HeaderString(params);
-    case 4:
-      return generateMode4HeaderString(params);
-    default:
-      console.warn(
-        `Attempting to generate header file for mode ${mode}, but it's unsupported for now. Defaulting to mode 3.`
-      );
-      return generateMode3HeaderString(params);
-  }
-}
-
-export function generateMode3HeaderString({
-  fileName,
-  imageDimensions,
-  palette
-}: headerFileParams): string {
-  return "mode 3 header string";
-}
-
-export function generateMode4HeaderString({
-  fileName,
-  imageDimensions,
-  palette
-}: headerFileParams): string {
-  if (!palette) {
-    console.error(
-      "Tried to generate mode 4 header string with no palette! Falling back to mode 3..."
-    );
-    return generateMode3HeaderString({
-      fileName: fileName,
-      imageDimensions: imageDimensions
-    });
-  }
-
-  // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
-  // into a short
-  const variableName = fileName.slice(0, fileName.lastIndexOf("."));
-  const bitmapLength = imageDimensions.height * imageDimensions.width;
-  const bitmapLengthDefinition = `#define ${variableName.toUpperCase()}_SIZE ${bitmapLength}\n`;
-  const imageHeightDefinition = `#define ${variableName.toUpperCase()}_HEIGHT ${
-    imageDimensions.height
-  }\n`;
-  const imageWidthDefinition = `#define ${variableName.toUpperCase()}_WIDTH ${
-    imageDimensions.width
-  }\n`;
-  const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${bitmapLength /
-    2}];\n\n`;
-
-  // Palette length is uncompressed
-  const paletteLength = palette.dimensions.height * palette.dimensions.width;
-  const paletteLengthDefinition = `#define ${variableName.toUpperCase()}_PAL_SIZE ${paletteLength *
-    2}\n`;
-  const paletteDefinitionString = `extern const unsigned short ${variableName}Palette[${paletteLength}];\n\n`;
-
-  const headerString =
-    bitmapLengthDefinition +
-    imageHeightDefinition +
-    imageWidthDefinition +
-    imageDefinitionString +
-    paletteLengthDefinition +
-    paletteDefinitionString;
-
-  return headerString;
 }
 
 /*
