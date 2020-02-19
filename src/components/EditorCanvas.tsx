@@ -69,43 +69,11 @@ function EditorCanvas({
     setupCanvas();
   }, [context]);
 
+  /**
+   * Draw the image whenever the image, imageCanvas, context, scale, or editor
+   * settings change.
+   */
   useEffect(() => {
-    // const drawGrid = () => {
-    //   if (!context) return;
-    //   const { width, height } = image.dimensions;
-    //   context.strokeStyle = "gray";
-    //   context.beginPath();
-
-    //   for (let x = 0; x <= width; x++) {
-    //     context.moveTo(x * scale, 0);
-    //     context.lineTo(x * scale, height * scale);
-    //   }
-
-    //   for (let y = 0; y <= height; y++) {
-    //     context.moveTo(0, y * scale);
-    //     context.lineTo(width * scale, y * scale);
-    //   }
-
-    //   context.stroke();
-    // };
-
-    // const drawPixel = (pos: ImageCoordinates, color: Color) => {
-    //   if (!context) return;
-    //   let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    //   context.fillStyle = colorString;
-    //   context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
-    // };
-
-    // const drawImage = (image: ImageInterface) => {
-    //   // console.log("drawing image of size", image.dimensions);
-    //   for (let x = 0; x < image.dimensions.width; x++) {
-    //     for (let y = 0; y < image.dimensions.height; y++) {
-    //       // console.log("trying to get color at", x, y);
-    //       drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
-    //     }
-    //   }
-    // };
-
     if (context && canvasRef.current && imageCanvas) {
       // Clear the context
       context.clearRect(
@@ -116,16 +84,22 @@ function EditorCanvas({
       );
       // Draw the image at the correct position and scale
       context.drawImage(
-        imageCanvas.getCanvasElement(),
+        imageCanvas.getImageCanvasElement(),
         0,
         0,
         imageCanvas.dimensions.width * scale,
         imageCanvas.dimensions.height * scale
       );
       // Draw the grid (if we need to)
-      // if (settings.grid) {
-      //   drawGrid();
-      // }
+      if (settings.grid && scale >= imageCanvas.pixelGridRatio / 2) {
+        context.drawImage(
+          imageCanvas.getPixelGridCanvasElement(),
+          0,
+          0,
+          imageCanvas.dimensions.width * scale,
+          imageCanvas.dimensions.height * scale
+        );
+      }
     }
   }, [image, imageCanvas, context, scale, settings]);
 
@@ -151,10 +125,12 @@ function EditorCanvas({
 
 class ImageCanvas {
   public dimensions: Dimensions;
+  public pixelGridRatio = 16;
 
   private image: ImageInterface;
   private hiddenCanvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
+  private pixelGrid: PixelGrid;
 
   public constructor(image: ImageInterface) {
     console.log("Creating new internal ImageCanvas.");
@@ -164,30 +140,17 @@ class ImageCanvas {
     this.hiddenCanvas = createHiddenCanvas(image.dimensions);
     this.context = this.hiddenCanvas.getContext("2d");
 
+    this.pixelGrid = new PixelGrid(this.image.dimensions, this.pixelGridRatio);
+
     this.drawImage();
   }
 
-  public getCanvasElement(): HTMLCanvasElement {
+  public getImageCanvasElement(): HTMLCanvasElement {
     return this.hiddenCanvas;
   }
 
-  private drawGrid(): void {
-    if (!this.context) return;
-    const { width, height } = this.image.dimensions;
-    this.context.strokeStyle = "gray";
-    this.context.beginPath();
-
-    for (let x = 0; x <= width; x++) {
-      this.context.moveTo(x, 0);
-      this.context.lineTo(x, height);
-    }
-
-    for (let y = 0; y <= height; y++) {
-      this.context.moveTo(0, y);
-      this.context.lineTo(width, y);
-    }
-
-    this.context.stroke();
+  public getPixelGridCanvasElement(): HTMLCanvasElement {
+    return this.pixelGrid.getCanvasElement();
   }
 
   private drawPixel(pos: ImageCoordinates, color: Color): void {
@@ -204,6 +167,55 @@ class ImageCanvas {
         this.drawPixel({ x, y }, this.image.getPixelColorAt({ x, y }));
       }
     }
+  }
+}
+
+class PixelGrid {
+  public dimensions: Dimensions;
+  public pixelGridRatio = 16;
+
+  private hiddenCanvas: HTMLCanvasElement;
+  private context: CanvasRenderingContext2D | null;
+
+  constructor(dimensions: Dimensions, pixelGridRatio: number) {
+    console.log("Setting up pixel grid.");
+
+    this.pixelGridRatio = pixelGridRatio;
+
+    this.dimensions = dimensions;
+    this.hiddenCanvas = createHiddenCanvas({
+      width: this.dimensions.width * this.pixelGridRatio,
+      height: this.dimensions.height * this.pixelGridRatio
+    });
+    this.context = this.hiddenCanvas.getContext("2d");
+
+    this.drawGrid();
+  }
+
+  public getCanvasElement(): HTMLCanvasElement {
+    return this.hiddenCanvas;
+  }
+
+  private drawGrid(): void {
+    if (!this.context) return;
+    const { width, height } = this.dimensions;
+    this.context.strokeStyle = "gray";
+    this.context.beginPath();
+
+    for (let x = 0; x <= width; x++) {
+      this.context.moveTo(x * this.pixelGridRatio, 0);
+      this.context.lineTo(
+        x * this.pixelGridRatio,
+        height * this.pixelGridRatio
+      );
+    }
+
+    for (let y = 0; y <= height; y++) {
+      this.context.moveTo(0, y * this.pixelGridRatio);
+      this.context.lineTo(width * this.pixelGridRatio, y * this.pixelGridRatio);
+    }
+
+    this.context.stroke();
   }
 }
 
