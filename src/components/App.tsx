@@ -15,9 +15,6 @@ import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import { quantize } from "../lib/quantize";
 
-///////////// Type Definitions:
-type ImageFile = File | null;
-
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(new Palette());
   const [image, setImage] = useState<ImageInterface>(new ImageObject("img"));
@@ -28,7 +25,7 @@ function App(): JSX.Element {
   });
   const [scale, setScale] = useState<number>(editorSettings.startingScale);
 
-  const handleImageLoad = async (imageFile: ImageFile) => {
+  const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
       console.log("Loading image...");
       let image = await loadNewImage(imageFile);
