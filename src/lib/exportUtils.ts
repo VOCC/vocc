@@ -39,7 +39,7 @@ function generateMode3CSourceFileString(image: ImageInterface): string {
     let hexcode = pixelToHex(bgr);
     imageDataHexString += hexcode + ",";
     pixelCount++;
-    if (pixelCount % 8 === 0 && pixelCount < 256) {
+    if (pixelCount % 8 === 0) {
       imageDataHexString += "\n";
       if (pixelCount % 64 === 0) {
         imageDataHexString += "\n\t";
