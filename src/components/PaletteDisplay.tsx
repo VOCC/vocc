@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import Palette from "./objects/Palette";
 
 interface IProps {
@@ -11,14 +11,15 @@ interface MousePos {
 }
 
 function PaletteDisplay({ palette }: IProps): JSX.Element {
-  const [selected, setSelected] = useState(-1);
+  const [selected, setSelected] = useState<number>(-1);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scale = 8;
 
   /**
    * method to draw the palette grid
    */
-  const drawGrid = () => {
+  const drawGrid = useCallback(
+    () => {
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
     if (!context) return;
@@ -37,13 +38,14 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     }
 
     context.stroke();
-  };
+  }, [palette.dimensions]);
 
   /**
    * method to populate the palette with colors
    * fills palette index with proper color using palette colorArray
    */
-  const fillPalette = () => {
+  const fillPalette = useCallback(
+    () => {
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
     if (!context) return;
@@ -58,7 +60,7 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
       let y = Math.floor(index / palette.dimensions.width);
       context.fillRect(x * scale, y * scale, scale, scale);
     });
-  };
+  }, [palette]);
 
   /**
    * gets mouse position on the palette canvas
@@ -79,23 +81,6 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
   }
 
   /**
-   * highlights the palette row with a transparent light blue color
-   * @param row row of palette to select/highlight
-   */
-  const highlightRow = (row: number): void => {
-    if (row === -1) return;
-    if (!canvasRef.current) return;
-    const context = canvasRef.current.getContext('2d');
-    if (!context) return;
-    let colorString = 'rgba(125, 200, 255, 0.25)';
-    context.fillStyle = colorString;
-    context.fillRect(0, row * scale, scale * palette.dimensions.width, scale);
-    context.globalAlpha = 1;
-    context.fillStyle = 'blue';
-    context.strokeRect(0, row * scale, scale * palette.dimensions.width, scale);
-  }
-
-  /**
    * handles mouse click event
    * selects the proper row on the palette
    * @param e MouseEvent
@@ -109,18 +94,10 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
   }
 
   /**
-   * fills palette on any change
-  */ 
-  useEffect(() => {
-    fillPalette();
-    drawGrid();
-    highlightRow(selected);
-  }, [selected]);
-
-  /**
    * refills palette when a new image is imported
    */
   useEffect(() => {
+    console.log('new image, new palette ...');
     let context: CanvasRenderingContext2D | null = null;
     if (canvasRef.current) {
       context = canvasRef.current.getContext("2d");
@@ -138,12 +115,41 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
   }, [palette]);
 
   /**
+   * fills palette on any change
+  */ 
+  useEffect(() => {
+
+  /**
+   * highlights the palette row with a transparent light blue color
+   * @param row row of palette to select/highlight
+   */
+  const highlightRow = (row: number): void => {
+    if (row < 0) return;
+    if (!canvasRef.current) return;
+    const context = canvasRef.current.getContext('2d');
+    if (!context) return;
+    let colorString = 'rgba(125, 200, 255, 0.25)';
+    context.fillStyle = colorString;
+    context.fillRect(0, row * scale, scale * palette.dimensions.width, scale);
+    context.globalAlpha = 1;
+    context.fillStyle = 'blue';
+    context.strokeRect(0, row * scale, scale * palette.dimensions.width, scale);
+  }
+
+    console.log('filling palette ...');
+    fillPalette();
+    drawGrid();
+    highlightRow(selected);
+  }, [selected, fillPalette, drawGrid, palette.dimensions]);
+
+  /**
    * initializes an empty palette
    */
   useEffect(() => {
+    console.log("initializing palette ...");
     fillPalette();
     drawGrid();
-  }, []);
+  }, [fillPalette, drawGrid]);
 
   return <canvas
     ref={canvasRef}
