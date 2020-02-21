@@ -2,11 +2,16 @@ import {
   Color,
   Dimensions,
   ImageCoordinates,
-  ModifiableImage
+  ImageInterface
 } from "../../lib/interfaces";
+import {
+  generateHeaderString,
+  generateCSourceFileString
+} from "../../lib/exportUtils";
+import * as Loader from "../../lib/imageLoadUtils";
 import Palette from "./Palette";
 
-export default class Sprite implements ModifiableImage {
+export default class Sprite implements ImageInterface {
   public dimensions: Dimensions;
   public fileName: string;
 
@@ -32,7 +37,59 @@ export default class Sprite implements ModifiableImage {
   }
 
   public getImageData(): Uint8ClampedArray {
-    return new Uint8ClampedArray();
+    return new Uint8ClampedArray(this.data);
+  }
+
+  public getHeaderData(): string {
+    return generateHeaderString(
+      {
+        fileName: this.fileName,
+        imageDimensions: this.dimensions,
+        palette: this.palette
+      },
+      4
+    );
+  }
+
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 4, this.palette);
+  }
+
+  public async getImageFileBlob(): Promise<Blob | null> {
+    const drawPixel = (
+      pos: ImageCoordinates,
+      color: Color,
+      ctx: CanvasRenderingContext2D
+    ) => {
+      const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+      ctx.fillStyle = colorString;
+      ctx.fillRect(pos.x, pos.y, 1, 1);
+    };
+
+    let hiddenCanvas = Loader.createHiddenCanvas(this.dimensions);
+    let context = hiddenCanvas.getContext("2d");
+
+    if (context) {
+      for (let r = 0; r < this.dimensions.height; r++) {
+        for (let c = 0; c < this.dimensions.width; c++) {
+          let pos = { x: c, y: r };
+          drawPixel(pos, this.getPixelColorAt(pos), context);
+        }
+      }
+    } else {
+      console.error(
+        "Failed to get hidden canvas context when constructing image file blob!"
+      );
+    }
+
+    return new Promise(resolve => {
+      hiddenCanvas.toBlob(blob => resolve(blob));
+    });
+  }
+
+  public isBlankImage(): boolean {
+    // set to false because if a sprite is initialized,
+    return false; // an image has been imported (i think this is the case)
   }
 
   /**
@@ -50,18 +107,12 @@ export default class Sprite implements ModifiableImage {
         this.dimensions
       );
     }
-    // console.log(
-    //   "Getting palette index at",
-    //   pos,
-    //   "index",
-    //   this.dimensions.width * pos.x + pos.y
-    // );
     return this.palette.getColorAt(
       this.data[this.dimensions.width * pos.y + pos.x]
     );
   }
 
-  public setPixelColor({ x, y }: ImageCoordinates): ModifiableImage {
+  public setPixelColor({ x, y }: ImageCoordinates): ImageInterface {
     console.warn(
       "Setting pixel colors not implemented yet! Returning unchanged image."
     );

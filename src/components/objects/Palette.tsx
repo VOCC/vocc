@@ -1,8 +1,5 @@
 import { Color, Dimensions } from "../../lib/interfaces";
-
-const BLACK: Color = { r: 0, g: 0, b: 0, a: 1 };
-const PALETTE_SIZE: Dimensions = { height: 16, width: 16 };
-const PALETTE_LENGTH = PALETTE_SIZE.height * PALETTE_SIZE.width;
+import { COLORS, PALETTE_SIZE, PALETTE_LENGTH } from "../../lib/consts";
 
 export default class Palette {
   public dimensions: Dimensions;
@@ -14,7 +11,7 @@ export default class Palette {
 
     this.colorArray = new Array(this.dimensions.width * this.dimensions.height);
     if (colorArray === undefined) {
-      this.colorArray.fill(BLACK);
+      this.colorArray.fill(COLORS.black);
     } else {
       if (colorArray.length > PALETTE_SIZE.height * PALETTE_SIZE.width) {
         console.warn(

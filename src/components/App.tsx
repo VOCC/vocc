@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { ModifiableImage, EditorSettings } from "../lib/interfaces";
-import { getGBAImageString } from "../lib/exportUtils";
+import { ImageInterface, EditorSettings } from "../lib/interfaces";
+import { exportImage, exportPalette } from "../lib/exportUtils";
+import { loadNewImage } from "../lib/imageLoadUtils";
 import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
 import ImageCanvas from "./ImageCanvas";
-import ImageObject, * as Loader from "./objects/ImageObject";
+import ImageObject from "./objects/ImageObject";
 import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
 import "../styles/app.scss";
@@ -19,7 +20,7 @@ type ImageFile = File | null;
 
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(new Palette());
-  const [image, setImage] = useState<ModifiableImage>(new ImageObject("img"));
+  const [image, setImage] = useState<ImageInterface>(new ImageObject("img"));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8,
@@ -30,26 +31,56 @@ function App(): JSX.Element {
   const handleImageLoad = async (imageFile: ImageFile) => {
     if (imageFile) {
       console.log("Loading image...");
-      let image = await Loader.loadNewImage(imageFile);
+      let image = await loadNewImage(imageFile);
       let { palette, sprite } = quantize(image, 16);
       setImage(sprite);
       setPalette(palette);
     }
   };
 
-  const handleImageExport = (): void => {
-    const alertMsg = () => alert("Please import an image first!");
-    if (!image) {
-      alertMsg();
+  const handleImageExport = async (type: string) => {
+    let fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
+    let fileType = "";
+    let blob: Blob | null;
+
+    const exportFailAlert = () =>
+      alert("Failed to export image! Check console for more information.");
+
+    switch (type) {
+      case "GBA":
+        //.c file
+        fileType = ".c";
+        let cBlob = new Blob([image.getCSourceData()]);
+        saveAs(cBlob, fileName + fileType);
+        //.h file
+        fileType = ".h";
+        let hBlob = new Blob([image.getHeaderData()]);
+        saveAs(hBlob, fileName + fileType);
+        return;
+      case "PAL":
+        //.pal file
+        fileType = ".pal";
+        blob = new Blob([exportPalette(palette)]);
+        break;
+      case "JPG":
+        //.jpeg file
+        fileType = ".jpg";
+        blob = await exportImage(image, type);
+        break;
+      case "PNG":
+        //.png file
+        fileType = ".png";
+        blob = await exportImage(image, type);
+        break;
+      default:
+        //default as .txt if unrecognized type is selected
+        fileType = ".txt";
+        blob = await exportImage(image, type);
+    }
+    if (!blob) {
+      exportFailAlert();
     } else {
-      let fileName = image.fileName;
-      let fileType = ".c";
-      let fullFileName =
-        fileName.slice(0, fileName.lastIndexOf(".")) + fileType;
-      let blob = new Blob([getGBAImageString(image)], {
-        type: "text/plain"
-      });
-      saveAs(blob, fullFileName);
+      saveAs(blob, fileName + fileType);
     }
   };
 
@@ -65,7 +96,14 @@ function App(): JSX.Element {
           Game Boy Advance Image Editor and Converter
         </span>
         <ImportButton onImageChange={handleImageLoad} />
-        <ExportButton startImageExport={handleImageExport} />
+        GBA ->
+        <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
+        Pal ->
+        <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} />
+        PNG ->
+        <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} />
+        JPG ->
+        <ExportButton startImageExport={handleImageExport.bind(null, "JPG")} />
       </div>
       <div className="workspace-container">
         <div className="left-panel">

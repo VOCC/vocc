@@ -1,13 +1,12 @@
 import React from "react";
 import "../../styles/buttons.scss";
 
-///////////// Type Definitions:
-interface IProps {
+interface ExportButtonProps {
   startImageExport: () => void;
 }
 
-function ExportButton({ startImageExport }: IProps): JSX.Element {
-  const handleClick = (e: any): void => {
+function ExportButton({ startImageExport }: ExportButtonProps): JSX.Element {
+  const handleClick = () => {
     startImageExport();
   };
 
