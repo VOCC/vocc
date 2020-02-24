@@ -36,9 +36,9 @@ function App(): JSX.Element {
     if (imageFile) {
       console.log("Loading image...");
       let image = await loadNewImage(imageFile);
-      let { palette, sprite } = quantize(image, 16);
-      setImage(sprite);
-      setPalette(palette);
+      // let { palette, sprite } = quantize(image, 16);
+      setImage(image);
+      // setPalette(palette);
     }
   };
 
