@@ -4,7 +4,10 @@ import {
   ImageInterface,
   ImageCoordinates
 } from "../../lib/interfaces";
-import { generateHeaderString } from "../../lib/exportUtils";
+import {
+  generateHeaderString,
+  generateCSourceFileString
+} from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
 
 export default class ImageObject implements ImageInterface {
@@ -49,7 +52,7 @@ export default class ImageObject implements ImageInterface {
   }
 
   public getCSourceData(): string {
-    return "";
+    return generateCSourceFileString(this, 3);
   }
 
   public getImageData(): Uint8ClampedArray {
