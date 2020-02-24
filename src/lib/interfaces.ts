@@ -43,7 +43,6 @@ export interface ImageInterface extends Drawable, Exportable, Modifiable {}
 
 export interface EditorSettings {
   grid: boolean;
-  startingScale: number;
   currentTool: Tools;
 }
 

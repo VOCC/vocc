@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState, useReducer } from "react";
 import { ImageInterface, EditorSettings } from "../lib/interfaces";
 import { exportImage, exportPalette } from "../lib/exportUtils";
 import { loadNewImage } from "../lib/imageLoadUtils";
@@ -15,15 +15,22 @@ import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import { quantize } from "../lib/quantize";
 
+function scaleReducer(state: number, e: WheelEvent) {
+  let direction = e.deltaY < 0 ? -1 : 1;
+  let newScale = state + direction / 4;
+  return newScale < 1 ? 1 : newScale;
+}
+
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(new Palette());
-  const [image, setImage] = useState<ImageInterface>(new ImageObject("img"));
+  const [image, setImage] = useState<ImageInterface>();
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    startingScale: 8,
     currentTool: Tools.PENCIL
   });
-  const [scale, setScale] = useState<number>(editorSettings.startingScale);
+  const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
+
+  const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
 
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
@@ -36,6 +43,10 @@ function App(): JSX.Element {
   };
 
   const handleImageExport = async (type: string) => {
+    if (!image) {
+      alert("No image to export! Try importing one first.");
+      return;
+    }
     let fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
     let fileType = "";
     let blob: Blob | null;
@@ -106,7 +117,7 @@ function App(): JSX.Element {
         <div className="left-panel">
           <div className="panel-label">Tools</div>
           <div className="tools-container">
-            <div> Scale: {scale.toFixed(2)}x </div>
+            {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
             <ToolsPanel
               settings={editorSettings}
               onSettingsChange={ns => handleSettingsChange(ns)}
@@ -115,10 +126,10 @@ function App(): JSX.Element {
         </div>
         <div className="image-container">
           <EditorCanvas
-            imageObject={image}
+            image={image}
             settings={editorSettings}
-            onChangeScale={(newScale: number) => setScale(newScale)}
-            // onChangeScale={(newScale: number) => null}
+            scale={scale}
+            onMouseWheel={handleMouseWheelEvent}
           />
         </div>
         <div className="right-panel">
