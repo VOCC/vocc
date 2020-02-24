@@ -162,6 +162,8 @@ function kmeans(
 
     changed = false;
 
+    changed = false;
+
     for (let i = 0; i < arrayToProcess.length; i++) {
       let minDist = -1;
       let minCluster = 0;
