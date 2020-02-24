@@ -1,4 +1,4 @@
-import ImageObject from "./ImageObject";
+import ImageObject from "./Bitmap3";
 import { Dimensions } from "../../lib/interfaces";
 
 export default class Background {

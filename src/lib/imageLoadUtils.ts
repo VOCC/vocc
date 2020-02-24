@@ -1,5 +1,5 @@
 import { Dimensions, ImageCoordinates } from "./interfaces";
-import ImageObject from "../components/objects/ImageObject";
+import ImageObject from "../components/objects/Bitmap3";
 
 export const createHiddenCanvas = (d: Dimensions): HTMLCanvasElement => {
   let hiddenCanvas = document.createElement("canvas");
@@ -35,6 +35,7 @@ export const loadHiddenImage = (imagefile: File): Promise<HTMLImageElement> => {
 };
 
 export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
+  console.log("Loading new image from file...");
   let hiddenImage = await loadHiddenImage(imageFile);
   let dimensions = {
     height: hiddenImage.naturalHeight,
