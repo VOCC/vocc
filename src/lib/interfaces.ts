@@ -36,7 +36,11 @@ export interface Exportable {
 }
 
 export interface Modifiable {
-  setPixelColor: (pos: ImageCoordinates, paletteIndex: number) => Modifiable;
+  setPixelColor: (
+    pos: ImageCoordinates,
+    paletteIndex?: number,
+    color?: Color
+  ) => void;
 }
 
 export interface ImageInterface extends Drawable, Exportable, Modifiable {}

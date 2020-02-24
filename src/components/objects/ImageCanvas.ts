@@ -55,7 +55,7 @@ export default class ImageCanvas {
   }
 }
 
-class PixelGrid {
+export class PixelGrid {
   public dimensions: Dimensions;
   public pixelGridRatio = 16;
 

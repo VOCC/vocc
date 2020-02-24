@@ -63,13 +63,10 @@ export default class Bitmap3 implements ImageInterface {
 
   public setPixelColor(
     pos: ImageCoordinates,
-    paletteIndex: number
-  ): ImageInterface {
-    console.warn(
-      "Method setPixelColor in ImageObject not implemented yet. " +
-        "Returning the current image."
-    );
-    return this;
+    paletteIndex?: number,
+    color?: Color
+  ): void {
+    return;
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {
