@@ -61,34 +61,8 @@ export default class Sprite implements ImageInterface {
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {
-    const drawPixel = (
-      pos: ImageCoordinates,
-      color: Color,
-      ctx: CanvasRenderingContext2D
-    ) => {
-      const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-      ctx.fillStyle = colorString;
-      ctx.fillRect(pos.x, pos.y, 1, 1);
-    };
-
-    let hiddenCanvas = Loader.createHiddenCanvas(this.dimensions);
-    let context = hiddenCanvas.getContext("2d");
-
-    if (context) {
-      for (let r = 0; r < this.dimensions.height; r++) {
-        for (let c = 0; c < this.dimensions.width; c++) {
-          let pos = { x: c, y: r };
-          drawPixel(pos, this.getPixelColorAt(pos), context);
-        }
-      }
-    } else {
-      console.error(
-        "Failed to get hidden canvas context when constructing image file blob!"
-      );
-    }
-
     return new Promise(resolve => {
-      hiddenCanvas.toBlob(blob => resolve(blob));
+      this.getImageCanvasElement().toBlob(blob => resolve(blob));
     });
   }
 

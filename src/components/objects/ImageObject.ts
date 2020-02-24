@@ -102,10 +102,8 @@ export default class ImageObject implements ImageInterface {
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {
-    let blob = new Blob();
-    for (let r = 0; r < this.dimensions.height; r++) {
-      for (let c = 0; c < this.dimensions.height; c++) {}
-    }
-    return blob;
+    return new Promise(resolve => {
+      this.getImageCanvasElement().toBlob(blob => resolve(blob));
+    });
   }
 }
