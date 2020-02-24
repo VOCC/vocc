@@ -9,8 +9,9 @@ import {
   generateCSourceFileString
 } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
+import ImageCanvas from "./ImageCanvas";
 
-export default class ImageObject implements ImageInterface {
+export default class Bitmap3 implements ImageInterface {
   public fileName: string;
   public dimensions: Dimensions = {
     height: 32,
@@ -20,6 +21,7 @@ export default class ImageObject implements ImageInterface {
   private hiddenCanvas: HTMLCanvasElement;
   private hiddenImage: HTMLImageElement;
   private imageData: Uint8ClampedArray;
+  private imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
@@ -42,6 +44,16 @@ export default class ImageObject implements ImageInterface {
         this.dimensions.height * this.dimensions.width
       );
     }
+
+    this.imageCanvas = new ImageCanvas(this);
+  }
+
+  public getImageCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getImageCanvasElement();
+  }
+
+  public getPixelGridCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getPixelGridCanvasElement();
   }
 
   public getHeaderData(): string {
@@ -57,10 +69,6 @@ export default class ImageObject implements ImageInterface {
 
   public getImageData(): Uint8ClampedArray {
     return this.imageData;
-  }
-
-  public getImageDimensions() {
-    return this.dimensions;
   }
 
   public getPixelColorAt(pos: ImageCoordinates): Color {
@@ -94,10 +102,8 @@ export default class ImageObject implements ImageInterface {
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {
-    let blob = new Blob();
-    for (let r = 0; r < this.dimensions.height; r++) {
-      for (let c = 0; c < this.dimensions.height; c++) {}
-    }
-    return blob;
+    return new Promise(resolve => {
+      this.getImageCanvasElement().toBlob(blob => resolve(blob));
+    });
   }
 }
