@@ -8,11 +8,10 @@ import {
   generateHeaderString,
   generateCSourceFileString
 } from "../../lib/exportUtils";
-import * as Loader from "../../lib/imageLoadUtils";
 import Palette from "./Palette";
 import ImageCanvas from "./ImageCanvas";
 
-export default class Sprite implements ImageInterface {
+export default class Bitmap4 implements ImageInterface {
   public dimensions: Dimensions;
   public fileName: string;
 

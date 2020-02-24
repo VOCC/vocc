@@ -11,7 +11,7 @@ import {
 import * as Loader from "../../lib/imageLoadUtils";
 import ImageCanvas from "./ImageCanvas";
 
-export default class ImageObject implements ImageInterface {
+export default class Bitmap3 implements ImageInterface {
   public fileName: string;
   public dimensions: Dimensions = {
     height: 32,

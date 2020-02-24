@@ -6,7 +6,6 @@ import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
 import EditorCanvas from "./EditorCanvas";
-import ImageObject from "./objects/ImageObject";
 import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
 import "../styles/app.scss";

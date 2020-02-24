@@ -1,5 +1,5 @@
-import ImageObject from "../components/objects/ImageObject";
-import Sprite from "../components/objects/Sprite";
+import ImageObject from "../components/objects/Bitmap3";
+import Sprite from "../components/objects/Bitmap4";
 import Palette from "../components/objects/Palette";
 import { Color } from "./interfaces";
 
@@ -34,7 +34,7 @@ export function quantize(image: ImageObject, depth: number) {
     centroids = uniqueColors;
     colors = uniqueColors.length;
   } else {
-    let {pickedCentroids} = findCentroids(uniqueColors, colors);
+    let { pickedCentroids } = findCentroids(uniqueColors, colors);
     // console.log(pickedCentroids)
     centroids = JSON.parse(JSON.stringify(pickedCentroids));
   }
@@ -65,7 +65,7 @@ export function quantize(image: ImageObject, depth: number) {
     return b.length - a.length;
   });
 
-  console.log(clusters)
+  console.log(clusters);
 
   let spriteIndexArrayLength = image.dimensions.height * image.dimensions.width;
 
@@ -156,11 +156,10 @@ function kmeans(
   let changed = false;
 
   do {
-
     for (let reset = 0; reset < clusters; reset++) {
       Groups[reset] = [];
     }
-    
+
     changed = false;
 
     for (let i = 0; i < arrayToProcess.length; i++) {
@@ -209,7 +208,7 @@ function kmeans(
             255
           )
         );
-        
+
         if (centroids[clusterIterate][i] !== oldcentroids[clusterIterate][i]) {
           changed = true;
           oldcentroids = [];
@@ -220,11 +219,11 @@ function kmeans(
     iterations++;
   } while (changed === true && iterations < 1000);
 
-  console.log("kmeans output:")
+  console.log("kmeans output:");
   console.log(iterations);
   // console.log(Groups.length);
   // console.log(Groups);
-  console.log("..........")
+  console.log("..........");
 
   // let ret = [Groups, centroids];
   // console.log(ret);
@@ -233,19 +232,20 @@ function kmeans(
   return { groups: Groups, centers: centroids };
 }
 
-//function to determine if there exists a group of centroids with specific 
+//function to determine if there exists a group of centroids with specific
 //average distance between them
 //points: list of points to search
 //midDist: desired average distance
 //numCentroids: number of points to find
 //
-//returns: 
+//returns:
 //possible (boolean)
 //centers (list of points with desired distance)
-function centroidPossible
-(points: number[][], midDist: number, numCentroids: number): 
-{possible: boolean, centers: number[][]} {
-  
+function centroidPossible(
+  points: number[][],
+  midDist: number,
+  numCentroids: number
+): { possible: boolean; centers: number[][] } {
   let centroids = 1;
   let currColor: number[] = points[0];
   let possible = false;
@@ -259,42 +259,40 @@ function centroidPossible
     for (let j = 0; j < points[i].length; j++) {
       dist += Math.pow(Math.abs(points[i][j] - currColor[j]), 2);
     }
-    dist = Math.sqrt(dist)
+    dist = Math.sqrt(dist);
 
     if (dist >= midDist) {
-      centroids++
+      centroids++;
       currColor = points[i];
       centers.push(points[i]);
 
       if (centroids >= numCentroids) {
         possible = true;
-        return {possible, centers}
+        return { possible, centers };
       }
     }
   }
-  return {possible, centers};
+  return { possible, centers };
 }
 
-//binary search to find centroids, reutrn list of centroids with 
+//binary search to find centroids, reutrn list of centroids with
 // average largest distance between them
 function findCentroids(
-   uniqueColors: number[][], 
-   depth: number
-  ):
-   {pickedCentroids: number[][]} 
-  {
+  uniqueColors: number[][],
+  depth: number
+): { pickedCentroids: number[][] } {
   let maxDist = 442;
   let minDist = 0;
-  let midDist = ((maxDist + minDist) / 2);
+  let midDist = (maxDist + minDist) / 2;
 
   let dist = 0;
 
   let pickedCentroids: number[][] = [];
 
   while (minDist <= maxDist) {
-    midDist = ((maxDist + minDist) / 2);
-    let {possible, centers} = centroidPossible(uniqueColors, midDist, depth);
-    
+    midDist = (maxDist + minDist) / 2;
+    let { possible, centers } = centroidPossible(uniqueColors, midDist, depth);
+
     if (!possible) {
       maxDist = midDist - 1;
     } else {
@@ -305,5 +303,5 @@ function findCentroids(
       minDist = midDist + 1;
     }
   }
-  return {pickedCentroids}
+  return { pickedCentroids };
 }
