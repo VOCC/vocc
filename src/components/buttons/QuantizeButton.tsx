@@ -9,6 +9,10 @@ function ExportButton({ handleQuantize }: ExportButtonProps): JSX.Element {
   const [depth, setDepth] = useState<number>(15);
 
   const handleClick = () => {
+    if (!depth) {
+      alert("Can't quantize with unspecified color depth!");
+      return;
+    }
     handleQuantize(depth);
   };
 

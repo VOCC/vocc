@@ -43,7 +43,17 @@ $textcolor: $darkgray;
 
 .right-panel {
   border-left: 1px solid $border-color;
+  max-width: 256px;
   min-width: 256px;
+}
+
+.palette-container {
+  text-align: center;
+}
+
+.palette-canvas {
+  height: 192px;
+  width: 192px;
 }
 
 .panel-label {

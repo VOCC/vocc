@@ -144,7 +144,9 @@ function App(): JSX.Element {
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
-          <PaletteDisplay palette={palette} />
+          <div className="palette-container">
+            <PaletteDisplay palette={palette} />
+          </div>
           <QuantizeButton handleQuantize={handleQuantize} />
         </div>
       </div>

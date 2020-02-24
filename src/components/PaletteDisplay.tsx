@@ -2,6 +2,11 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import Palette from "./objects/Palette";
 import { PALETTE_SIZE } from "../lib/consts";
 
+const PALETTE_CANVAS_SIZE = {
+  height: 192,
+  width: 192
+};
+
 interface IProps {
   palette: Palette;
 }
@@ -23,7 +28,13 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext("2d");
     if (!context) return;
-    context.drawImage(palette.getPixelGridCanvas(), 0, 0);
+    context.drawImage(
+      palette.getPixelGridCanvas(),
+      0,
+      0,
+      PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
+      PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
+    );
   }, [palette]);
 
   /**
@@ -38,8 +49,8 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
       palette.getPaletteCanvas(),
       0,
       0,
-      PALETTE_SIZE.width * 8,
-      PALETTE_SIZE.height * 8
+      PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
+      PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
     );
   }, [palette]);
 
