@@ -6,6 +6,7 @@ import {
 } from "../../lib/interfaces";
 import { generateHeaderString } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
+import ImageCanvas from "./ImageCanvas";
 
 export default class ImageObject implements ImageInterface {
   public fileName: string;
@@ -17,6 +18,7 @@ export default class ImageObject implements ImageInterface {
   private hiddenCanvas: HTMLCanvasElement;
   private hiddenImage: HTMLImageElement;
   private imageData: Uint8ClampedArray;
+  private imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
@@ -39,6 +41,16 @@ export default class ImageObject implements ImageInterface {
         this.dimensions.height * this.dimensions.width
       );
     }
+
+    this.imageCanvas = new ImageCanvas(this);
+  }
+
+  public getImageCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getImageCanvasElement();
+  }
+
+  public getPixelGridCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getPixelGridCanvasElement();
   }
 
   public getHeaderData(): string {
@@ -54,10 +66,6 @@ export default class ImageObject implements ImageInterface {
 
   public getImageData(): Uint8ClampedArray {
     return this.imageData;
-  }
-
-  public getImageDimensions() {
-    return this.dimensions;
   }
 
   public getPixelColorAt(pos: ImageCoordinates): Color {

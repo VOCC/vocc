@@ -35,6 +35,7 @@ export const loadHiddenImage = (imagefile: File): Promise<HTMLImageElement> => {
 };
 
 export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
+  console.log("Loading new image from file...");
   let hiddenImage = await loadHiddenImage(imageFile);
   let dimensions = {
     height: hiddenImage.naturalHeight,

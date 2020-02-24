@@ -10,7 +10,6 @@ export default class ImageCanvas {
   public dimensions: Dimensions;
   public pixelGridRatio = 16;
 
-  private image: ImageInterface;
   private hiddenCanvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
   private pixelGrid: PixelGrid;
@@ -18,14 +17,13 @@ export default class ImageCanvas {
   public constructor(image: ImageInterface) {
     console.log("Creating new internal ImageCanvas.");
 
-    this.image = image;
     this.dimensions = image.dimensions;
     this.hiddenCanvas = createHiddenCanvas(image.dimensions);
     this.context = this.hiddenCanvas.getContext("2d");
 
-    this.pixelGrid = new PixelGrid(this.image.dimensions, this.pixelGridRatio);
+    this.pixelGrid = new PixelGrid(image.dimensions, this.pixelGridRatio);
 
-    this.drawImage();
+    this.drawImageToHiddenCanvas(image);
   }
 
   public getImageCanvasElement(): HTMLCanvasElement {
@@ -36,6 +34,10 @@ export default class ImageCanvas {
     return this.pixelGrid.getCanvasElement();
   }
 
+  public updatePixel(pos: ImageCoordinates, color: Color): void {
+    this.drawPixel(pos, color);
+  }
+
   private drawPixel(pos: ImageCoordinates, color: Color): void {
     if (!this.context) return;
     let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
@@ -43,11 +45,11 @@ export default class ImageCanvas {
     this.context.fillRect(pos.x, pos.y, 1, 1);
   }
 
-  private drawImage() {
+  private drawImageToHiddenCanvas(image: ImageInterface) {
     console.log("Drawing internal image.");
-    for (let x = 0; x < this.image.dimensions.width; x++) {
-      for (let y = 0; y < this.image.dimensions.height; y++) {
-        this.drawPixel({ x, y }, this.image.getPixelColorAt({ x, y }));
+    for (let x = 0; x < image.dimensions.width; x++) {
+      for (let y = 0; y < image.dimensions.height; y++) {
+        this.drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
       }
     }
   }

@@ -10,6 +10,7 @@ import {
 } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
 import Palette from "./Palette";
+import ImageCanvas from "./ImageCanvas";
 
 export default class Sprite implements ImageInterface {
   public dimensions: Dimensions;
@@ -17,13 +18,8 @@ export default class Sprite implements ImageInterface {
 
   private data: number[];
   private palette: Palette;
+  private imageCanvas: ImageCanvas;
 
-  /**
-   *
-   * @param indexArray (rows, columns) a 2D array that represents the colors in
-   *    the image as indices into the palette
-   * @param palette the color palette that the sprite should draw from
-   */
   constructor(
     fileName: string,
     indexArray: number[],
@@ -34,6 +30,15 @@ export default class Sprite implements ImageInterface {
     this.fileName = fileName;
     this.data = indexArray;
     this.palette = palette;
+    this.imageCanvas = new ImageCanvas(this);
+  }
+
+  public getImageCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getImageCanvasElement();
+  }
+
+  public getPixelGridCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getPixelGridCanvasElement();
   }
 
   public getImageData(): Uint8ClampedArray {
@@ -85,11 +90,6 @@ export default class Sprite implements ImageInterface {
     return new Promise(resolve => {
       hiddenCanvas.toBlob(blob => resolve(blob));
     });
-  }
-
-  public isBlankImage(): boolean {
-    // set to false because if a sprite is initialized,
-    return false; // an image has been imported (i think this is the case)
   }
 
   /**

@@ -1,6 +1,8 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import { ImageInterface, EditorSettings } from "../lib/interfaces";
-import ImageCanvas from "./objects/ImageCanvas";
+
+// The pixel grid will not be visible when the scale is smaller than this value.
+const PIXELGRID_ZOOM_LIMIT = 8;
 
 interface EditorCanvasProps {
   imageObject: ImageInterface;
@@ -19,9 +21,8 @@ function EditorCanvas({
   settings,
   onChangeScale
 }: EditorCanvasProps): JSX.Element {
-  const [image, setImage] = useState<ImageInterface>(imageObject);
-  const [imageCanvas, setImageCanvas] = useState<ImageCanvas>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [image, setImage] = useState<ImageInterface>(imageObject);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(
     canvasRef ? getContext(canvasRef) : null
   );
@@ -68,7 +69,7 @@ function EditorCanvas({
    * settings change.
    */
   useEffect(() => {
-    if (context && canvasRef.current && imageCanvas) {
+    if (context && canvasRef.current) {
       // Clear the context
       context.clearRect(
         0,
@@ -78,24 +79,24 @@ function EditorCanvas({
       );
       // Draw the image at the correct position and scale
       context.drawImage(
-        imageCanvas.getImageCanvasElement(),
+        image.getImageCanvasElement(),
         0,
         0,
-        imageCanvas.dimensions.width * scale,
-        imageCanvas.dimensions.height * scale
+        image.dimensions.width * scale,
+        image.dimensions.height * scale
       );
       // Draw the grid (if we need to)
-      if (settings.grid && scale >= imageCanvas.pixelGridRatio / 2) {
+      if (settings.grid && scale >= PIXELGRID_ZOOM_LIMIT) {
         context.drawImage(
-          imageCanvas.getPixelGridCanvasElement(),
+          image.getPixelGridCanvasElement(),
           0,
           0,
-          imageCanvas.dimensions.width * scale,
-          imageCanvas.dimensions.height * scale
+          image.dimensions.width * scale,
+          image.dimensions.height * scale
         );
       }
     }
-  }, [image, imageCanvas, context, scale, settings]);
+  }, [image, context, scale, settings]);
 
   /**
    * When we change the scale, then we should update the scale display in the
@@ -111,7 +112,6 @@ function EditorCanvas({
    */
   useEffect(() => {
     setImage(imageObject);
-    setImageCanvas(new ImageCanvas(imageObject));
   }, [imageObject]);
 
   return <canvas ref={canvasRef} className="image-canvas" />;
