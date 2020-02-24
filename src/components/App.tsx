@@ -1,18 +1,20 @@
 import React, { useCallback, useState, useReducer } from "react";
-import { ImageInterface, EditorSettings } from "../lib/interfaces";
 import { exportImage, exportPalette } from "../lib/exportUtils";
+import { ImageInterface, EditorSettings } from "../lib/interfaces";
 import { loadNewImage } from "../lib/imageLoadUtils";
+import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
-import ExportButton from "./buttons/ExportButton";
+import Bitmap3 from "./objects/Bitmap3";
 import EditorCanvas from "./EditorCanvas";
+import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
+import Palette from "./objects/Palette";
+import PaletteDisplay from "./PaletteDisplay";
+import QuantizeButton from "./buttons/QuantizeButton";
 import ToolsPanel from "./ToolsPanel";
 import "../styles/app.scss";
 import "../styles/toolbar.scss";
-import Palette from "./objects/Palette";
-import PaletteDisplay from "./PaletteDisplay";
-import { quantize } from "../lib/quantize";
 
 function scaleReducer(state: number, e: WheelEvent) {
   let direction = e.deltaY < 0 ? -1 : 1;
@@ -35,9 +37,18 @@ function App(): JSX.Element {
     if (imageFile) {
       console.log("Loading image...");
       let image = await loadNewImage(imageFile);
-      // let { palette, sprite } = quantize(image, 16);
       setImage(image);
-      // setPalette(palette);
+    }
+  };
+
+  const handleQuantize = (newColorDepth: number): void => {
+    newColorDepth = Math.floor(newColorDepth); // just in case of a float
+    if (!(image instanceof Bitmap3)) {
+      alert("Requantization of paletted images currently not supported!");
+    } else {
+      let { palette, sprite } = quantize(image, newColorDepth);
+      setImage(sprite);
+      setPalette(palette);
     }
   };
 
@@ -134,6 +145,7 @@ function App(): JSX.Element {
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
           <PaletteDisplay palette={palette} />
+          <QuantizeButton handleQuantize={handleQuantize} />
         </div>
       </div>
     </div>

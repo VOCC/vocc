@@ -32,3 +32,14 @@ input[type="file"] {
 .export-button {
   @extend .button;
 }
+
+.quantize-container {
+  width: 100%;
+  text-align: center;
+}
+
+.quantize-input {
+  border-radius: 4px;
+  width: 64px;
+  box-sizing: border-box;
+}
