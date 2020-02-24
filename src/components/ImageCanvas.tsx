@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState, useCallback } from "react";
 import {
   Color,
   Dimensions,
@@ -6,6 +6,8 @@ import {
   EditorSettings,
   ImageCoordinates
 } from "../lib/interfaces";
+import { COLORS } from "../lib/consts";
+import { start } from "repl";
 
 interface ImageCanvasProps {
   imageObject: ImageInterface;
@@ -18,6 +20,11 @@ function scaleReducer(state: number, e: WheelEvent) {
   let newScale = state + direction / 2;
   return newScale < 1 ? 1 : newScale;
 }
+
+type Coordinate = {
+  x: number;
+  y: number;
+};
 
 function ImageCanvas({
   imageObject,
@@ -34,6 +41,11 @@ function ImageCanvas({
     width: 0
   });
   const [scale, dispatch] = useReducer(scaleReducer, settings.startingScale);
+
+  ///////////////////// Drawing Tool
+  const [isPainting, setIsPainting] = useState<boolean>(false);
+  const [mousePos, setMousePos] = useState<Coordinate | undefined>(undefined);
+  /////////////////////
 
   useEffect(() => {
     const setupCanvas = () => {
@@ -119,6 +131,91 @@ function ImageCanvas({
       }
     }
   }, [image, context, scale, canvasSize, settings]);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Drawing Tool
+  const getMousePos = (e: MouseEvent): Coordinate | undefined => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+    return undefined;
+  }
+  
+  // todo: make drawing only fill pixel grids
+  const drawLine = (
+    startingPos: Coordinate, endingPos: Coordinate, color: Color
+    ): void => {
+      
+    if (!canvasRef.current) return;
+    const context = canvasRef.current.getContext('2d');
+    if (!context) return;
+    const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    context.strokeStyle = colorString;
+    const lineWidth = 4;
+    const lineJoin = 'round';
+    context.lineWidth = lineWidth;
+    context.lineJoin = lineJoin;
+
+    context.beginPath();
+    context.moveTo(startingPos.x, startingPos.y);
+    context.lineTo(endingPos.x, endingPos.y);
+    context.closePath();
+    context.stroke();
+  }
+
+  const startPaint = useCallback((e: MouseEvent) => {
+    const mousePosition = getMousePos(e);
+    if (mousePosition) {
+      setMousePos(mousePosition);
+      setIsPainting(true);
+    }
+  }, []);
+
+  const paint = useCallback((e: MouseEvent) => {
+    if (isPainting) {
+      const newMousePos = getMousePos(e);
+      if (mousePos && newMousePos) {
+        drawLine(mousePos, newMousePos, COLORS.red);
+        setMousePos(newMousePos);
+      }
+    }
+  }, [isPainting, mousePos]);
+
+  const stopPaint = useCallback(() => {
+    setMousePos(undefined);
+    setIsPainting(false);
+  }, []);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mousedown', startPaint);
+    return () => canvas.removeEventListener('mousedown', startPaint);
+  }, [startPaint]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mousemove', paint);
+    return () => canvas.removeEventListener('mousemove', paint);
+  }, [paint]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mouseup', stopPaint);
+    canvas.addEventListener('mouseleave', stopPaint)
+    return () => {
+      canvas.removeEventListener('mouseup', stopPaint);
+      canvas.removeEventListener('mouseleave', stopPaint);
+    }
+  }, [stopPaint]);
+
+  /////////////////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     onChangeScale(scale);
