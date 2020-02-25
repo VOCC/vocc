@@ -1,140 +1,100 @@
-import React, { useEffect, useReducer, useRef, useState, useCallback } from "react";
-import {
-  Color,
-  Dimensions,
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { 
   ImageInterface,
   EditorSettings,
-  ImageCoordinates
-} from "../lib/interfaces";
+  ImageCoordinates,
+  Color } from "../lib/interfaces";
 import { COLORS } from "../lib/consts";
-import { start } from "repl";
+import Bitmap from "./objects/Bitmap";
 
-interface ImageCanvasProps {
-  imageObject: ImageInterface;
+// The pixel grid will not be visible when the scale is smaller than this value.
+const PIXELGRID_ZOOM_LIMIT = 8;
+
+interface EditorCanvasProps {
+  image: Bitmap | undefined;
   settings: EditorSettings;
-  onChangeScale: (newScale: number) => void;
+  scale: number;
+  onMouseWheel: (e: WheelEvent) => void;
 }
 
-function scaleReducer(state: number, e: WheelEvent) {
-  let direction = e.deltaY < 0 ? -1 : 1;
-  let newScale = state + direction / 2;
-  return newScale < 1 ? 1 : newScale;
-}
-
-type Coordinate = {
-  x: number;
-  y: number;
-};
-
-function ImageCanvas({
-  imageObject,
+export default function EditorCanvas({
+  image,
   settings,
-  onChangeScale
-}: ImageCanvasProps): JSX.Element {
-  const [image, setImage] = useState<ImageInterface>(imageObject);
+  scale,
+  onMouseWheel
+}: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // const [localImage, setImage] = useState<ImageInterface>(image);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(
     canvasRef ? getContext(canvasRef) : null
   );
-  const [canvasSize, setCanvasSize] = useState<Dimensions>({
-    height: 0,
-    width: 0
-  });
-  const [scale, dispatch] = useReducer(scaleReducer, settings.startingScale);
 
   ///////////////////// Drawing Tool
   const [isPainting, setIsPainting] = useState<boolean>(false);
-  const [mousePos, setMousePos] = useState<Coordinate | undefined>(undefined);
+  const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(undefined);
   /////////////////////
 
+  /**
+   * Set up the canvas every time the context changes.
+   */
   useEffect(() => {
+    console.log("Setting up canvas...");
+
     const setupCanvas = () => {
       let canvas = getCanvas(canvasRef);
       if (!canvas) return;
       setContext(getContext(canvasRef));
       if (!context) return;
 
-      var devicePixelRatio = window.devicePixelRatio || 1;
+      const setupCanvasSize = (canvas: HTMLCanvasElement) => {
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        canvas.width = canvas.clientWidth * devicePixelRatio;
+        canvas.height = canvas.clientHeight * devicePixelRatio;
+        context.imageSmoothingEnabled = false;
+      };
 
-      var rect = canvas.getBoundingClientRect();
-
-      canvas.width = rect.width * devicePixelRatio;
-      canvas.height = rect.height * devicePixelRatio;
-      setCanvasSize({ height: canvas.height, width: canvas.width });
-
-      canvas.addEventListener("wheel", e => dispatch(e));
-
+      setupCanvasSize(canvas);
       window.addEventListener("resize", () => {
-        if (canvas) {
-          let devicePixelRatio = window.devicePixelRatio || 1;
-          let rect = canvas.getBoundingClientRect();
-          canvas.width = rect.width * devicePixelRatio;
-          canvas.height = rect.height * devicePixelRatio;
-          setCanvasSize({ height: canvas.height, width: canvas.width });
-        }
+        if (canvas) setupCanvasSize(canvas);
       });
 
-      context.scale(devicePixelRatio, devicePixelRatio);
-
-      console.log("Setting up canvas...");
+      // Add the event listener for updating the scale with the scale dispatcher
+      canvas.addEventListener("wheel", onMouseWheel);
     };
     setupCanvas();
-  }, [context]);
+  }, [context, onMouseWheel]);
 
+  /**
+   * Draw the image whenever the image, imageCanvas, context, scale, or editor
+   * settings change.
+   */
   useEffect(() => {
-    const drawGrid = () => {
-      if (!context) return;
-      const { width, height } = image.dimensions;
-      context.strokeStyle = "gray";
-      context.beginPath();
-
-      for (let x = 0; x <= width; x++) {
-        context.moveTo(x * scale, 0);
-        context.lineTo(x * scale, height * scale);
-      }
-
-      for (let y = 0; y <= height; y++) {
-        context.moveTo(0, y * scale);
-        context.lineTo(width * scale, y * scale);
-      }
-
-      context.stroke();
-    };
-
-    const drawPixel = (pos: ImageCoordinates, color: Color) => {
-      if (!context) return;
-      let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-      context.fillStyle = colorString;
-      context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
-    };
-
-    const drawImage = (image: ImageInterface) => {
-      // console.log("drawing image of size", image.dimensions);
-      for (let x = 0; x < image.dimensions.width; x++) {
-        for (let y = 0; y < image.dimensions.height; y++) {
-          // console.log("trying to get color at", x, y);
-          drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
-        }
-      }
-    };
-
-    if (context && canvasRef.current) {
-      context.clearRect(
+    if (!image || !context || !canvasRef.current) return;
+    // Clear the context
+    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    // Draw the image at the correct position and scale
+    context.drawImage(
+      image.getImageCanvasElement(),
+      0,
+      0,
+      image.dimensions.width * scale,
+      image.dimensions.height * scale
+    );
+    // Draw the grid (if we need to)
+    if (settings.grid && scale >= PIXELGRID_ZOOM_LIMIT) {
+      context.drawImage(
+        image.getPixelGridCanvasElement(),
         0,
         0,
-        canvasRef.current.width,
-        canvasRef.current.height
+        image.dimensions.width * scale,
+        image.dimensions.height * scale
       );
-      drawImage(image);
-      if (settings.grid) {
-        drawGrid();
-      }
     }
-  }, [image, context, scale, canvasSize, settings]);
+  }, [image, context, scale, settings]);
 
   /////////////////////////////////////////////////////////////////////////////
   // Drawing Tool
-  const getMousePos = (e: MouseEvent): Coordinate | undefined => {
+  const getMousePos = (e: MouseEvent): ImageCoordinates | undefined => {
     if (canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
       return {
@@ -147,7 +107,7 @@ function ImageCanvas({
   
   // todo: make drawing only fill pixel grids
   const drawLine = (
-    startingPos: Coordinate, endingPos: Coordinate, color: Color
+    startingPos: ImageCoordinates, endingPos: ImageCoordinates, color: Color
     ): void => {
       
     if (!canvasRef.current) return;
@@ -217,14 +177,6 @@ function ImageCanvas({
 
   /////////////////////////////////////////////////////////////////////////////
 
-  useEffect(() => {
-    onChangeScale(scale);
-  }, [scale, onChangeScale]);
-
-  useEffect(() => {
-    setImage(imageObject);
-  }, [imageObject]);
-
   return <canvas ref={canvasRef} className="image-canvas" />;
 }
 
@@ -242,5 +194,3 @@ const getContext = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
   }
   return context;
 };
-
-export default ImageCanvas;

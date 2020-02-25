@@ -1,0 +1,30 @@
+import React, { useState } from "react";
+import "../../styles/buttons.scss";
+
+interface ExportButtonProps {
+  handleQuantize: (newColorDepth: number) => void;
+}
+
+function ExportButton({ handleQuantize }: ExportButtonProps): JSX.Element {
+  const [depth, setDepth] = useState<number>(15);
+
+  const handleClick = () => {
+    handleQuantize(depth);
+  };
+
+  return (
+    <div className="quantize-container">
+      <button className="button export-button" onClick={handleClick}>
+        Quantize
+      </button>
+      <input
+        className="quantize-input"
+        type="number"
+        value={depth}
+        onChange={e => setDepth(parseInt(e.target.value))}
+      ></input>
+    </div>
+  );
+}
+
+export default ExportButton;
