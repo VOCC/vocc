@@ -26,6 +26,7 @@ function scaleReducer(state: number, e: WheelEvent) {
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [image, setImage] = useState<ImageInterface>();
+  const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     currentTool: Tool.PENCIL
@@ -163,7 +164,11 @@ function App(): JSX.Element {
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
           <div className="palette-container">
-            <PaletteDisplay palette={palette} />
+            <PaletteDisplay
+              palette={palette}
+              selectedColorIndex={selectedColorIndex}
+              onChangeSelectedColorIndex={setSelectedColorIndex}
+            />
           </div>
           <QuantizeButton handleQuantize={handleQuantize} />
         </div>
