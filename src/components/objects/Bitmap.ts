@@ -44,10 +44,6 @@ export default abstract class Bitmap implements ImageInterface {
     return this.imageCanvas.getPixelGridCanvasElement();
   }
 
-  public getCSourceData(): string {
-    return generateCSourceFileString(this, 3);
-  }
-
   public getImageData(): Uint8ClampedArray {
     return this.imageData;
   }
@@ -60,6 +56,7 @@ export default abstract class Bitmap implements ImageInterface {
 
   /////////////////////////////////////// abstract classes
 
+  public abstract getCSourceData(): string;
   public abstract getHeaderData(): string;
   public abstract getPixelColorAt(pos: ImageCoordinates): Color;
   public abstract setPixelColor(

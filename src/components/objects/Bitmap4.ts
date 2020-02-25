@@ -5,7 +5,7 @@ import {
   ImageInterface
 } from "../../lib/interfaces";
 import {
-  generateHeaderString
+  generateHeaderString, generateCSourceFileString
 } from "../../lib/exportUtils";
 import Palette from "./Palette";
 import Bitmap from "./Bitmap";
@@ -23,6 +23,10 @@ export default class Bitmap4 extends Bitmap {
     super(fileName, dimensions);
     this.data = indexArray;
     this.palette = palette;
+  }
+
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 4, this.palette);
   }
 
   public getHeaderData(): string {

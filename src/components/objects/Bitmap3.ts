@@ -4,7 +4,7 @@ import {
   ImageCoordinates
 } from "../../lib/interfaces";
 import {
-  generateHeaderString
+  generateHeaderString, generateCSourceFileString
 } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
 import Bitmap from "./Bitmap";
@@ -17,6 +17,10 @@ export default class Bitmap3 extends Bitmap {
     imageData: Uint8ClampedArray
   ) {
     super(fileName, dimensions, imageData);
+  }
+
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 3);
   }
 
   public getHeaderData(): string {
