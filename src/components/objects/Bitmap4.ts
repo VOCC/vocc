@@ -5,43 +5,24 @@ import {
   ImageInterface
 } from "../../lib/interfaces";
 import {
-  generateHeaderString,
-  generateCSourceFileString
+  generateHeaderString
 } from "../../lib/exportUtils";
 import Palette from "./Palette";
-import ImageCanvas from "./ImageCanvas";
+import Bitmap from "./Bitmap";
 
-export default class Bitmap4 implements ImageInterface {
-  public dimensions: Dimensions;
-  public fileName: string;
-
+export default class Bitmap4 extends Bitmap {
   private data: number[];
   private palette: Palette;
-  private imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
+    dimensions: Dimensions,
     indexArray: number[],
-    palette: Palette,
-    dimensions: Dimensions
+    palette: Palette
   ) {
-    this.dimensions = dimensions;
-    this.fileName = fileName;
+    super(fileName, dimensions);
     this.data = indexArray;
     this.palette = palette;
-    this.imageCanvas = new ImageCanvas(this);
-  }
-
-  public getImageCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getImageCanvasElement();
-  }
-
-  public getPixelGridCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getPixelGridCanvasElement();
-  }
-
-  public getImageData(): Uint8ClampedArray {
-    return new Uint8ClampedArray(this.data);
   }
 
   public getHeaderData(): string {
@@ -53,16 +34,6 @@ export default class Bitmap4 implements ImageInterface {
       },
       4
     );
-  }
-
-  public getCSourceData(): string {
-    return generateCSourceFileString(this, 4, this.palette);
-  }
-
-  public async getImageFileBlob(): Promise<Blob | null> {
-    return new Promise(resolve => {
-      this.getImageCanvasElement().toBlob(blob => resolve(blob));
-    });
   }
 
   /**
