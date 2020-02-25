@@ -4,10 +4,6 @@ import {
   ImageInterface,
   ImageCoordinates
 } from "../../lib/interfaces";
-import {
-  generateHeaderString,
-  generateCSourceFileString
-} from "../../lib/exportUtils";
 import ImageCanvas from "./ImageCanvas";
 
 export default abstract class Bitmap implements ImageInterface {
@@ -63,5 +59,5 @@ export default abstract class Bitmap implements ImageInterface {
     pos: ImageCoordinates,
     paletteIndex?: number,
     color?: Color
-  ): void;
+  ): ImageInterface;
 }

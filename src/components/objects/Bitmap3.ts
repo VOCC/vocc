@@ -1,7 +1,8 @@
 import {
   Color,
   Dimensions,
-  ImageCoordinates
+  ImageCoordinates,
+  ImageInterface
 } from "../../lib/interfaces";
 import {
   generateHeaderString, generateCSourceFileString
@@ -10,6 +11,8 @@ import * as Loader from "../../lib/imageLoadUtils";
 import Bitmap from "./Bitmap";
 
 export default class Bitmap3 extends Bitmap {
+  private hiddenCanvas: HTMLCanvasElement;
+  private hiddenImage: HTMLImageElement;
 
   constructor(
     fileName: string,
@@ -17,6 +20,10 @@ export default class Bitmap3 extends Bitmap {
     imageData: Uint8ClampedArray
   ) {
     super(fileName, dimensions, imageData);
+    this.hiddenImage = document.createElement("img");
+    this.hiddenImage.height = this.dimensions.height;
+    this.hiddenImage.width = this.dimensions.width;
+    this.hiddenCanvas = Loader.createHiddenCanvas(this.dimensions);
   }
 
   public getCSourceData(): string {
@@ -43,7 +50,11 @@ export default class Bitmap3 extends Bitmap {
     pos: ImageCoordinates,
     paletteIndex?: number,
     color?: Color
-  ): void {
-    return;
+  ): ImageInterface {
+    console.warn(
+      "Method setPixelColor in ImageObject not implemented yet. " +
+      "Returning the current image."
+    );
+    return this;
   }
 }
