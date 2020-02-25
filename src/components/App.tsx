@@ -4,8 +4,9 @@ import { ImageInterface, EditorSettings } from "../lib/interfaces";
 import { loadNewImage } from "../lib/imageLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
-import { Tools } from "../lib/consts";
+import { Tool } from "../lib/consts";
 import Bitmap3 from "./objects/Bitmap3";
+import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
@@ -23,11 +24,11 @@ function scaleReducer(state: number, e: WheelEvent) {
 }
 
 function App(): JSX.Element {
-  const [palette, setPalette] = useState<Palette>(new Palette());
+  const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [image, setImage] = useState<ImageInterface>();
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    currentTool: Tools.PENCIL
+    currentTool: Tool.PENCIL
   });
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
 
@@ -40,6 +41,16 @@ function App(): JSX.Element {
       setImage(image);
     }
   };
+
+  const handleToolChange = useCallback(
+    (newTool: Tool) => {
+      setEditorSettings({
+        grid: editorSettings.grid,
+        currentTool: newTool
+      });
+    },
+    [editorSettings.grid]
+  );
 
   const handleQuantize = (newColorDepth: number): void => {
     newColorDepth = Math.floor(newColorDepth); // just in case of a float
@@ -77,9 +88,14 @@ function App(): JSX.Element {
         return;
       case "PAL":
         //.pal file
-        fileType = ".pal";
-        blob = new Blob([exportPalette(palette)]);
-        break;
+        if (!palette) {
+          alert("Can't export a non-existant palette!");
+          return;
+        } else {
+          fileType = ".pal";
+          blob = new Blob([exportPalette(palette)]);
+          break;
+        }
       case "JPG":
         //.jpeg file
         fileType = ".jpg";
@@ -102,9 +118,10 @@ function App(): JSX.Element {
     }
   };
 
-  const handleSettingsChange = (newSettings: EditorSettings): void => {
-    setEditorSettings(newSettings);
-  };
+  const handleSettingsChange = useCallback(
+    (newSettings: EditorSettings): void => setEditorSettings(newSettings),
+    []
+  );
 
   return (
     <div className="app-container">
@@ -130,7 +147,8 @@ function App(): JSX.Element {
             {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
             <ToolsPanel
               settings={editorSettings}
-              onSettingsChange={ns => handleSettingsChange(ns)}
+              onSettingsChange={handleSettingsChange}
+              onToolChange={handleToolChange}
             ></ToolsPanel>
           </div>
         </div>

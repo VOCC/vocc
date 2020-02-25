@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import Palette from "./objects/Palette";
-import { PALETTE_SIZE } from "../lib/consts";
 
 const PALETTE_CANVAS_SIZE = {
   height: 192,
