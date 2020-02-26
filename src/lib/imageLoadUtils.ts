@@ -51,7 +51,7 @@ export const loadNewImage = async (imageFile: File): Promise<Bitmap> => {
     }
   }
   console.warn("Couldn't load image - loaded blank image instead.");
-  return new Bitmap3("img", {height: 0, width: 0});
+  return new Bitmap3("img", {height: 1, width: 1});
 };
 
 export const offset = (pos: ImageCoordinates, d: Dimensions) =>

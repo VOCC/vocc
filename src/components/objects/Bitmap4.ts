@@ -15,6 +15,8 @@ export default class Bitmap4 extends Bitmap {
   private data: number[];
   private palette: Palette;
 
+  protected imageCanvas: ImageCanvas;
+
   constructor(
     fileName: string,
     dimensions: Dimensions,
@@ -25,7 +27,7 @@ export default class Bitmap4 extends Bitmap {
     this.data = indexArray;
     this.palette = palette;
 
-    this.imageCanvas.drawImageToHiddenCanvas(this);
+    this.imageCanvas = new ImageCanvas(this);
   }
 
   public getCSourceData(): string {

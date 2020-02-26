@@ -14,7 +14,7 @@ export default class ImageCanvas {
   private context: CanvasRenderingContext2D | null;
   private pixelGrid: PixelGrid;
 
-  public constructor(image: ImageInterface) {
+  constructor(image: ImageInterface) {
     console.log("Creating new internal ImageCanvas.");
 
     this.dimensions = image.dimensions;
@@ -23,7 +23,7 @@ export default class ImageCanvas {
 
     this.pixelGrid = new PixelGrid(image.dimensions, this.pixelGridRatio);
 
-    // this.drawImageToHiddenCanvas(image);
+    this.drawImageToHiddenCanvas(image);
   }
 
   public getImageCanvasElement(): HTMLCanvasElement {

@@ -11,7 +11,7 @@ export default abstract class Bitmap implements ImageInterface {
   public dimensions: Dimensions;
 
   protected imageData: Uint8ClampedArray;
-  protected imageCanvas: ImageCanvas;
+  protected abstract imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
@@ -28,8 +28,6 @@ export default abstract class Bitmap implements ImageInterface {
         this.dimensions.width * this.dimensions.height * 4
       );
     }
-
-    this.imageCanvas = new ImageCanvas(this);
   }
 
   public getImageCanvasElement(): HTMLCanvasElement {

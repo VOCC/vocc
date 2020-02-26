@@ -12,6 +12,7 @@ import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 
 export default class Bitmap3 extends Bitmap {
+  protected imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
@@ -20,7 +21,7 @@ export default class Bitmap3 extends Bitmap {
   ) {
     super(fileName, dimensions, imageData);
 
-    this.imageCanvas.drawImageToHiddenCanvas(this);
+    this.imageCanvas = new ImageCanvas(this);
   }
 
   public getCSourceData(): string {
