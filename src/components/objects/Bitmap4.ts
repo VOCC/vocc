@@ -9,6 +9,7 @@ import {
 } from "../../lib/exportUtils";
 import Palette from "./Palette";
 import Bitmap from "./Bitmap";
+import ImageCanvas from "./ImageCanvas";
 
 export default class Bitmap4 extends Bitmap {
   private data: number[];
@@ -23,6 +24,8 @@ export default class Bitmap4 extends Bitmap {
     super(fileName, dimensions);
     this.data = indexArray;
     this.palette = palette;
+
+    this.imageCanvas.drawImageToHiddenCanvas(this);
   }
 
   public getCSourceData(): string {

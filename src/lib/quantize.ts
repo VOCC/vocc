@@ -1,7 +1,7 @@
-import ImageObject from "../components/objects/ImageObject";
-import Sprite from "../components/objects/Sprite";
+import Bitmap4 from "../components/objects/Bitmap4";
 import Palette from "../components/objects/Palette";
 import { Color } from "./interfaces";
+import Bitmap from "../components/objects/Bitmap";
 
 const BLACK: Color = {
   r: 0,
@@ -10,7 +10,7 @@ const BLACK: Color = {
   a: 1
 };
 
-export function quantize(image: ImageObject, depth: number) {
+export function quantize(image: Bitmap, depth: number) {
   let centroids: number[][];
   let imageArr = imageToArr(image);
   let colors = depth;
@@ -70,8 +70,8 @@ export function quantize(image: ImageObject, depth: number) {
   let spriteIndexArrayLength = image.dimensions.height * image.dimensions.width;
 
   // generate out sprite and palette based on k-means clusters
-  let spriteIndexArray: number[] = new Array(spriteIndexArrayLength);
-  spriteIndexArray.fill(0, 0, spriteIndexArrayLength);
+  let spriteIndexArray: number[] = new Array<number>(spriteIndexArrayLength);
+  spriteIndexArray.fill(0);
 
   let paletteColorArray: Color[] = new Array(256);
 
@@ -99,11 +99,11 @@ export function quantize(image: ImageObject, depth: number) {
   }
 
   let palette = new Palette(paletteColorArray);
-  let sprite = new Sprite(
+  let sprite = new Bitmap4(
     image.fileName,
+    image.dimensions,
     spriteIndexArray,
-    palette,
-    image.dimensions
+    palette
   );
   return { sprite: sprite, palette: palette };
 }
@@ -125,7 +125,7 @@ function getColorIndex(imageArr: number[][], colorArr: number[]): number {
 }
 
 //converts imageObject into array of colors for k-means
-function imageToArr(image: ImageObject): number[][] {
+function imageToArr(image: Bitmap): number[][] {
   let imageArr = [];
   for (let y = 0; y < image.dimensions.height; y++) {
     for (let x = 0; x < image.dimensions.width; x++) {

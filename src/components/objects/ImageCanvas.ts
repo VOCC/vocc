@@ -23,7 +23,7 @@ export default class ImageCanvas {
 
     this.pixelGrid = new PixelGrid(image.dimensions, this.pixelGridRatio);
 
-    this.drawImageToHiddenCanvas(image);
+    // this.drawImageToHiddenCanvas(image);
   }
 
   public getImageCanvasElement(): HTMLCanvasElement {
@@ -45,7 +45,7 @@ export default class ImageCanvas {
     this.context.fillRect(pos.x, pos.y, 1, 1);
   }
 
-  private drawImageToHiddenCanvas(image: ImageInterface) {
+  public drawImageToHiddenCanvas(image: ImageInterface) {
     console.log("Drawing internal image.");
     for (let x = 0; x < image.dimensions.width; x++) {
       for (let y = 0; y < image.dimensions.height; y++) {

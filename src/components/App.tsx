@@ -5,8 +5,7 @@ import { loadNewImage } from "../lib/imageLoadUtils";
 import { saveAs } from "file-saver";
 import { Tools } from "../lib/consts";
 import ExportButton from "./buttons/ExportButton";
-import ImageCanvas from "./ImageCanvas";
-import ImageObject from "./objects/ImageObject";
+import EditorCanvas from "./EditorCanvas";
 import ImportButton from "./buttons/ImportButton";
 import ToolsPanel from "./ToolsPanel";
 import "../styles/app.scss";
@@ -14,13 +13,18 @@ import "../styles/toolbar.scss";
 import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import { quantize } from "../lib/quantize";
+import Bitmap from "./objects/Bitmap"
+import Bitmap3 from "./objects/Bitmap3";
 
 ///////////// Type Definitions:
 type ImageFile = File | null;
 
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(new Palette());
-  const [image, setImage] = useState<ImageInterface>(new ImageObject("img"));
+  const [image, setImage] = useState<Bitmap>(new Bitmap3(
+    "img",
+    {height: 1, width: 1}
+  ));
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     startingScale: 8,
@@ -32,6 +36,7 @@ function App(): JSX.Element {
     if (imageFile) {
       console.log("Loading image...");
       let image = await loadNewImage(imageFile);
+      console.log(image);
       let { palette, sprite } = quantize(image, 16);
       setImage(sprite);
       setPalette(palette);
@@ -117,10 +122,11 @@ function App(): JSX.Element {
           </div>
         </div>
         <div className="image-container">
-          <ImageCanvas
-            imageObject={image}
+          <EditorCanvas
+            image={image}
             settings={editorSettings}
-            onChangeScale={(newScale: number) => setScale(newScale)}
+            scale={scale}
+            onMouseWheel={e => {}}
           />
         </div>
         <div className="right-panel">

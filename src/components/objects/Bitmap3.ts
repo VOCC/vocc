@@ -9,21 +9,18 @@ import {
 } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
 import Bitmap from "./Bitmap";
+import ImageCanvas from "./ImageCanvas";
 
 export default class Bitmap3 extends Bitmap {
-  private hiddenCanvas: HTMLCanvasElement;
-  private hiddenImage: HTMLImageElement;
 
   constructor(
     fileName: string,
     dimensions: Dimensions,
-    imageData: Uint8ClampedArray
+    imageData?: Uint8ClampedArray
   ) {
     super(fileName, dimensions, imageData);
-    this.hiddenImage = document.createElement("img");
-    this.hiddenImage.height = this.dimensions.height;
-    this.hiddenImage.width = this.dimensions.width;
-    this.hiddenCanvas = Loader.createHiddenCanvas(this.dimensions);
+
+    this.imageCanvas.drawImageToHiddenCanvas(this);
   }
 
   public getCSourceData(): string {
