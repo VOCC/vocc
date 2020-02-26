@@ -1,5 +1,3 @@
-@import "./buttons.scss";
-
 .tools-container {
   max-width: 90px;
   margin-left: 0.5rem;
@@ -20,6 +18,6 @@
 
 .toggle-on {
   @extend .toggle;
-  background-color: $blue;
-  color: white;
+  background-color: $button-highlight;
+  color: $bg-color;
 }

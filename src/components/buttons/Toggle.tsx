@@ -1,5 +1,4 @@
 import React, { PropsWithChildren } from "react";
-import "../../styles/buttons.scss";
 
 type ToggleProps = {
   state: boolean;

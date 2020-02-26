@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "../../styles/buttons.scss";
 
 interface ExportButtonProps {
   handleQuantize: (newColorDepth: number) => void;

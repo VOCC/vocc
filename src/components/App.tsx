@@ -14,8 +14,6 @@ import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
 import ToolsPanel from "./ToolsPanel";
-import "../styles/app.scss";
-import "../styles/toolbar.scss";
 
 function scaleReducer(state: number, e: WheelEvent) {
   let direction = e.deltaY < 0 ? -1 : 1;
@@ -154,12 +152,18 @@ function App(): JSX.Element {
           </div>
         </div>
         <div className="image-container">
-          <EditorCanvas
-            image={image}
-            settings={editorSettings}
-            scale={scale}
-            onMouseWheel={handleMouseWheelEvent}
-          />
+          {image ? (
+            <EditorCanvas
+              image={image}
+              settings={editorSettings}
+              scale={scale}
+              onMouseWheel={handleMouseWheelEvent}
+            />
+          ) : (
+            <div className="start-message">
+              <em>Import an image to get started</em>
+            </div>
+          )}
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>

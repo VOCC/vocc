@@ -1,16 +1,14 @@
-$blue: #007aff;
-
 .button {
   margin: 0.5rem;
   margin-left: 0;
   line-height: 20pt;
-  background-color: white;
-  border: 1px solid $blue;
-  color: $blue;
+  background-color: $bg-color;
+  border: 1px solid $button-highlight;
+  color: $button-highlight;
   border-radius: 4px;
   &:hover {
-    background-color: $blue;
-    color: white;
+    background-color: $button-highlight;
+    color: $bg-color;
   }
   transition: 0.1s;
 }
@@ -25,7 +23,7 @@ input[type="file"] {
 
 .import-loaded {
   margin-right: 0.5rem;
-  color: gray;
+  color: $text-color-secondary;
   font-size: 10pt;
 }
 

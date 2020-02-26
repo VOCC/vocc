@@ -1,0 +1,41 @@
+// Shamelessly ripped from Apple Human Interface Guidelines
+// https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/color/
+
+$gray: #8e8e93;
+
+$lgray2: #aeaeb2;
+$lgray3: #c7c7cc;
+$lgray4: #d1d1d6;
+$lgray5: #e5e5ea;
+$lgray6: #f2f2f7;
+
+$dgray2: #636366;
+$dgray3: #48484a;
+$dgray4: #3a3a3c;
+$dgray5: #2c2c2e;
+$dgray6: #1c1c1e;
+
+$white: white;
+$blue: rgb(0, 122, 255);
+$green: rgb(52, 199, 89);
+$indigo: rgb(88, 86, 214);
+$orange: rgb(255, 149, 0);
+$pink: rgb(255, 45, 85);
+$purple: rgb(175, 82, 222);
+$red: rgb(255, 59, 48);
+$teal: rgb(90, 200, 250);
+$yellow: rgb(255, 204, 0);
+
+// Layout colors
+
+$bg-color: $white;
+$bg-color-secondary: $lgray5;
+
+$text-color: $dgray4;
+$text-color-secondary: $gray;
+
+$border-color: $lgray3;
+
+//Button colors
+
+$button-highlight: $orange;
