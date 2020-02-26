@@ -51,7 +51,6 @@ function PaletteDisplay({
       PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
       PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
     );
-    console.log("drew grid");
   }, [palette]);
 
   /**
@@ -68,12 +67,10 @@ function PaletteDisplay({
       PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
       PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
     );
-    console.log("drew palette");
   }, [palette]);
 
   const drawSelectedColorHighlight = useCallback(
     (index: number) => {
-      console.log(`drawing index ${index}`);
       let context = canvasRef?.current?.getContext("2d");
       if (!context) return;
       context.beginPath();
