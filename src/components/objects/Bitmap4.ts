@@ -5,28 +5,43 @@ import {
   ImageInterface
 } from "../../lib/interfaces";
 import {
-  generateHeaderString, generateCSourceFileString
+  generateHeaderString,
+  generateCSourceFileString
 } from "../../lib/exportUtils";
 import Palette from "./Palette";
-import Bitmap from "./Bitmap";
+import ImageCanvas from "./ImageCanvas";
 
-export default class Bitmap4 extends Bitmap {
+export default class Bitmap4 implements ImageInterface {
+  public dimensions: Dimensions;
+  public fileName: string;
+
   private data: number[];
   private palette: Palette;
+  private imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
-    dimensions: Dimensions,
     indexArray: number[],
-    palette: Palette
+    palette: Palette,
+    dimensions: Dimensions
   ) {
-    super(fileName, dimensions);
+    this.dimensions = dimensions;
+    this.fileName = fileName;
     this.data = indexArray;
     this.palette = palette;
+    this.imageCanvas = new ImageCanvas(this);
   }
 
-  public getCSourceData(): string {
-    return generateCSourceFileString(this, 4, this.palette);
+  public getImageCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getImageCanvasElement();
+  }
+
+  public getPixelGridCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getPixelGridCanvasElement();
+  }
+
+  public getImageData(): Uint8ClampedArray {
+    return new Uint8ClampedArray(this.data);
   }
 
   public getHeaderData(): string {
@@ -38,6 +53,16 @@ export default class Bitmap4 extends Bitmap {
       },
       4
     );
+  }
+
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 4, this.palette);
+  }
+
+  public async getImageFileBlob(): Promise<Blob | null> {
+    return new Promise(resolve => {
+      this.getImageCanvasElement().toBlob(blob => resolve(blob));
+    });
   }
 
   /**

@@ -1,33 +1,40 @@
 import {
   Color,
   Dimensions,
-  ImageCoordinates,
-  ImageInterface
+  ImageInterface,
+  ImageCoordinates
 } from "../../lib/interfaces";
 import {
-  generateHeaderString, generateCSourceFileString
+  generateHeaderString,
+  generateCSourceFileString
 } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
-import Bitmap from "./Bitmap";
+import ImageCanvas from "./ImageCanvas";
 
-export default class Bitmap3 extends Bitmap {
-  private hiddenCanvas: HTMLCanvasElement;
-  private hiddenImage: HTMLImageElement;
+export default class Bitmap3 implements ImageInterface {
+  public fileName: string;
+  public dimensions: Dimensions;
+
+  private imageData: Uint8ClampedArray;
+  private imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
-    dimensions: Dimensions,
-    imageData: Uint8ClampedArray
+    imageData: Uint8ClampedArray,
+    dimensions: Dimensions
   ) {
-    super(fileName, dimensions, imageData);
-    this.hiddenImage = document.createElement("img");
-    this.hiddenImage.height = this.dimensions.height;
-    this.hiddenImage.width = this.dimensions.width;
-    this.hiddenCanvas = Loader.createHiddenCanvas(this.dimensions);
+    this.fileName = fileName;
+    this.imageData = imageData;
+    this.dimensions = dimensions;
+    this.imageCanvas = new ImageCanvas(this);
   }
 
-  public getCSourceData(): string {
-    return generateCSourceFileString(this, 3);
+  public getImageCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getImageCanvasElement();
+  }
+
+  public getPixelGridCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.getPixelGridCanvasElement();
   }
 
   public getHeaderData(): string {
@@ -37,11 +44,19 @@ export default class Bitmap3 extends Bitmap {
     );
   }
 
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 3);
+  }
+
+  public getImageData(): Uint8ClampedArray {
+    return this.imageData;
+  }
+
   public getPixelColorAt(pos: ImageCoordinates): Color {
     return {
       r: this.imageData[Loader.offset(pos, this.dimensions)],
-      b: this.imageData[Loader.offset(pos, this.dimensions) + 2],
       g: this.imageData[Loader.offset(pos, this.dimensions) + 1],
+      b: this.imageData[Loader.offset(pos, this.dimensions) + 2],
       a: this.imageData[Loader.offset(pos, this.dimensions) + 3]
     };
   }
@@ -50,11 +65,13 @@ export default class Bitmap3 extends Bitmap {
     pos: ImageCoordinates,
     paletteIndex?: number,
     color?: Color
-  ): ImageInterface {
-    console.warn(
-      "Method setPixelColor in ImageObject not implemented yet. " +
-      "Returning the current image."
-    );
-    return this;
+  ): void {
+    return;
+  }
+
+  public async getImageFileBlob(): Promise<Blob | null> {
+    return new Promise(resolve => {
+      this.getImageCanvasElement().toBlob(blob => resolve(blob));
+    });
   }
 }
