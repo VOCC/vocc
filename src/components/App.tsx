@@ -1,10 +1,11 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { ImageInterface, EditorSettings } from "../lib/interfaces";
+import { EditorSettings } from "../lib/interfaces";
 import { loadNewImage } from "../lib/imageLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
 import { Tool } from "../lib/consts";
+import Bitmap from "./objects/Bitmap";
 import Bitmap3 from "./objects/Bitmap3";
 import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
@@ -23,7 +24,7 @@ function scaleReducer(state: number, e: WheelEvent) {
 
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
-  const [image, setImage] = useState<ImageInterface>();
+  const [image, setImage] = useState<Bitmap>();
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,

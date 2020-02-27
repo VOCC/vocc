@@ -1,5 +1,6 @@
 import { Dimensions, ImageCoordinates } from "./interfaces";
-import ImageObject from "../components/objects/Bitmap3";
+import Bitmap from "../components/objects/Bitmap";
+import Bitmap3 from "../components/objects/Bitmap3";
 
 export const createHiddenCanvas = (d: Dimensions): HTMLCanvasElement => {
   let hiddenCanvas = document.createElement("canvas");
@@ -32,17 +33,17 @@ export const loadHiddenImage = (imagefile: File): Promise<HTMLImageElement> => {
   });
 };
 
-export const loadNewImage = async (imageFile: File): Promise<ImageObject> => {
-  console.log("Loading new image from file...");
+export const loadNewImage = async (imageFile: File): Promise<Bitmap> => {
   let hiddenImage = await loadHiddenImage(imageFile);
   let dimensions = {
     height: hiddenImage.naturalHeight,
     width: hiddenImage.naturalWidth
   };
   let hiddenCanvas = createHiddenCanvas(dimensions);
-  hiddenCanvas.getContext("2d")?.drawImage(hiddenImage, 0, 0);
+  const context = hiddenCanvas.getContext('2d');
+  if (context) context.drawImage(hiddenImage, 0, 0);
   let imageData = loadImageDataFromCanvas(hiddenCanvas, dimensions);
-  return new ImageObject(imageFile.name, imageData, dimensions);
+  return new Bitmap3(imageFile.name, dimensions, imageData);
 };
 
 export const offset = (pos: ImageCoordinates, d: Dimensions) =>

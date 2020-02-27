@@ -1,40 +1,30 @@
 import {
   Color,
   Dimensions,
-  ImageInterface,
   ImageCoordinates
 } from "../../lib/interfaces";
 import {
-  generateHeaderString,
-  generateCSourceFileString
+  generateHeaderString, generateCSourceFileString
 } from "../../lib/exportUtils";
 import * as Loader from "../../lib/imageLoadUtils";
+import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 
-export default class Bitmap3 implements ImageInterface {
-  public fileName: string;
-  public dimensions: Dimensions;
-
-  private imageData: Uint8ClampedArray;
-  private imageCanvas: ImageCanvas;
+export default class Bitmap3 extends Bitmap {
+  protected imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
-    imageData: Uint8ClampedArray,
-    dimensions: Dimensions
+    dimensions: Dimensions,
+    imageData: Uint8ClampedArray
   ) {
-    this.fileName = fileName;
-    this.imageData = imageData;
-    this.dimensions = dimensions;
+    super(fileName, dimensions, imageData);
+
     this.imageCanvas = new ImageCanvas(this);
   }
 
-  public getImageCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getImageCanvasElement();
-  }
-
-  public getPixelGridCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getPixelGridCanvasElement();
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 3);
   }
 
   public getHeaderData(): string {
@@ -42,14 +32,6 @@ export default class Bitmap3 implements ImageInterface {
       { fileName: this.fileName, imageDimensions: this.dimensions },
       3
     );
-  }
-
-  public getCSourceData(): string {
-    return generateCSourceFileString(this, 3);
-  }
-
-  public getImageData(): Uint8ClampedArray {
-    return this.imageData;
   }
 
   public getPixelColorAt(pos: ImageCoordinates): Color {
@@ -67,11 +49,5 @@ export default class Bitmap3 implements ImageInterface {
     color?: Color
   ): void {
     return;
-  }
-
-  public async getImageFileBlob(): Promise<Blob | null> {
-    return new Promise(resolve => {
-      this.getImageCanvasElement().toBlob(blob => resolve(blob));
-    });
   }
 }

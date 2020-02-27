@@ -1,11 +1,16 @@
-import React, { useCallback, useRef, useState, useLayoutEffect } from "react";
-import { ImageInterface, EditorSettings } from "../lib/interfaces";
+import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
+import {
+  EditorSettings,
+  ImageCoordinates,
+  Color } from "../lib/interfaces";
+import { COLORS } from "../lib/consts";
+import Bitmap from "./objects/Bitmap";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
 
 interface EditorCanvasProps {
-  image: ImageInterface | undefined;
+  image: Bitmap;
   settings: EditorSettings;
   scale: number;
   onMouseWheel: (e: WheelEvent) => void;
@@ -18,12 +23,18 @@ export default function EditorCanvas({
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvasSize, setCanvasSize] = useState([0, 0]); // width, height
+  const [canvasSize, setCanvasSize] = useState([0, 0]);
+
+  ///////////////////// Drawing Tool
+  const [isPainting, setIsPainting] = useState<boolean>(false);
+  const [mousePos, setMousePos] = useState<
+    ImageCoordinates | undefined>(undefined);
+  /////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
-    let canvas = getCanvas(canvasRef);
+    const canvas = canvasRef.current;
     if (!canvas) return;
-    let context = getContext(canvasRef);
+    const context = canvas.getContext('2d');
     if (!context) return;
     if (!image) return;
 
@@ -69,9 +80,9 @@ export default function EditorCanvas({
    */
   useLayoutEffect(() => {
     console.log("Setting up canvas...");
-    let canvas = getCanvas(canvasRef);
+    const canvas = canvasRef.current;
     if (!canvas) return;
-    let context = getContext(canvasRef);
+    const context = canvas.getContext('2d');
     if (!context) return;
     setCanvasSize([canvas.clientWidth, canvas.clientHeight]);
     context.imageSmoothingEnabled = false;
@@ -81,9 +92,9 @@ export default function EditorCanvas({
    * Change the dimensions of the canvas when the canvasSize changes.
    */
   useLayoutEffect(() => {
-    let canvas = getCanvas(canvasRef);
+    const canvas = canvasRef.current;
     if (!canvas) return;
-    let context = getContext(canvasRef);
+    const context = canvas.getContext('2d');
     if (!context) return;
 
     const devicePixelRatio = window.devicePixelRatio || 1;
@@ -96,7 +107,9 @@ export default function EditorCanvas({
    * Handle mousewheel zooming
    */
   useLayoutEffect(() => {
-    canvasRef.current?.addEventListener("wheel", onMouseWheel);
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener("wheel", onMouseWheel);
+    }
   }, [onMouseWheel]);
 
   /**
@@ -105,20 +118,90 @@ export default function EditorCanvas({
    */
   useLayoutEffect(() => drawImageOnCanvas(), [drawImageOnCanvas, canvasSize]);
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Drawing Tool
+  const getMousePos = (e: MouseEvent): ImageCoordinates | undefined => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+    return undefined;
+  }
+  
+  // todo: make drawing only fill pixel grids
+  const drawLine = (
+    startingPos: ImageCoordinates, endingPos: ImageCoordinates, color: Color
+    ): void => {
+      
+    if (!canvasRef.current) return;
+    const context = canvasRef.current.getContext('2d');
+    if (!context) return;
+    const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    context.strokeStyle = colorString;
+    const lineWidth = 4;
+    const lineJoin = 'round';
+    context.lineWidth = lineWidth;
+    context.lineJoin = lineJoin;
+
+    context.beginPath();
+    context.moveTo(startingPos.x, startingPos.y);
+    context.lineTo(endingPos.x, endingPos.y);
+    context.closePath();
+    context.stroke();
+  }
+
+  const startPaint = useCallback((e: MouseEvent) => {
+    const mousePosition = getMousePos(e);
+    if (mousePosition) {
+      setMousePos(mousePosition);
+      setIsPainting(true);
+    }
+  }, []);
+
+  const paint = useCallback((e: MouseEvent) => {
+    if (isPainting) {
+      const newMousePos = getMousePos(e);
+      if (mousePos && newMousePos) {
+        drawLine(mousePos, newMousePos, COLORS.red);
+        setMousePos(newMousePos);
+      }
+    }
+  }, [isPainting, mousePos]);
+
+  const stopPaint = useCallback(() => {
+    setMousePos(undefined);
+    setIsPainting(false);
+  }, []);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mousedown', startPaint);
+    return () => canvas.removeEventListener('mousedown', startPaint);
+  }, [startPaint]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mousemove', paint);
+    return () => canvas.removeEventListener('mousemove', paint);
+  }, [paint]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mouseup', stopPaint);
+    canvas.addEventListener('mouseleave', stopPaint)
+    return () => {
+      canvas.removeEventListener('mouseup', stopPaint);
+      canvas.removeEventListener('mouseleave', stopPaint);
+    }
+  }, [stopPaint]);
+
+  /////////////////////////////////////////////////////////////////////////////
+
   return <canvas ref={canvasRef} className="image-canvas" />;
 }
-
-const getCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
-  if (canvasRef == null) return;
-  return canvasRef.current;
-};
-
-const getContext = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
-  const canvas = getCanvas(canvasRef);
-  if (canvas == null) return null;
-  let context = null;
-  if (!(context = canvas.getContext("2d"))) {
-    throw new Error(`2d context not supported or canvas already initialized`);
-  }
-  return context;
-};
