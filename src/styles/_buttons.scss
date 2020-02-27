@@ -1,0 +1,43 @@
+.button {
+  margin: 0.5rem;
+  margin-left: 0;
+  line-height: 20pt;
+  background-color: $bg-color;
+  border: 1px solid $button-highlight;
+  color: $button-highlight;
+  border-radius: 4px;
+  &:hover {
+    background-color: $button-highlight;
+    color: $bg-color;
+  }
+  transition: 0.1s;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.import-button {
+  @extend .button;
+}
+
+.import-loaded {
+  margin-right: 0.5rem;
+  color: $text-color-secondary;
+  font-size: 10pt;
+}
+
+.export-button {
+  @extend .button;
+}
+
+.quantize-container {
+  width: 100%;
+  text-align: center;
+}
+
+.quantize-input {
+  border-radius: 4px;
+  width: 64px;
+  box-sizing: border-box;
+}

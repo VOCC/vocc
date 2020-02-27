@@ -13,11 +13,9 @@ export const createHiddenCanvas = (d: Dimensions): HTMLCanvasElement => {
 export const loadImageDataFromCanvas = (
   canvas: HTMLCanvasElement,
   dimensions: Dimensions
-): Uint8ClampedArray | void => {
-  const context = canvas.getContext("2d");
-  if (context == null) return;
-  const _data = context.getImageData(0, 0, dimensions.width, dimensions.height);
-  return _data.data;
+): Uint8ClampedArray => {
+  const context = canvas.getContext("2d") as CanvasRenderingContext2D; // unsafe
+  return context.getImageData(0, 0, dimensions.width, dimensions.height).data;
 };
 
 // is async necessary here???? I don't think it is
@@ -42,16 +40,10 @@ export const loadNewImage = async (imageFile: File): Promise<Bitmap> => {
     width: hiddenImage.naturalWidth
   };
   let hiddenCanvas = createHiddenCanvas(dimensions);
-  const context = hiddenCanvas.getContext("2d");
-  if (context != null) {
-    context.drawImage(hiddenImage, 0, 0);
-    let imageData = loadImageDataFromCanvas(hiddenCanvas, dimensions);
-    if (imageData) {
-      return new Bitmap3(imageFile.name, dimensions, imageData);
-    }
-  }
-  console.warn("Couldn't load image - loaded blank image instead.");
-  return new Bitmap3("img", {height: 1, width: 1});
+  const context = hiddenCanvas.getContext('2d');
+  if (context) context.drawImage(hiddenImage, 0, 0);
+  let imageData = loadImageDataFromCanvas(hiddenCanvas, dimensions);
+  return new Bitmap3(imageFile.name, dimensions, imageData);
 };
 
 export const offset = (pos: ImageCoordinates, d: Dimensions) =>

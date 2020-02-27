@@ -1,15 +1,15 @@
 import {
   Color,
   Dimensions,
-  ImageCoordinates,
-  ImageInterface
+  ImageCoordinates
 } from "../../lib/interfaces";
 import {
-  generateHeaderString, generateCSourceFileString
+  generateHeaderString,
+  generateCSourceFileString
 } from "../../lib/exportUtils";
 import Palette from "./Palette";
-import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
+import Bitmap from "./Bitmap";
 
 export default class Bitmap4 extends Bitmap {
   private data: number[];
@@ -19,19 +19,14 @@ export default class Bitmap4 extends Bitmap {
 
   constructor(
     fileName: string,
-    dimensions: Dimensions,
     indexArray: number[],
-    palette: Palette
+    palette: Palette,
+    dimensions: Dimensions
   ) {
     super(fileName, dimensions);
     this.data = indexArray;
     this.palette = palette;
-
     this.imageCanvas = new ImageCanvas(this);
-  }
-
-  public getCSourceData(): string {
-    return generateCSourceFileString(this, 4, this.palette);
   }
 
   public getHeaderData(): string {
@@ -43,6 +38,10 @@ export default class Bitmap4 extends Bitmap {
       },
       4
     );
+  }
+
+  public getCSourceData(): string {
+    return generateCSourceFileString(this, 4, this.palette);
   }
 
   /**
@@ -65,10 +64,10 @@ export default class Bitmap4 extends Bitmap {
     );
   }
 
-  public setPixelColor({ x, y }: ImageCoordinates): ImageInterface {
+  public setPixelColor({ x, y }: ImageCoordinates): void {
     console.warn(
       "Setting pixel colors not implemented yet! Returning unchanged image."
     );
-    return this;
+    return;
   }
 }

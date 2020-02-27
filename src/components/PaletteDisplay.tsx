@@ -1,66 +1,92 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import Palette from "./objects/Palette";
 
-interface IProps {
-  palette: Palette
+interface IPaletteDisplay {
+  palette: Palette;
+  selectedColorIndex: number;
+  onChangeSelectedColorIndex: (newIndex: number) => void;
 }
 
 interface MousePos {
-  x: number,
-  y: number
+  x: number;
+  y: number;
 }
 
-function PaletteDisplay({ palette }: IProps): JSX.Element {
-  const [selected, setSelected] = useState<number>(-1);
+// This size is defined the same in app.scss
+const PALETTE_CANVAS_SIZE = {
+  height: 192,
+  width: 192
+};
+
+const SCALE = PALETTE_CANVAS_SIZE.height / 16;
+
+const INDEX_TO_X = (index: number) => index % 16;
+const INDEX_TO_Y = (index: number) => Math.floor(index / 16);
+const XY_TO_INDEX = ({ x, y }: { x: number; y: number }) => y * 16 + x;
+const MOUSE_POS_TO_XY = ({ x, y }: { x: number; y: number }) => ({
+  x: Math.floor(x / SCALE),
+  y: Math.floor(y / SCALE)
+});
+const MOUSE_POS_TO_INDEX = (pos: { x: number; y: number }) =>
+  XY_TO_INDEX(MOUSE_POS_TO_XY(pos));
+
+function PaletteDisplay({
+  palette,
+  selectedColorIndex,
+  onChangeSelectedColorIndex
+}: IPaletteDisplay): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const scale = 8;
 
   /**
    * method to draw the palette grid
    */
-  const drawGrid = useCallback(
-    () => {
+  const drawGrid = useCallback(() => {
     if (!canvasRef.current) return;
-    const context = canvasRef.current.getContext('2d');
+    const context = canvasRef.current.getContext("2d");
     if (!context) return;
-    const { height, width } = palette.dimensions;
-    context.strokeStyle = "gray";
-    context.beginPath();
-
-    for (let x = 0; x <= width; x++) {
-      context.moveTo(x * scale, 0);
-      context.lineTo(x * scale, height * scale);
-    }
-
-    for (let y = 0; y <= height; y++) {
-      context.moveTo(0, y * scale);
-      context.lineTo(width * scale, y * scale);
-    }
-
-    context.stroke();
-  }, [palette.dimensions]);
+    context.drawImage(
+      palette.getPixelGridCanvas(),
+      0,
+      0,
+      PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
+      PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
+    );
+  }, [palette]);
 
   /**
    * method to populate the palette with colors
    * fills palette index with proper color using palette colorArray
    */
-  const fillPalette = useCallback(
-    () => {
-    if (!canvasRef.current) return;
-    const context = canvasRef.current.getContext('2d');
+  const drawPalette = useCallback(() => {
+    const context = canvasRef?.current?.getContext("2d");
     if (!context) return;
-    const colorArray = palette.getColorArray();
-    colorArray.forEach((color, index) => {
-      if (!context) return;
-      let colorString = `rgba(
-        ${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-      context.fillStyle = colorString;
-
-      let x = index % palette.dimensions.width;
-      let y = Math.floor(index / palette.dimensions.width);
-      context.fillRect(x * scale, y * scale, scale, scale);
-    });
+    context.drawImage(
+      palette.getPaletteCanvas(),
+      0,
+      0,
+      PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
+      PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
+    );
   }, [palette]);
+
+  const drawSelectedColorHighlight = useCallback(
+    (index: number) => {
+      let context = canvasRef?.current?.getContext("2d");
+      if (!context) return;
+      context.beginPath();
+      context.strokeStyle = "rgba(255, 255, 0, 1)";
+      context.lineWidth = 2;
+      const ratio = window.devicePixelRatio * SCALE;
+      context.rect(
+        INDEX_TO_X(index) * ratio,
+        INDEX_TO_Y(index) * ratio,
+        15,
+        15
+      );
+      context.stroke();
+    },
+    [canvasRef]
+  );
 
   /**
    * gets mouse position on the palette canvas
@@ -78,7 +104,7 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
       x: -1,
       y: -1
     };
-  }
+  };
 
   /**
    * handles mouse click event
@@ -86,76 +112,38 @@ function PaletteDisplay({ palette }: IProps): JSX.Element {
    * @param e MouseEvent
    */
   const handleClick = (e: React.MouseEvent): void => {
-    let mousePos = getMousePos(e);
-    if (mousePos.y >= 0 && mousePos.y <= scale * palette.dimensions.width) {
-      const row = Math.floor(mousePos.y / scale);
-      setSelected(row);
-    }
-  }
+    onChangeSelectedColorIndex(MOUSE_POS_TO_INDEX(getMousePos(e)));
+  };
 
   /**
-   * refills palette when a new image is imported
+   * Set up the canvas
    */
   useEffect(() => {
-    console.log('new image, new palette ...');
-    let context: CanvasRenderingContext2D | null = null;
+    console.log("Setting up palette canvas");
+    const setupCanvasSize = (canvas: HTMLCanvasElement) => {
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      canvas.width = canvas.clientWidth * devicePixelRatio;
+      canvas.height = canvas.clientHeight * devicePixelRatio;
+      const context = canvas.getContext("2d");
+      if (context) context.imageSmoothingEnabled = false;
+    };
     if (canvasRef.current) {
-      context = canvasRef.current.getContext("2d");
+      setupCanvasSize(canvasRef.current);
     }
-
-    if (context && canvasRef.current) {
-      context.clearRect(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
-      setSelected(-1);
-    }
-  }, [palette]);
+  }, []);
 
   /**
-   * fills palette on any change
-  */ 
-  useEffect(() => {
-
-  /**
-   * highlights the palette row with a transparent light blue color
-   * @param row row of palette to select/highlight
-   */
-  const highlightRow = (row: number): void => {
-    if (row < 0) return;
-    if (!canvasRef.current) return;
-    const context = canvasRef.current.getContext('2d');
-    if (!context) return;
-    let colorString = 'rgba(125, 200, 255, 0.25)';
-    context.fillStyle = colorString;
-    context.fillRect(0, row * scale, scale * palette.dimensions.width, scale);
-    context.globalAlpha = 1;
-    context.fillStyle = 'blue';
-    context.strokeRect(0, row * scale, scale * palette.dimensions.width, scale);
-  }
-
-    console.log('filling palette ...');
-    fillPalette();
-    drawGrid();
-    highlightRow(selected);
-  }, [selected, fillPalette, drawGrid, palette.dimensions]);
-
-  /**
-   * initializes an empty palette
+   * Draw the palette every time something changes
    */
   useEffect(() => {
-    console.log("initializing palette ...");
-    fillPalette();
+    drawPalette();
     drawGrid();
-  }, [fillPalette, drawGrid]);
+    drawSelectedColorHighlight(selectedColorIndex);
+  }, [selectedColorIndex, drawPalette, drawGrid, drawSelectedColorHighlight]);
 
-  return <canvas
-    ref={canvasRef}
-    onClick={handleClick}
-    className="palette-canvas"
-  />;
+  return (
+    <canvas ref={canvasRef} onClick={handleClick} className="palette-canvas" />
+  );
 }
 
 export default PaletteDisplay;

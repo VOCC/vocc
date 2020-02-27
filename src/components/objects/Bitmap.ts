@@ -57,5 +57,5 @@ export default abstract class Bitmap implements ImageInterface {
     pos: ImageCoordinates,
     paletteIndex?: number,
     color?: Color
-  ): ImageInterface;
+  ): void;
 }

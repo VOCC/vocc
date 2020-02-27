@@ -14,13 +14,12 @@ export default class ImageCanvas {
   private context: CanvasRenderingContext2D | null;
   private pixelGrid: PixelGrid;
 
-  constructor(image: ImageInterface) {
+  public constructor(image: ImageInterface) {
     console.log("Creating new internal ImageCanvas.");
 
     this.dimensions = image.dimensions;
     this.hiddenCanvas = createHiddenCanvas(image.dimensions);
     this.context = this.hiddenCanvas.getContext("2d");
-
     this.pixelGrid = new PixelGrid(image.dimensions, this.pixelGridRatio);
 
     this.drawImageToHiddenCanvas(image);
@@ -45,7 +44,7 @@ export default class ImageCanvas {
     this.context.fillRect(pos.x, pos.y, 1, 1);
   }
 
-  public drawImageToHiddenCanvas(image: ImageInterface) {
+  private drawImageToHiddenCanvas(image: ImageInterface) {
     console.log("Drawing internal image.");
     for (let x = 0; x < image.dimensions.width; x++) {
       for (let y = 0; y < image.dimensions.height; y++) {

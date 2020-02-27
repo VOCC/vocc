@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { 
-  ImageInterface,
+import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
+import {
   EditorSettings,
   ImageCoordinates,
   Color } from "../lib/interfaces";
@@ -24,6 +23,7 @@ export default function EditorCanvas({
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [canvasSize, setCanvasSize] = useState([0, 0]);
 
   ///////////////////// Drawing Tool
   const [isPainting, setIsPainting] = useState<boolean>(false);
@@ -31,46 +31,15 @@ export default function EditorCanvas({
     ImageCoordinates | undefined>(undefined);
   /////////////////////
 
-  /**
-   * Set up the canvas every time the context changes.
-   */
-  useEffect(() => {
-    console.log("Setting up canvas...");
-
-    const setupCanvas = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const context = canvas.getContext('2d');
-      if (!context) return;
-
-      const setupCanvasSize = (canvas: HTMLCanvasElement) => {
-        const devicePixelRatio = window.devicePixelRatio || 1;
-        canvas.width = canvas.clientWidth * devicePixelRatio;
-        canvas.height = canvas.clientHeight * devicePixelRatio;
-        context.imageSmoothingEnabled = false;
-      };
-
-      setupCanvasSize(canvas);
-      window.addEventListener("resize", () => {
-        if (canvas) setupCanvasSize(canvas);
-      });
-
-      // Add the event listener for updating the scale with the scale dispatcher
-      canvas.addEventListener("wheel", onMouseWheel);
-    };
-    setupCanvas();
-  }, []);
-
-  /**
-   * Draw the image whenever the image, imageCanvas, context, scale, or editor
-   * settings change.
-   */
-  useEffect(() => {
-    if (!image || !canvasRef.current) return;
-    // Clear the context
-    const context = canvasRef.current.getContext('2d');
+  const drawImageOnCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
     if (!context) return;
-    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    if (!image) return;
+
+    // Clear the context
+    context.clearRect(0, 0, canvas.width, canvas.height);
     // Draw the image at the correct position and scale
     context.drawImage(
       image.getImageCanvasElement(),
@@ -89,7 +58,65 @@ export default function EditorCanvas({
         image.dimensions.height * scale
       );
     }
-  }, [image, scale, settings]);
+  }, [image, canvasRef, scale, settings.grid]);
+
+  /**
+   * Handle window resizing and set the new canvasSize state.
+   */
+  useLayoutEffect(() => {
+    const updateCanvasSize = () => {
+      if (canvasRef.current) {
+        setCanvasSize([
+          canvasRef.current.clientWidth,
+          canvasRef.current.clientHeight
+        ]);
+      }
+    };
+    window.addEventListener("resize", () => updateCanvasSize());
+  }, []);
+
+  /**
+   * Set up the canvas.
+   */
+  useLayoutEffect(() => {
+    console.log("Setting up canvas...");
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    setCanvasSize([canvas.clientWidth, canvas.clientHeight]);
+    context.imageSmoothingEnabled = false;
+  }, [canvasRef]);
+
+  /**
+   * Change the dimensions of the canvas when the canvasSize changes.
+   */
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    canvas.width = canvasSize[0] * devicePixelRatio;
+    canvas.height = canvasSize[1] * devicePixelRatio;
+    context.imageSmoothingEnabled = false;
+  }, [canvasSize, canvasRef]);
+
+  /**
+   * Handle mousewheel zooming
+   */
+  useLayoutEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener("wheel", onMouseWheel);
+    }
+  }, [onMouseWheel]);
+
+  /**
+   * Draw the image whenever the image, imageCanvas, context, scale, or editor
+   * settings change.
+   */
+  useLayoutEffect(() => drawImageOnCanvas(), [drawImageOnCanvas, canvasSize]);
 
   /////////////////////////////////////////////////////////////////////////////
   // Drawing Tool

@@ -1,0 +1,23 @@
+.tools-container {
+  max-width: 90px;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  text-align: center;
+}
+
+.toggle {
+  @extend .button;
+  margin: 4px;
+  height: 32px;
+  width: 32px;
+}
+
+.toggle-off {
+  @extend .toggle;
+}
+
+.toggle-on {
+  @extend .toggle;
+  background-color: $button-highlight;
+  color: $bg-color;
+}

@@ -1,8 +1,3 @@
-$border-color: #c7c7cc;
-$lightgray: #e5e5ea;
-$darkgray: #3a3a3c;
-$textcolor: $darkgray;
-
 .app-container {
   display: flex;
   flex-direction: column;
@@ -18,7 +13,7 @@ $textcolor: $darkgray;
   line-height: 32pt;
   padding-left: 1rem;
   border-bottom: 1px solid $border-color;
-  color: $textcolor;
+  color: $text-color;
   .title {
     padding-right: 1rem;
     font-weight: 900;
@@ -38,31 +33,30 @@ $textcolor: $darkgray;
 
 .left-panel {
   border-right: 1px solid $border-color;
-  min-width: 128px;
+  min-width: 106px;
 }
 
 .right-panel {
   border-left: 1px solid $border-color;
+  max-width: 256px;
   min-width: 256px;
-}
-
-.panel-label {
-  padding-left: 1rem;
-  padding-top: 0.5rem;
-  font-weight: 600;
-  color: $textcolor;
 }
 
 .image-container {
   margin: 0;
   padding: 0;
   flex-grow: 1;
-  background-color: $lightgray;
+  background-color: $bg-color-secondary;
+  position: relative;
 }
 
-.image-canvas {
+.image-container > .start-message {
   width: 100%;
-  height: 100%;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  color: $text-color-secondary;
 }
 
 .hidden {

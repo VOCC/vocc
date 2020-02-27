@@ -1,8 +1,7 @@
 import {
   Color,
   Dimensions,
-  ImageCoordinates,
-  ImageInterface
+  ImageCoordinates
 } from "../../lib/interfaces";
 import {
   generateHeaderString, generateCSourceFileString
@@ -17,7 +16,7 @@ export default class Bitmap3 extends Bitmap {
   constructor(
     fileName: string,
     dimensions: Dimensions,
-    imageData?: Uint8ClampedArray
+    imageData: Uint8ClampedArray
   ) {
     super(fileName, dimensions, imageData);
 
@@ -38,8 +37,8 @@ export default class Bitmap3 extends Bitmap {
   public getPixelColorAt(pos: ImageCoordinates): Color {
     return {
       r: this.imageData[Loader.offset(pos, this.dimensions)],
-      b: this.imageData[Loader.offset(pos, this.dimensions) + 2],
       g: this.imageData[Loader.offset(pos, this.dimensions) + 1],
+      b: this.imageData[Loader.offset(pos, this.dimensions) + 2],
       a: this.imageData[Loader.offset(pos, this.dimensions) + 3]
     };
   }
@@ -48,11 +47,7 @@ export default class Bitmap3 extends Bitmap {
     pos: ImageCoordinates,
     paletteIndex?: number,
     color?: Color
-  ): ImageInterface {
-    console.warn(
-      "Method setPixelColor in ImageObject not implemented yet. " +
-      "Returning the current image."
-    );
-    return this;
+  ): void {
+    return;
   }
 }
