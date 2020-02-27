@@ -11,7 +11,7 @@ import Bitmap from "./objects/Bitmap";
 const PIXELGRID_ZOOM_LIMIT = 8;
 
 interface EditorCanvasProps {
-  image: Bitmap | undefined;
+  image: Bitmap;
   settings: EditorSettings;
   scale: number;
   onMouseWheel: (e: WheelEvent) => void;
@@ -24,14 +24,11 @@ export default function EditorCanvas({
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const [localImage, setImage] = useState<ImageInterface>(image);
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>(
-    canvasRef ? getContext(canvasRef) : null
-  );
 
   ///////////////////// Drawing Tool
   const [isPainting, setIsPainting] = useState<boolean>(false);
-  const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(undefined);
+  const [mousePos, setMousePos] = useState<
+    ImageCoordinates | undefined>(undefined);
   /////////////////////
 
   /**
@@ -41,9 +38,9 @@ export default function EditorCanvas({
     console.log("Setting up canvas...");
 
     const setupCanvas = () => {
-      let canvas = getCanvas(canvasRef);
+      const canvas = canvasRef.current;
       if (!canvas) return;
-      setContext(getContext(canvasRef));
+      const context = canvas.getContext('2d');
       if (!context) return;
 
       const setupCanvasSize = (canvas: HTMLCanvasElement) => {
@@ -62,15 +59,17 @@ export default function EditorCanvas({
       canvas.addEventListener("wheel", onMouseWheel);
     };
     setupCanvas();
-  }, [context, onMouseWheel]);
+  }, []);
 
   /**
    * Draw the image whenever the image, imageCanvas, context, scale, or editor
    * settings change.
    */
   useEffect(() => {
-    if (!image || !context || !canvasRef.current) return;
+    if (!image || !canvasRef.current) return;
     // Clear the context
+    const context = canvasRef.current.getContext('2d');
+    if (!context) return;
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     // Draw the image at the correct position and scale
     context.drawImage(
@@ -90,7 +89,7 @@ export default function EditorCanvas({
         image.dimensions.height * scale
       );
     }
-  }, [image, context, scale, settings]);
+  }, [image, scale, settings]);
 
   /////////////////////////////////////////////////////////////////////////////
   // Drawing Tool
@@ -179,18 +178,3 @@ export default function EditorCanvas({
 
   return <canvas ref={canvasRef} className="image-canvas" />;
 }
-
-const getCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
-  if (canvasRef == null) return;
-  return canvasRef.current;
-};
-
-const getContext = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
-  const canvas = getCanvas(canvasRef);
-  if (canvas == null) return null;
-  let context = null;
-  if (!(context = canvas.getContext("2d"))) {
-    throw new Error(`2d context not supported or canvas already initialized`);
-  }
-  return context;
-};
