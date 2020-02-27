@@ -157,6 +157,8 @@ function App(): JSX.Element {
             <EditorCanvas
               image={image}
               settings={editorSettings}
+              palette={palette}
+              selectedPaletteIndex={selectedColorIndex}
               scale={scale}
               onMouseWheel={handleMouseWheelEvent}
             />

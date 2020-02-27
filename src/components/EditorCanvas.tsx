@@ -6,14 +6,17 @@ import React, {
   useLayoutEffect
 } from "react";
 import { EditorSettings, ImageCoordinates, Color } from "../lib/interfaces";
-import { COLORS } from "../lib/consts";
 import Bitmap from "./objects/Bitmap";
+import Bitmap3 from "./objects/Bitmap3";
+import Palette from "./objects/Palette";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
 
 interface EditorCanvasProps {
   image: Bitmap;
+  palette: Palette;
+  selectedPaletteIndex: number;
   settings: EditorSettings;
   scale: number;
   onMouseWheel: (e: WheelEvent) => void;
@@ -21,6 +24,8 @@ interface EditorCanvasProps {
 
 export default function EditorCanvas({
   image,
+  palette,
+  selectedPaletteIndex,
   settings,
   scale,
   onMouseWheel
@@ -163,6 +168,10 @@ export default function EditorCanvas({
     const mousePosition = getMousePos(e);
     if (mousePosition) {
       setMousePos(mousePosition);
+      // fillPixel(
+      //   getImageCoord(mousePosition),
+      //   palette.getColorAt(selectedPaletteIndex)
+      // );
       setIsPainting(true);
     }
   }, []);
@@ -171,11 +180,18 @@ export default function EditorCanvas({
     (e: MouseEvent) => {
       const newMousePos = getMousePos(e);
       if (isPainting && newMousePos) {
-        fillPixel(getImageCoord(newMousePos), COLORS.red);
+        if (image instanceof Bitmap3) {
+          fillPixel(
+            getImageCoord(newMousePos),
+            palette.getColorAt(selectedPaletteIndex)
+          );
+        } else {
+          console.warn(`Drawing not supported for ${typeof image}.`);
+        }
         setMousePos(newMousePos);
       }
     },
-    [isPainting, fillPixel, getImageCoord]
+    [image, isPainting, fillPixel, getImageCoord, palette, selectedPaletteIndex]
   );
 
   const stopPaint = useCallback(() => {
