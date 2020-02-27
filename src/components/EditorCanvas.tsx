@@ -5,6 +5,7 @@ import {
   Color } from "../lib/interfaces";
 import { COLORS } from "../lib/consts";
 import Bitmap from "./objects/Bitmap";
+import { createHiddenCanvas } from "../lib/imageLoadUtils";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
@@ -141,7 +142,6 @@ export default function EditorCanvas({
     return {x, y};
   }, [scale]);
   
-  // todo: make drawing only fill pixel grids
   const fillPixel = useCallback((pos: ImageCoordinates, color: Color): void => {
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
@@ -162,14 +162,12 @@ export default function EditorCanvas({
   }, []);
 
   const paint = useCallback((e: MouseEvent) => {
-    if (isPainting) {
-      const newMousePos = getMousePos(e);
-      if (mousePos && newMousePos) {
+    const newMousePos = getMousePos(e);
+    if (isPainting && newMousePos) {
         fillPixel(getImageCoord(newMousePos), COLORS.red);
         setMousePos(newMousePos);
-      }
     }
-  }, [isPainting, mousePos, fillPixel, getImageCoord]);
+  }, [isPainting, fillPixel, getImageCoord]);
 
   const stopPaint = useCallback(() => {
     setMousePos(undefined);
@@ -187,7 +185,9 @@ export default function EditorCanvas({
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     canvas.addEventListener('mousemove', paint);
-    return () => canvas.removeEventListener('mousemove', paint);
+    return () => {
+      canvas.removeEventListener('mousemove', paint);
+    }
   }, [paint]);
 
   useEffect(() => {
