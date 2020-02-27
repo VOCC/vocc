@@ -1,4 +1,4 @@
-import { Tools } from "./consts";
+import { Tool } from "./consts";
 
 export interface Color {
   r: number;
@@ -47,7 +47,7 @@ export interface ImageInterface extends Drawable, Exportable, Modifiable {}
 
 export interface EditorSettings {
   grid: boolean;
-  currentTool: Tools;
+  currentTool: Tool;
 }
 
 export interface ImageCoordinates {

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "../../styles/buttons.scss";
 
 interface ExportButtonProps {
   handleQuantize: (newColorDepth: number) => void;
@@ -9,6 +8,10 @@ function ExportButton({ handleQuantize }: ExportButtonProps): JSX.Element {
   const [depth, setDepth] = useState<number>(15);
 
   const handleClick = () => {
+    if (!depth) {
+      alert("Can't quantize with unspecified color depth!");
+      return;
+    }
     handleQuantize(depth);
   };
 

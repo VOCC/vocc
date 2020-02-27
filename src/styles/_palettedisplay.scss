@@ -1,0 +1,15 @@
+.palette-container {
+  text-align: center;
+}
+
+.palette-canvas {
+  height: 192px;
+  width: 192px;
+}
+
+.panel-label {
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  font-weight: 600;
+  color: $text-color;
+}
