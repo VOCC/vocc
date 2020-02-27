@@ -96,9 +96,9 @@ function App(): JSX.Element {
           blob = new Blob([exportPalette(palette)]);
           break;
         }
-      case "JPG":
-        //.jpeg file
-        fileType = ".jpg";
+      case "BMP":
+        //.bmp file
+        fileType = ".bmp";
         blob = await exportImage(image, type);
         break;
       case "PNG":
@@ -137,8 +137,8 @@ function App(): JSX.Element {
         <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} />
         PNG ->
         <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} />
-        JPG ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "JPG")} />
+        BMP ->
+        <ExportButton startImageExport={handleImageExport.bind(null, "BMP")} />
       </div>
       <div className="workspace-container">
         <div className="left-panel">
