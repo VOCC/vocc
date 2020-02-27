@@ -12,8 +12,7 @@ import EditorCanvas from "./EditorCanvas";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
 import Palette from "./objects/Palette";
-import PaletteDisplay from "./PaletteDisplay";
-import QuantizeButton from "./buttons/QuantizeButton";
+import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
 
 function scaleReducer(state: number, e: WheelEvent) {
@@ -169,15 +168,12 @@ function App(): JSX.Element {
           )}
         </div>
         <div className="right-panel">
-          <div className="panel-label">Color Palette</div>
-          <div className="palette-container">
-            <PaletteDisplay
-              palette={palette}
-              selectedColorIndex={selectedColorIndex}
-              onChangeSelectedColorIndex={setSelectedColorIndex}
-            />
-          </div>
-          <QuantizeButton handleQuantize={handleQuantize} />
+          <PalettePanel
+            palette={palette}
+            selectedColorIndex={selectedColorIndex}
+            onChangeSelectedColorIndex={setSelectedColorIndex}
+            handleQuantize={handleQuantize}
+          />
         </div>
       </div>
     </div>
