@@ -58,7 +58,8 @@ function PaletteDisplay({
    * fills palette index with proper color using palette colorArray
    */
   const drawPalette = useCallback(() => {
-    const context = canvasRef?.current?.getContext("2d");
+    if (!canvasRef.current) return;
+    const context = canvasRef.current.getContext("2d");
     if (!context) return;
     context.drawImage(
       palette.getPaletteCanvas(),
@@ -71,7 +72,8 @@ function PaletteDisplay({
 
   const drawSelectedColorHighlight = useCallback(
     (index: number) => {
-      let context = canvasRef?.current?.getContext("2d");
+      if (!canvasRef.current) return;
+      let context = canvasRef.current.getContext("2d");
       if (!context) return;
       context.beginPath();
       context.strokeStyle = "rgba(255, 255, 0, 1)";

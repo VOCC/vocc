@@ -23,7 +23,7 @@ export default function EditorCanvas({
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [canvasSize, setCanvasSize] = useState([0, 0]);
+  const [canvasSize, setCanvasSize] = useState<number[]>([0, 0]);
 
   ///////////////////// Drawing Tool
   const [isPainting, setIsPainting] = useState<boolean>(false);
@@ -133,28 +133,25 @@ export default function EditorCanvas({
     }
     return undefined;
   }
+
+  const getImageCoord = useCallback(
+    (mousePos: ImageCoordinates): ImageCoordinates => {
+    const x = Math.floor(mousePos.x / scale);
+    const y = Math.floor(mousePos.y / scale);
+    return {x, y};
+  }, [scale]);
   
   // todo: make drawing only fill pixel grids
-  const drawLine = (
-    startingPos: ImageCoordinates, endingPos: ImageCoordinates, color: Color
-    ): void => {
-      
+  const fillPixel = useCallback((pos: ImageCoordinates, color: Color): void => {
     if (!canvasRef.current) return;
     const context = canvasRef.current.getContext('2d');
     if (!context) return;
-    const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    context.strokeStyle = colorString;
-    const lineWidth = 4;
-    const lineJoin = 'round';
-    context.lineWidth = lineWidth;
-    context.lineJoin = lineJoin;
 
-    context.beginPath();
-    context.moveTo(startingPos.x, startingPos.y);
-    context.lineTo(endingPos.x, endingPos.y);
-    context.closePath();
-    context.stroke();
-  }
+    image.setPixelColor(pos, color);
+    const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    context.fillStyle = colorString;
+    context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
+  }, [image, scale]);
 
   const startPaint = useCallback((e: MouseEvent) => {
     const mousePosition = getMousePos(e);
@@ -168,11 +165,11 @@ export default function EditorCanvas({
     if (isPainting) {
       const newMousePos = getMousePos(e);
       if (mousePos && newMousePos) {
-        drawLine(mousePos, newMousePos, COLORS.red);
+        fillPixel(getImageCoord(newMousePos), COLORS.red);
         setMousePos(newMousePos);
       }
     }
-  }, [isPainting, mousePos]);
+  }, [isPainting, mousePos, fillPixel, getImageCoord]);
 
   const stopPaint = useCallback(() => {
     setMousePos(undefined);

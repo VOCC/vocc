@@ -38,8 +38,7 @@ export interface Exportable {
 export interface Modifiable {
   setPixelColor: (
     pos: ImageCoordinates,
-    paletteIndex?: number,
-    color?: Color
+    color: Color
   ) => void;
 }
 

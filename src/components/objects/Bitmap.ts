@@ -5,6 +5,7 @@ import {
   ImageCoordinates
 } from "../../lib/interfaces";
 import ImageCanvas from "./ImageCanvas";
+import * as Loader from "../../lib/imageLoadUtils";
 
 export default abstract class Bitmap implements ImageInterface {
   public  fileName: string;
@@ -48,6 +49,13 @@ export default abstract class Bitmap implements ImageInterface {
     });
   }
 
+  protected updateImageData(pos: ImageCoordinates, color: Color): void {
+    this.imageData[Loader.offset(pos, this.dimensions)] = color.r;
+    this.imageData[Loader.offset(pos, this.dimensions) + 1] = color.g;
+    this.imageData[Loader.offset(pos, this.dimensions) + 2] = color.b;
+    this.imageData[Loader.offset(pos, this.dimensions) + 3] = color.a;
+  }
+
   /////////////////////////////////////// abstract classes
 
   public abstract getCSourceData(): string;
@@ -55,7 +63,6 @@ export default abstract class Bitmap implements ImageInterface {
   public abstract getPixelColorAt(pos: ImageCoordinates): Color;
   public abstract setPixelColor(
     pos: ImageCoordinates,
-    paletteIndex?: number,
-    color?: Color
+    color: Color
   ): void;
 }

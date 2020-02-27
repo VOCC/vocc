@@ -45,9 +45,10 @@ export default class Bitmap3 extends Bitmap {
 
   public setPixelColor(
     pos: ImageCoordinates,
-    paletteIndex?: number,
-    color?: Color
+    color: Color
   ): void {
-    return;
+    console.log("setting pixel color bmp3");
+    super.updateImageData(pos, color);
+    this.imageCanvas.updatePixel(pos, color);
   }
 }

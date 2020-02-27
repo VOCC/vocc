@@ -64,10 +64,14 @@ export default class Bitmap4 extends Bitmap {
     );
   }
 
-  public setPixelColor({ x, y }: ImageCoordinates): void {
-    console.warn(
-      "Setting pixel colors not implemented yet! Returning unchanged image."
-    );
-    return;
+  public setPixelColor(
+    pos: ImageCoordinates,
+    color: Color
+  ): void {
+    console.log("setting pixel color bmp4");
+    const paletteIndex = 255;
+    this.palette.setColorAt(paletteIndex, color);
+    this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;
+    this.imageCanvas.updatePixel(pos, color);
   }
 }
