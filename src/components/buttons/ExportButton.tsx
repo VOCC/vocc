@@ -1,5 +1,4 @@
 import React from "react";
-import "../../styles/buttons.scss";
 
 interface ExportButtonProps {
   startImageExport: () => void;

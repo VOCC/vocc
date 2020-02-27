@@ -20,7 +20,6 @@ export default class ImageCanvas {
     this.dimensions = image.dimensions;
     this.hiddenCanvas = createHiddenCanvas(image.dimensions);
     this.context = this.hiddenCanvas.getContext("2d");
-
     this.pixelGrid = new PixelGrid(image.dimensions, this.pixelGridRatio);
 
     this.drawImageToHiddenCanvas(image);
@@ -55,7 +54,7 @@ export default class ImageCanvas {
   }
 }
 
-class PixelGrid {
+export class PixelGrid {
   public dimensions: Dimensions;
   public pixelGridRatio = 16;
 

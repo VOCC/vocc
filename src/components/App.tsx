@@ -1,18 +1,20 @@
 import React, { useCallback, useState, useReducer } from "react";
-import { ImageInterface, EditorSettings } from "../lib/interfaces";
 import { exportImage, exportPalette } from "../lib/exportUtils";
+import { EditorSettings } from "../lib/interfaces";
 import { loadNewImage } from "../lib/imageLoadUtils";
+import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
-import { Tools } from "../lib/consts";
-import ExportButton from "./buttons/ExportButton";
+import { Tool } from "../lib/consts";
+import Bitmap from "./objects/Bitmap";
+import Bitmap3 from "./objects/Bitmap3";
+import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
+import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
-import ToolsPanel from "./ToolsPanel";
-import "../styles/app.scss";
-import "../styles/toolbar.scss";
 import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
-import { quantize } from "../lib/quantize";
+import QuantizeButton from "./buttons/QuantizeButton";
+import ToolsPanel from "./ToolsPanel";
 
 function scaleReducer(state: number, e: WheelEvent) {
   let direction = e.deltaY < 0 ? -1 : 1;
@@ -21,11 +23,12 @@ function scaleReducer(state: number, e: WheelEvent) {
 }
 
 function App(): JSX.Element {
-  const [palette, setPalette] = useState<Palette>(new Palette());
-  const [image, setImage] = useState<ImageInterface>();
+  const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
+  const [image, setImage] = useState<Bitmap>();
+  const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    currentTool: Tools.PENCIL
+    currentTool: Tool.PENCIL
   });
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
 
@@ -35,9 +38,28 @@ function App(): JSX.Element {
     if (imageFile) {
       console.log("Loading image...");
       let image = await loadNewImage(imageFile);
-      // let { palette, sprite } = quantize(image, 16);
       setImage(image);
-      // setPalette(palette);
+    }
+  };
+
+  const handleToolChange = useCallback(
+    (newTool: Tool) => {
+      setEditorSettings({
+        grid: editorSettings.grid,
+        currentTool: newTool
+      });
+    },
+    [editorSettings.grid]
+  );
+
+  const handleQuantize = (newColorDepth: number): void => {
+    newColorDepth = Math.floor(newColorDepth); // just in case of a float
+    if (!(image instanceof Bitmap3)) {
+      alert("Requantization of paletted images currently not supported!");
+    } else {
+      let { palette, sprite } = quantize(image, newColorDepth);
+      setImage(sprite);
+      setPalette(palette);
     }
   };
 
@@ -66,9 +88,14 @@ function App(): JSX.Element {
         return;
       case "PAL":
         //.pal file
-        fileType = ".pal";
-        blob = new Blob([exportPalette(palette)]);
-        break;
+        if (!palette) {
+          alert("Can't export a non-existant palette!");
+          return;
+        } else {
+          fileType = ".pal";
+          blob = new Blob([exportPalette(palette)]);
+          break;
+        }
       case "JPG":
         //.jpeg file
         fileType = ".jpg";
@@ -91,9 +118,10 @@ function App(): JSX.Element {
     }
   };
 
-  const handleSettingsChange = (newSettings: EditorSettings): void => {
-    setEditorSettings(newSettings);
-  };
+  const handleSettingsChange = useCallback(
+    (newSettings: EditorSettings): void => setEditorSettings(newSettings),
+    []
+  );
 
   return (
     <div className="app-container">
@@ -119,21 +147,35 @@ function App(): JSX.Element {
             {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
             <ToolsPanel
               settings={editorSettings}
-              onSettingsChange={ns => handleSettingsChange(ns)}
+              onSettingsChange={handleSettingsChange}
+              onToolChange={handleToolChange}
             ></ToolsPanel>
           </div>
         </div>
         <div className="image-container">
-          <EditorCanvas
-            image={image}
-            settings={editorSettings}
-            scale={scale}
-            onMouseWheel={handleMouseWheelEvent}
-          />
+          {image ? (
+            <EditorCanvas
+              image={image}
+              settings={editorSettings}
+              scale={scale}
+              onMouseWheel={handleMouseWheelEvent}
+            />
+          ) : (
+            <div className="start-message">
+              <em>Import an image to get started</em>
+            </div>
+          )}
         </div>
         <div className="right-panel">
           <div className="panel-label">Color Palette</div>
-          <PaletteDisplay palette={palette} />
+          <div className="palette-container">
+            <PaletteDisplay
+              palette={palette}
+              selectedColorIndex={selectedColorIndex}
+              onChangeSelectedColorIndex={setSelectedColorIndex}
+            />
+          </div>
+          <QuantizeButton handleQuantize={handleQuantize} />
         </div>
       </div>
     </div>

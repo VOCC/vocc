@@ -1,8 +1,7 @@
 import {
   Color,
   Dimensions,
-  ImageCoordinates,
-  ImageInterface
+  ImageCoordinates
 } from "../../lib/interfaces";
 import {
   generateHeaderString,
@@ -10,14 +9,13 @@ import {
 } from "../../lib/exportUtils";
 import Palette from "./Palette";
 import ImageCanvas from "./ImageCanvas";
+import Bitmap from "./Bitmap";
 
-export default class Bitmap4 implements ImageInterface {
-  public dimensions: Dimensions;
-  public fileName: string;
-
+export default class Bitmap4 extends Bitmap {
   private data: number[];
   private palette: Palette;
-  private imageCanvas: ImageCanvas;
+
+  protected imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
@@ -25,23 +23,10 @@ export default class Bitmap4 implements ImageInterface {
     palette: Palette,
     dimensions: Dimensions
   ) {
-    this.dimensions = dimensions;
-    this.fileName = fileName;
+    super(fileName, dimensions);
     this.data = indexArray;
     this.palette = palette;
     this.imageCanvas = new ImageCanvas(this);
-  }
-
-  public getImageCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getImageCanvasElement();
-  }
-
-  public getPixelGridCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getPixelGridCanvasElement();
-  }
-
-  public getImageData(): Uint8ClampedArray {
-    return new Uint8ClampedArray(this.data);
   }
 
   public getHeaderData(): string {
@@ -57,12 +42,6 @@ export default class Bitmap4 implements ImageInterface {
 
   public getCSourceData(): string {
     return generateCSourceFileString(this, 4, this.palette);
-  }
-
-  public async getImageFileBlob(): Promise<Blob | null> {
-    return new Promise(resolve => {
-      this.getImageCanvasElement().toBlob(blob => resolve(blob));
-    });
   }
 
   /**
@@ -85,10 +64,14 @@ export default class Bitmap4 implements ImageInterface {
     );
   }
 
-  public setPixelColor({ x, y }: ImageCoordinates): ImageInterface {
-    console.warn(
-      "Setting pixel colors not implemented yet! Returning unchanged image."
-    );
-    return this;
+  public setPixelColor(
+    pos: ImageCoordinates,
+    color: Color
+  ): void {
+    console.log("setting pixel color bmp4");
+    const paletteIndex = 255;
+    this.palette.setColorAt(paletteIndex, color);
+    this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;
+    this.imageCanvas.updatePixel(pos, color);
   }
 }

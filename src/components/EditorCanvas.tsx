@@ -1,11 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ImageInterface, EditorSettings } from "../lib/interfaces";
+import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
+import {
+  EditorSettings,
+  ImageCoordinates,
+  Color } from "../lib/interfaces";
+import { COLORS } from "../lib/consts";
+import Bitmap from "./objects/Bitmap";
+import { createHiddenCanvas } from "../lib/imageLoadUtils";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
 
 interface EditorCanvasProps {
-  image: ImageInterface | undefined;
+  image: Bitmap;
   settings: EditorSettings;
   scale: number;
   onMouseWheel: (e: WheelEvent) => void;
@@ -18,49 +24,23 @@ export default function EditorCanvas({
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const [localImage, setImage] = useState<ImageInterface>(image);
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>(
-    canvasRef ? getContext(canvasRef) : null
-  );
+  const [canvasSize, setCanvasSize] = useState<number[]>([0, 0]);
 
-  /**
-   * Set up the canvas every time the context changes.
-   */
-  useEffect(() => {
-    console.log("Setting up canvas...");
+  ///////////////////// Drawing Tool
+  const [isPainting, setIsPainting] = useState<boolean>(false);
+  const [mousePos, setMousePos] = useState<
+    ImageCoordinates | undefined>(undefined);
+  /////////////////////
 
-    const setupCanvas = () => {
-      let canvas = getCanvas(canvasRef);
-      if (!canvas) return;
-      setContext(getContext(canvasRef));
-      if (!context) return;
+  const drawImageOnCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    if (!image) return;
 
-      const setupCanvasSize = (canvas: HTMLCanvasElement) => {
-        const devicePixelRatio = window.devicePixelRatio || 1;
-        canvas.width = canvas.clientWidth * devicePixelRatio;
-        canvas.height = canvas.clientHeight * devicePixelRatio;
-        context.imageSmoothingEnabled = false;
-      };
-
-      setupCanvasSize(canvas);
-      window.addEventListener("resize", () => {
-        if (canvas) setupCanvasSize(canvas);
-      });
-
-      // Add the event listener for updating the scale with the scale dispatcher
-      canvas.addEventListener("wheel", onMouseWheel);
-    };
-    setupCanvas();
-  }, [context, onMouseWheel]);
-
-  /**
-   * Draw the image whenever the image, imageCanvas, context, scale, or editor
-   * settings change.
-   */
-  useEffect(() => {
-    if (!image || !context || !canvasRef.current) return;
     // Clear the context
-    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
     // Draw the image at the correct position and scale
     context.drawImage(
       image.getImageCanvasElement(),
@@ -79,22 +59,149 @@ export default function EditorCanvas({
         image.dimensions.height * scale
       );
     }
-  }, [image, context, scale, settings]);
+  }, [image, canvasRef, scale, settings.grid]);
+
+  /**
+   * Handle window resizing and set the new canvasSize state.
+   */
+  useLayoutEffect(() => {
+    const updateCanvasSize = () => {
+      if (canvasRef.current) {
+        setCanvasSize([
+          canvasRef.current.clientWidth,
+          canvasRef.current.clientHeight
+        ]);
+      }
+    };
+    window.addEventListener("resize", () => updateCanvasSize());
+  }, []);
+
+  /**
+   * Set up the canvas.
+   */
+  useLayoutEffect(() => {
+    console.log("Setting up canvas...");
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    setCanvasSize([canvas.clientWidth, canvas.clientHeight]);
+    context.imageSmoothingEnabled = false;
+  }, [canvasRef]);
+
+  /**
+   * Change the dimensions of the canvas when the canvasSize changes.
+   */
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    canvas.width = canvasSize[0] * devicePixelRatio;
+    canvas.height = canvasSize[1] * devicePixelRatio;
+    context.imageSmoothingEnabled = false;
+  }, [canvasSize, canvasRef]);
+
+  /**
+   * Handle mousewheel zooming
+   */
+  useLayoutEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener("wheel", onMouseWheel);
+    }
+  }, [onMouseWheel]);
+
+  /**
+   * Draw the image whenever the image, imageCanvas, context, scale, or editor
+   * settings change.
+   */
+  useLayoutEffect(() => drawImageOnCanvas(), [drawImageOnCanvas, canvasSize]);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Drawing Tool
+  const getMousePos = (e: MouseEvent): ImageCoordinates | undefined => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+    }
+    return undefined;
+  }
+
+  const getImageCoord = useCallback(
+    (mousePos: ImageCoordinates): ImageCoordinates => {
+    const x = Math.floor(mousePos.x / scale);
+    const y = Math.floor(mousePos.y / scale);
+    return {x, y};
+  }, [scale]);
+  
+  const fillPixel = useCallback((pos: ImageCoordinates, color: Color): void => {
+    if (!canvasRef.current) return;
+    const context = canvasRef.current.getContext('2d');
+    if (!context) return;
+
+    image.setPixelColor(pos, color);
+    const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    context.fillStyle = colorString;
+    context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
+  }, [image, scale]);
+
+  const startPaint = useCallback((e: MouseEvent) => {
+    const mousePosition = getMousePos(e);
+    if (mousePosition) {
+      setMousePos(mousePosition);
+      setIsPainting(true);
+    }
+  }, []);
+
+  const paint = useCallback((e: MouseEvent) => {
+    const newMousePos = getMousePos(e);
+    if (isPainting && newMousePos) {
+        fillPixel(getImageCoord(newMousePos), COLORS.red);
+        setMousePos(newMousePos);
+    }
+  }, [isPainting, fillPixel, getImageCoord]);
+
+  const stopPaint = useCallback(() => {
+    setMousePos(undefined);
+    setIsPainting(false);
+  }, []);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mousedown', startPaint);
+    return () => canvas.removeEventListener('mousedown', startPaint);
+  }, [startPaint]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mousemove', paint);
+    return () => {
+      canvas.removeEventListener('mousemove', paint);
+    }
+  }, [paint]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    canvas.addEventListener('mouseup', stopPaint);
+    canvas.addEventListener('mouseleave', stopPaint)
+    return () => {
+      canvas.removeEventListener('mouseup', stopPaint);
+      canvas.removeEventListener('mouseleave', stopPaint);
+    }
+  }, [stopPaint]);
+
+  /////////////////////////////////////////////////////////////////////////////
 
   return <canvas ref={canvasRef} className="image-canvas" />;
 }
-
-const getCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
-  if (canvasRef == null) return;
-  return canvasRef.current;
-};
-
-const getContext = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
-  const canvas = getCanvas(canvasRef);
-  if (canvas == null) return null;
-  let context = null;
-  if (!(context = canvas.getContext("2d"))) {
-    throw new Error(`2d context not supported or canvas already initialized`);
-  }
-  return context;
-};

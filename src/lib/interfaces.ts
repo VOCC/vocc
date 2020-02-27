@@ -1,4 +1,4 @@
-import { Tools } from "./consts";
+import { Tool } from "./consts";
 
 export interface Color {
   r: number;
@@ -36,14 +36,17 @@ export interface Exportable {
 }
 
 export interface Modifiable {
-  setPixelColor: (pos: ImageCoordinates, paletteIndex: number) => Modifiable;
+  setPixelColor: (
+    pos: ImageCoordinates,
+    color: Color
+  ) => void;
 }
 
 export interface ImageInterface extends Drawable, Exportable, Modifiable {}
 
 export interface EditorSettings {
   grid: boolean;
-  currentTool: Tools;
+  currentTool: Tool;
 }
 
 export interface ImageCoordinates {
