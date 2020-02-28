@@ -40,6 +40,13 @@ function App(): JSX.Element {
 
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
 
+  const handleDropdownChange = useCallback(
+    (newType: DropdownMenu) => {
+      setDropdown(newType);
+    },
+    []
+  );
+
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
       console.log("Loading image...");
@@ -148,13 +155,13 @@ function App(): JSX.Element {
         </span>
         <Dropdown 
           type={dropdown}
-          settings={editorSettings} 
-          onSettingsChange={handleSettingsChange}
+          onTypeChange={handleDropdownChange}  
         />
         IMG ->
         <ImportButton onFileChange={handleImageLoad} />
         PAL ->
         <ImportButton onFileChange={handlePaletteLoad} />
+
         GBA ->
         <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
         Pal ->

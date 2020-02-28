@@ -1,15 +1,16 @@
 import React from "react";
 import { EditorSettings, DropdownMenu } from "../lib/interfaces";
-import { settings } from "cluster";
-import ReactDOM from "react-dom";
+import Bitmap from "./objects/Bitmap";
+import Palette from "./objects/Palette";
 
-
-// https://www.codementor.io/@chrisharrington/create-a-dropdown-using-react-js--font-awesome-and-less-css-du1087rsx
-// https://reactjs.org/docs/web-components.html
-// how to implement dropdown
 
 type DropdownProps = {
   type: DropdownMenu;
+  onTypeChange: (newType: DropdownMenu) => void;
+  
+  image?: Bitmap;
+  palette?: Palette;
+
   settings?: EditorSettings;
   onSettingsChange?: (newSettings: EditorSettings) => void;
 
@@ -17,31 +18,75 @@ type DropdownProps = {
 
 export default function Dropdown({
   type,
-  settings,
-  onSettingsChange
+  onTypeChange
 }: DropdownProps) {
-  
-  return (
-    <div className="App">
-      <div className="container">
-        <button type="button">
-          {type}
-        </button>
-      </div>
-    </div>
-  );
-}
+  console.log("Dropdown Menu Type: " + type)
 
-class Xsearch extends HTMLElement {
-  connectedCallback() {
-    const mountPoint = document.createElement('span');
-    this.attachShadow({ mode: 'open' }).appendChild(mountPoint);
-
-    const name = this.getAttribute('name');
-    const url = 'https://www.google.com/search?q=' + name;
-    ReactDOM.render(<a href={url}>{name}</a>, mountPoint);
+  switch(type) {
+    case DropdownMenu.Import: 
+      return (
+      <div className="App">
+          <div className="container">
+          <button className="button" onClick={() => onTypeChange(DropdownMenu.None)}>
+              Import
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Export)}>
+              Export
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Settings)}>
+              Settings
+            </button>
+          </div>
+        </div>
+      );
+    case DropdownMenu.Export:
+      return (
+        <div className="App">
+          <div className="container">
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Import)}>
+              Import
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.None)}>
+              Export
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Settings)}>
+              Settings
+            </button>
+          </div>
+        </div>
+      );
+    case DropdownMenu.Settings:
+      return (
+        <div className="App">
+          <div className="container">
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Import)}>
+              Import
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Export)}>
+              Export
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.None)}>
+              Settings
+            </button>
+          </div>
+        </div>
+      );
+    default:
+      return (
+        <div className="App">
+          <div className="container">
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Import)}>
+              Import
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Export)}>
+              Export
+            </button>
+            <button className="button" onClick={() => onTypeChange(DropdownMenu.Settings)}>
+              Settings
+            </button>
+          </div>
+        </div>
+      );
   }
 }
 
-
-customElements.define("x-search", Xsearch);

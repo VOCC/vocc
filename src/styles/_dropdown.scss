@@ -1,23 +1,43 @@
-
-.title {
-  padding-right: 1rem;
-  font-weight: 900;
+.button {
+  margin: 0.5rem;
+  margin-left: 0;
+  line-height: 20pt;
+  background-color: $bg-color;
+  border: 1px solid $button-highlight;
+  color: $button-highlight;
+  border-radius: 4px;
+  &:hover {
+    background-color: $button-highlight;
+    color: $bg-color;
+  }
+  transition: 0.1s;
 }
-.subtitle {
-  flex-grow: 1;
+
+input[type="file"] {
+  display: none;
 }
 
-.container { 
-  position: relative; 
-  display: inline-block; 
-} 
+.import-button {
+  @extend .button;
+}
 
-.button { 
-  padding: 0; 
-  width: 50px; 
-  border: 0; 
-  background-color: #fff; 
-  color: #333; 
-  cursor: pointer; 
-  outline: 0; 
+.import-loaded {
+  margin-right: 0.5rem;
+  color: $text-color-secondary;
+  font-size: 10pt;
+}
+
+.export-button {
+  @extend .button;
+}
+
+.quantize-container {
+  width: 100%;
+  text-align: center;
+}
+
+.quantize-input {
+  border-radius: 4px;
+  width: 64px;
+  box-sizing: border-box;
 }

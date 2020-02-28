@@ -21,10 +21,10 @@ export enum EditorMode {
 }
 
 export enum DropdownMenu {
-  None = "n/a",
-  Import = "Import",
-  Export = "Export",
-  Settings = "Settings"
+  None,
+  Import,
+  Export,
+  Settings
 }
 
 export interface Drawable {
