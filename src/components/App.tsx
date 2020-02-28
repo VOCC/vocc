@@ -23,6 +23,7 @@ function scaleReducer(state: number, e: WheelEvent) {
 
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
+  const [paletteHash, setPaletteHash] = useState<string>("");
   const [image, setImage] = useState<Bitmap>();
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
@@ -59,7 +60,13 @@ function App(): JSX.Element {
       let { palette, sprite } = quantize(image, newColorDepth);
       setImage(sprite);
       setPalette(palette);
+      setPaletteHash(JSON.stringify(palette));
     }
+  };
+
+  const handlePaletteUpdate = (newPalette: Palette): void => {
+    setPalette(palette);
+    setPaletteHash(JSON.stringify(palette));
   };
 
   const handleImageExport = async (type: string) => {
@@ -170,6 +177,8 @@ function App(): JSX.Element {
         <div className="right-panel">
           <PalettePanel
             palette={palette}
+            paletteHash={paletteHash}
+            updatePalette={handlePaletteUpdate}
             selectedColorIndex={selectedColorIndex}
             onChangeSelectedColorIndex={setSelectedColorIndex}
             handleQuantize={handleQuantize}

@@ -3,6 +3,7 @@ import Palette from "./objects/Palette";
 
 interface IPaletteDisplay {
   palette: Palette;
+  paletteHash: string;
   selectedColorIndex: number;
   onChangeSelectedColorIndex: (newIndex: number) => void;
 }
@@ -32,6 +33,7 @@ const MOUSE_POS_TO_INDEX = (pos: { x: number; y: number }) =>
 
 function PaletteDisplay({
   palette,
+  paletteHash,
   selectedColorIndex,
   onChangeSelectedColorIndex
 }: IPaletteDisplay): JSX.Element {
@@ -51,7 +53,7 @@ function PaletteDisplay({
       PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
       PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
     );
-  }, [palette]);
+  }, [palette, paletteHash]);
 
   /**
    * method to populate the palette with colors

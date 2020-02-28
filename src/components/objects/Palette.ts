@@ -4,7 +4,7 @@ import { createHiddenCanvas } from "../../lib/imageLoadUtils";
 import { PixelGrid } from "./ImageCanvas";
 
 interface IPalette {
-  dimensions: Dimensions;
+  readonly dimensions: Dimensions;
   getColorAt: (index: number) => Color;
   setColorAt: (index: number, color: Color) => void;
   swapRows: (row1: number, row2: number) => void;
@@ -65,6 +65,7 @@ export default class Palette implements IPalette {
 
   public setColorAt(index: number, color: Color) {
     this.colorArray[index] = color;
+    this.drawPaletteToHiddenCanvas(this.hiddenCanvas);
   }
 
   public getPaletteCanvas(): HTMLCanvasElement {
