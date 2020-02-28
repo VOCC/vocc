@@ -20,6 +20,13 @@ export enum EditorMode {
   Background = "Background"
 }
 
+export enum DropdownMenu {
+  None = "n/a",
+  Import = "Import",
+  Export = "Export",
+  Settings = "Settings"
+}
+
 export interface Drawable {
   dimensions: Dimensions;
   getImageCanvasElement: () => HTMLCanvasElement;

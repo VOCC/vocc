@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { EditorSettings, EditorMode } from "../lib/interfaces";
+import { EditorSettings, EditorMode, DropdownMenu } from "../lib/interfaces";
 import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
@@ -15,6 +15,7 @@ import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
 import ToolsPanel from "./ToolsPanel";
+import Dropdown from "./Dropdown";
 
 function scaleReducer(state: number, e: WheelEvent) {
   let direction = e.deltaY < 0 ? -1 : 1;
@@ -32,6 +33,9 @@ function App(): JSX.Element {
     mode: 3,
     editorMode: EditorMode.Bitmap
   });
+
+  const [dropdown, setDropdown] = useState<DropdownMenu>(DropdownMenu.None);
+
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
 
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
@@ -142,6 +146,11 @@ function App(): JSX.Element {
         <span className="subtitle">
           Game Boy Advance Image Editor and Converter
         </span>
+        <Dropdown 
+          type={dropdown}
+          settings={editorSettings} 
+          onSettingsChange={handleSettingsChange}
+        />
         IMG ->
         <ImportButton onFileChange={handleImageLoad} />
         PAL ->

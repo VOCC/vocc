@@ -1,0 +1,23 @@
+
+.title {
+  padding-right: 1rem;
+  font-weight: 900;
+}
+.subtitle {
+  flex-grow: 1;
+}
+
+.container { 
+  position: relative; 
+  display: inline-block; 
+} 
+
+.button { 
+  padding: 0; 
+  width: 50px; 
+  border: 0; 
+  background-color: #fff; 
+  color: #333; 
+  cursor: pointer; 
+  outline: 0; 
+}
