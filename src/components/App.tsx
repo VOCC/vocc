@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { EditorSettings } from "../lib/interfaces";
+import { EditorSettings, EditorMode } from "../lib/interfaces";
 import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
@@ -28,7 +28,9 @@ function App(): JSX.Element {
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    currentTool: Tool.PENCIL
+    currentTool: Tool.PENCIL,
+    mode: 3,
+    editorMode: EditorMode.Bitmap
   });
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
 
@@ -46,7 +48,9 @@ function App(): JSX.Element {
     (newTool: Tool) => {
       setEditorSettings({
         grid: editorSettings.grid,
-        currentTool: newTool
+        currentTool: newTool,
+        mode: editorSettings.mode,
+        editorMode: editorSettings.editorMode
       });
     },
     [editorSettings.grid]
@@ -153,7 +157,6 @@ function App(): JSX.Element {
       </div>
       <div className="workspace-container">
         <div className="left-panel">
-          <div className="panel-label">Tools</div>
           <div className="tools-container">
             {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
             <ToolsPanel
