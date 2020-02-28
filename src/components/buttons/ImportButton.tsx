@@ -1,20 +1,20 @@
 import React, { useState, useRef } from "react";
 
-type ImageFile = File | null;
+type ImportFile = File | null;
 
 interface IProps {
-  onImageChange: (imageFile: ImageFile) => void;
+  onFileChange: (imageFile: ImportFile) => void;
 }
 
 interface IFile {
   fileName: string;
-  hasLoadedImage: boolean;
+  hasLoadedFile: boolean;
 }
 
-function ImportButton({ onImageChange }: IProps): JSX.Element {
-  const [file, setImageFile] = useState<IFile>({
+function ImportButton({ onFileChange }: IProps): JSX.Element {
+  const [file, setFile] = useState<IFile>({
     fileName: "No file name",
-    hasLoadedImage: false
+    hasLoadedFile: false
   });
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -22,28 +22,28 @@ function ImportButton({ onImageChange }: IProps): JSX.Element {
     e.preventDefault();
     if (fileInput.current) {
       if (fileInput.current.files) {
-        setImageFile({
+        setFile({
           fileName: fileInput.current.files[0].name,
-          hasLoadedImage: true
+          hasLoadedFile: true
         });
-        onImageChange(fileInput.current.files[0]);
+        onFileChange(fileInput.current.files[0]);
       }
     }
   };
 
-  const renderLoaded = (imageTitle: string): JSX.Element => (
+  const renderLoaded = (fileTitle: string): JSX.Element => (
     <div className="import-loaded">
-      Loaded <em>{imageTitle}</em>
+      Loaded <em>{fileTitle}</em>
     </div>
   );
 
   const renderUnloaded = (): JSX.Element => (
     <button className="button import-button">
       <label>
-        Import Image
+        Import
         <input
           type="file"
-          accept=".png, .jpg, .jpeg, .bmp"
+          accept=".png, .jpg, .jpeg, .bmp, .pal"
           ref={fileInput}
           onChange={handleSubmit}
         />
@@ -51,7 +51,7 @@ function ImportButton({ onImageChange }: IProps): JSX.Element {
     </button>
   );
 
-  return file.hasLoadedImage ? renderLoaded(file.fileName) : renderUnloaded();
+  return file.hasLoadedFile ? renderLoaded(file.fileName) : renderUnloaded();
 }
 
 export default ImportButton;

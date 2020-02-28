@@ -5,7 +5,7 @@ import {
   Color } from "../lib/interfaces";
 import { COLORS } from "../lib/consts";
 import Bitmap from "./objects/Bitmap";
-import { createHiddenCanvas } from "../lib/imageLoadUtils";
+import { createHiddenCanvas } from "../lib/fileLoadUtils";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;

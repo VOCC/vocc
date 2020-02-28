@@ -10,12 +10,11 @@
     "@fortawesome/react-native-fontawesome": "^0.2.1",
     "@types/file-saver": "^2.0.1",
     "@types/jest": "24.0.23",
-    "@types/node": "12.12.7",
     "@types/react": "16.9.11",
     "@types/react-dom": "16.9.4",
     "file-saver": "^2.0.2",
     "node-sass": "^4.13.1",
-    "react": "^16.12.0",
+    "react": "^16.13.0",
     "react-dom": "^16.12.0",
     "react-native-svg": "^11.0.1",
     "react-scripts": "^3.3.0",
@@ -42,5 +41,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.7"
   }
 }
