@@ -32,7 +32,18 @@ function ImportButton({ onFileChange }: IProps): JSX.Element {
   };
 
   const renderLoaded = (fileTitle: string): JSX.Element => (
-    <div className="import-loaded">
+    <div>
+      <button className="button import-button">
+      <label>
+        Import
+        <input
+          type="file"
+          accept=".png, .jpg, .jpeg, .bmp, .pal"
+          ref={fileInput}
+          onChange={handleSubmit}
+        />
+      </label>
+    </button>
       Loaded <em>{fileTitle}</em>
     </div>
   );
