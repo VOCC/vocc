@@ -305,19 +305,19 @@ function PaletteToGBA(pal: Palette): string {
   return palC + "};";
 }
 
+export function exportPalette(pal: Palette): string {
+  return paletteToHex(pal);
+}
+
 export async function exportImage(
   img: ImageInterface,
   type: string
 ): Promise<Blob | null> {
   switch (type) {
-    case "JPG":
+    case "BMP":
     case "PNG":
       return await img.getImageFileBlob();
     default:
       return new Blob(["Invalid file type"]);
   }
-}
-
-export function exportPalette(pal: Palette): string {
-  return paletteToHex(pal);
 }

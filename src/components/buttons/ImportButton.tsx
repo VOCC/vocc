@@ -43,7 +43,7 @@ function ImportButton({ onImageChange }: IProps): JSX.Element {
         Import Image
         <input
           type="file"
-          accept=".png, .jpg, .jpeg"
+          accept=".png, .jpg, .jpeg, .bmp"
           ref={fileInput}
           onChange={handleSubmit}
         />
