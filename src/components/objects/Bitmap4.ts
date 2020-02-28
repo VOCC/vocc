@@ -1,8 +1,4 @@
-import {
-  Color,
-  Dimensions,
-  ImageCoordinates
-} from "../../lib/interfaces";
+import { Color, Dimensions, ImageCoordinates } from "../../lib/interfaces";
 import {
   generateHeaderString,
   generateCSourceFileString
@@ -64,11 +60,8 @@ export default class Bitmap4 extends Bitmap {
     );
   }
 
-  public setPixelColor(
-    pos: ImageCoordinates,
-    color: Color
-  ): void {
-    console.log("setting pixel color bmp4");
+  public setPixelColor(pos: ImageCoordinates, color: Color): void {
+    // console.log("setting pixel color bmp4");
     const paletteIndex = 255;
     this.palette.setColorAt(paletteIndex, color);
     this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;

@@ -70,6 +70,9 @@ function PaletteDisplay({
     );
   }, [palette]);
 
+  /**
+   * Draws a box around the selected color in the palette view.
+   */
   const drawSelectedColorHighlight = useCallback(
     (index: number) => {
       if (!canvasRef.current) return;
@@ -82,8 +85,8 @@ function PaletteDisplay({
       context.rect(
         INDEX_TO_X(index) * ratio,
         INDEX_TO_Y(index) * ratio,
-        15,
-        15
+        ratio,
+        ratio
       );
       context.stroke();
     },

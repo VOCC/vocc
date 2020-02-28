@@ -1,17 +1,22 @@
-import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
-import {
-  EditorSettings,
-  ImageCoordinates,
-  Color } from "../lib/interfaces";
-import { COLORS } from "../lib/consts";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useLayoutEffect
+} from "react";
+import { EditorSettings, ImageCoordinates, Color } from "../lib/interfaces";
 import Bitmap from "./objects/Bitmap";
-import { createHiddenCanvas } from "../lib/imageLoadUtils";
+import Bitmap3 from "./objects/Bitmap3";
+import Palette from "./objects/Palette";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
 
 interface EditorCanvasProps {
   image: Bitmap;
+  palette: Palette;
+  selectedPaletteIndex: number;
   settings: EditorSettings;
   scale: number;
   onMouseWheel: (e: WheelEvent) => void;
@@ -19,6 +24,8 @@ interface EditorCanvasProps {
 
 export default function EditorCanvas({
   image,
+  palette,
+  selectedPaletteIndex,
   settings,
   scale,
   onMouseWheel
@@ -28,14 +35,15 @@ export default function EditorCanvas({
 
   ///////////////////// Drawing Tool
   const [isPainting, setIsPainting] = useState<boolean>(false);
-  const [mousePos, setMousePos] = useState<
-    ImageCoordinates | undefined>(undefined);
+  const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(
+    undefined
+  );
   /////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     if (!context) return;
     if (!image) return;
 
@@ -83,7 +91,7 @@ export default function EditorCanvas({
     console.log("Setting up canvas...");
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     if (!context) return;
     setCanvasSize([canvas.clientWidth, canvas.clientHeight]);
     context.imageSmoothingEnabled = false;
@@ -95,7 +103,7 @@ export default function EditorCanvas({
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     if (!context) return;
 
     const devicePixelRatio = window.devicePixelRatio || 1;
@@ -133,41 +141,58 @@ export default function EditorCanvas({
       };
     }
     return undefined;
-  }
+  };
 
   const getImageCoord = useCallback(
     (mousePos: ImageCoordinates): ImageCoordinates => {
-    const x = Math.floor(mousePos.x / scale);
-    const y = Math.floor(mousePos.y / scale);
-    return {x, y};
-  }, [scale]);
-  
-  const fillPixel = useCallback((pos: ImageCoordinates, color: Color): void => {
-    if (!canvasRef.current) return;
-    const context = canvasRef.current.getContext('2d');
-    if (!context) return;
+      const x = Math.floor(mousePos.x / scale);
+      const y = Math.floor(mousePos.y / scale);
+      return { x, y };
+    },
+    [scale]
+  );
 
-    image.setPixelColor(pos, color);
-    const colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    context.fillStyle = colorString;
-    context.fillRect(pos.x * scale, pos.y * scale, scale, scale);
-  }, [image, scale]);
+  const fillPixel = useCallback(
+    (pos: ImageCoordinates, color: Color): void => {
+      if (!canvasRef.current) return;
+      const context = canvasRef.current.getContext("2d");
+      if (!context) return;
+
+      image.setPixelColor(pos, color);
+      drawImageOnCanvas();
+    },
+    [drawImageOnCanvas, image]
+  );
 
   const startPaint = useCallback((e: MouseEvent) => {
     const mousePosition = getMousePos(e);
     if (mousePosition) {
       setMousePos(mousePosition);
+      // fillPixel(
+      //   getImageCoord(mousePosition),
+      //   palette.getColorAt(selectedPaletteIndex)
+      // );
       setIsPainting(true);
     }
   }, []);
 
-  const paint = useCallback((e: MouseEvent) => {
-    const newMousePos = getMousePos(e);
-    if (isPainting && newMousePos) {
-        fillPixel(getImageCoord(newMousePos), COLORS.red);
+  const paint = useCallback(
+    (e: MouseEvent) => {
+      const newMousePos = getMousePos(e);
+      if (isPainting && newMousePos) {
+        if (image instanceof Bitmap3) {
+          fillPixel(
+            getImageCoord(newMousePos),
+            palette.getColorAt(selectedPaletteIndex)
+          );
+        } else {
+          console.warn(`Drawing not supported for ${typeof image}.`);
+        }
         setMousePos(newMousePos);
-    }
-  }, [isPainting, fillPixel, getImageCoord]);
+      }
+    },
+    [image, isPainting, fillPixel, getImageCoord, palette, selectedPaletteIndex]
+  );
 
   const stopPaint = useCallback(() => {
     setMousePos(undefined);
@@ -177,28 +202,28 @@ export default function EditorCanvas({
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    canvas.addEventListener('mousedown', startPaint);
-    return () => canvas.removeEventListener('mousedown', startPaint);
+    canvas.addEventListener("mousedown", startPaint);
+    return () => canvas.removeEventListener("mousedown", startPaint);
   }, [startPaint]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    canvas.addEventListener('mousemove', paint);
+    canvas.addEventListener("mousemove", paint);
     return () => {
-      canvas.removeEventListener('mousemove', paint);
-    }
+      canvas.removeEventListener("mousemove", paint);
+    };
   }, [paint]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    canvas.addEventListener('mouseup', stopPaint);
-    canvas.addEventListener('mouseleave', stopPaint)
+    canvas.addEventListener("mouseup", stopPaint);
+    canvas.addEventListener("mouseleave", stopPaint);
     return () => {
-      canvas.removeEventListener('mouseup', stopPaint);
-      canvas.removeEventListener('mouseleave', stopPaint);
-    }
+      canvas.removeEventListener("mouseup", stopPaint);
+      canvas.removeEventListener("mouseleave", stopPaint);
+    };
   }, [stopPaint]);
 
   /////////////////////////////////////////////////////////////////////////////
