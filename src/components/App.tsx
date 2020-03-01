@@ -11,7 +11,7 @@ import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
-import Palette, * as PaletteUtils from "./objects/Palette";
+import Palette from "./objects/Palette";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
 

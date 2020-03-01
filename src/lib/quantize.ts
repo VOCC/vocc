@@ -1,5 +1,5 @@
 import Bitmap4 from "../components/objects/Bitmap4";
-import Palette, * as PaletteUtils from "../components/objects/Palette";
+import Palette from "../components/objects/Palette";
 import { Color } from "./interfaces";
 import Bitmap from "../components/objects/Bitmap";
 

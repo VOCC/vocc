@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
-import Palette, * as PaletteUtils from "./objects/Palette";
+import React from "react";
+import Palette from "./objects/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
-import { Color, Color32 } from "../lib/interfaces";
+import { Color } from "../lib/interfaces";
 
 interface PalettePanelProps {
   palette: Palette;
