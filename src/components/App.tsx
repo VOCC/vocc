@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { EditorSettings } from "../lib/interfaces";
+import { Color, EditorSettings } from "../lib/interfaces";
 import { loadNewImage } from "../lib/imageLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
@@ -11,7 +11,7 @@ import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
-import Palette from "./objects/Palette";
+import Palette, * as PaletteUtils from "./objects/Palette";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
 
@@ -23,7 +23,6 @@ function scaleReducer(state: number, e: WheelEvent) {
 
 function App(): JSX.Element {
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
-  const [paletteHash, setPaletteHash] = useState<string>("");
   const [image, setImage] = useState<Bitmap>();
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
@@ -60,13 +59,13 @@ function App(): JSX.Element {
       let { palette, sprite } = quantize(image, newColorDepth);
       setImage(sprite);
       setPalette(palette);
-      setPaletteHash(JSON.stringify(palette));
     }
   };
 
-  const handlePaletteUpdate = (newPalette: Palette): void => {
-    setPalette(palette);
-    setPaletteHash(JSON.stringify(palette));
+  const handleColorChange = (newColor: Color): void => {
+    const newPalette = palette.slice();
+    newPalette[selectedColorIndex] = newColor;
+    setPalette(newPalette);
   };
 
   const handleImageExport = async (type: string) => {
@@ -177,10 +176,10 @@ function App(): JSX.Element {
         <div className="right-panel">
           <PalettePanel
             palette={palette}
-            paletteHash={paletteHash}
-            updatePalette={handlePaletteUpdate}
+            updatePalette={setPalette}
             selectedColorIndex={selectedColorIndex}
             onChangeSelectedColorIndex={setSelectedColorIndex}
+            onChangeColor={handleColorChange}
             handleQuantize={handleQuantize}
           />
         </div>

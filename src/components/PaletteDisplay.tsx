@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useCallback } from "react";
-import Palette from "./objects/Palette";
+import React, { useRef, useEffect, useCallback, useState } from "react";
+import Palette, * as PaletteUtils from "./objects/Palette";
+import { PixelGrid } from "./objects/ImageCanvas";
 
 interface IPaletteDisplay {
   palette: Palette;
-  paletteHash: string;
   selectedColorIndex: number;
   onChangeSelectedColorIndex: (newIndex: number) => void;
 }
@@ -33,44 +33,49 @@ const MOUSE_POS_TO_INDEX = (pos: { x: number; y: number }) =>
 
 function PaletteDisplay({
   palette,
-  paletteHash,
   selectedColorIndex,
   onChangeSelectedColorIndex
 }: IPaletteDisplay): JSX.Element {
+  const [paletteHiddenCanvas, setPaletteHiddenCanvas] = useState<
+    HTMLCanvasElement
+  >();
+  const [pixelGrid, setPixelGrid] = useState<PixelGrid>();
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   /**
    * method to draw the palette grid
    */
   const drawGrid = useCallback(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !pixelGrid) return;
     const context = canvasRef.current.getContext("2d");
     if (!context) return;
     context.drawImage(
-      palette.getPixelGridCanvas(),
+      pixelGrid.getCanvasElement(),
       0,
       0,
       PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
       PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
     );
-  }, [palette, paletteHash]);
+  }, [pixelGrid]);
 
   /**
    * method to populate the palette with colors
    * fills palette index with proper color using palette colorArray
    */
   const drawPalette = useCallback(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !paletteHiddenCanvas) return;
     const context = canvasRef.current.getContext("2d");
     if (!context) return;
+    PaletteUtils.drawPaletteToHiddenCanvas(palette, paletteHiddenCanvas);
     context.drawImage(
-      palette.getPaletteCanvas(),
+      paletteHiddenCanvas,
       0,
       0,
       PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,
       PALETTE_CANVAS_SIZE.height * window.devicePixelRatio
     );
-  }, [palette]);
+  }, [palette, paletteHiddenCanvas]);
 
   /**
    * Draws a box around the selected color in the palette view.
@@ -137,6 +142,12 @@ function PaletteDisplay({
     if (canvasRef.current) {
       setupCanvasSize(canvasRef.current);
     }
+    const {
+      pixelGrid,
+      hiddenCanvas
+    } = PaletteUtils.PaletteDrawablesGenerator();
+    setPaletteHiddenCanvas(hiddenCanvas);
+    setPixelGrid(pixelGrid);
   }, []);
 
   /**
@@ -146,7 +157,13 @@ function PaletteDisplay({
     drawPalette();
     drawGrid();
     drawSelectedColorHighlight(selectedColorIndex);
-  }, [selectedColorIndex, drawPalette, drawGrid, drawSelectedColorHighlight]);
+  }, [
+    palette,
+    selectedColorIndex,
+    drawPalette,
+    drawGrid,
+    drawSelectedColorHighlight
+  ]);
 
   return (
     <canvas ref={canvasRef} onClick={handleClick} className="palette-canvas" />

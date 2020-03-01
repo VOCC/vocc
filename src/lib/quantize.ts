@@ -1,5 +1,5 @@
 import Bitmap4 from "../components/objects/Bitmap4";
-import Palette from "../components/objects/Palette";
+import Palette, * as PaletteUtils from "../components/objects/Palette";
 import { Color } from "./interfaces";
 import Bitmap from "../components/objects/Bitmap";
 
@@ -10,7 +10,10 @@ const BLACK: Color = {
   a: 1
 };
 
-export function quantize(image: Bitmap, depth: number) {
+export function quantize(
+  image: Bitmap,
+  depth: number
+): { sprite: Bitmap4; palette: Palette } {
   let centroids: number[][];
   let imageArr = imageToArr(image);
   let colors = depth;
@@ -73,7 +76,7 @@ export function quantize(image: Bitmap, depth: number) {
   let spriteIndexArray: number[] = new Array<number>(spriteIndexArrayLength);
   spriteIndexArray.fill(0);
 
-  let paletteColorArray: Color[] = new Array(256);
+  let palette: Color[] = new Array(256);
 
   //clusters: [center[r,g,b]], [point 1[r,g,b]], ...]
   let i = 0;
@@ -84,7 +87,7 @@ export function quantize(image: Bitmap, depth: number) {
       b: clusters[i][0][2],
       a: 1
     };
-    paletteColorArray[i] = center;
+    palette[i] = center;
     for (let j = 1; j < clusters[i].length; j++) {
       let imageIndex = getColorIndex(imageArr, clusters[i][j]);
       // console.log(imageIndex);
@@ -95,17 +98,16 @@ export function quantize(image: Bitmap, depth: number) {
   }
   // console.log(paletteColorArray)
   for (i; i < MaxPalSize; i++) {
-    paletteColorArray[i] = BLACK;
+    palette[i] = BLACK;
   }
 
-  let palette = new Palette(paletteColorArray);
   let sprite = new Bitmap4(
     image.fileName,
     spriteIndexArray,
     palette,
     image.dimensions
   );
-  return { sprite: sprite, palette: palette };
+  return { sprite, palette };
 }
 
 // Used to find index of colors for building sprite colorArray

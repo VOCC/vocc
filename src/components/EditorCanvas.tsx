@@ -181,10 +181,7 @@ export default function EditorCanvas({
       const newMousePos = getMousePos(e);
       if (isPainting && newMousePos) {
         if (image instanceof Bitmap3) {
-          fillPixel(
-            getImageCoord(newMousePos),
-            palette.getColorAt(selectedPaletteIndex)
-          );
+          fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
         } else {
           console.warn(`Drawing not supported for ${typeof image}.`);
         }

@@ -55,15 +55,14 @@ export default class Bitmap4 extends Bitmap {
         this.dimensions
       );
     }
-    return this.palette.getColorAt(
-      this.data[this.dimensions.width * pos.y + pos.x]
-    );
+    return this.palette[this.data[this.dimensions.width * pos.y + pos.x]];
   }
 
+  // TODO: this is totally broken
   public setPixelColor(pos: ImageCoordinates, color: Color): void {
     // console.log("setting pixel color bmp4");
     const paletteIndex = 255;
-    this.palette.setColorAt(paletteIndex, color);
+    // this.palette.setColorAt(paletteIndex, color);
     this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;
     this.imageCanvas.updatePixel(pos, color);
   }
