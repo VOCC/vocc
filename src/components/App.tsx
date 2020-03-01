@@ -7,6 +7,7 @@ import { saveAs } from "file-saver";
 import { Tool } from "../lib/consts";
 import Bitmap from "./objects/Bitmap";
 import Bitmap3 from "./objects/Bitmap3";
+import Bitmap4 from "./objects/Bitmap4";
 import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
 import ExportButton from "./buttons/ExportButton";
@@ -65,6 +66,9 @@ function App(): JSX.Element {
   const handleColorChange = (newColor: Color): void => {
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
+    if (image instanceof Bitmap4) {
+      image.updatePalette(newPalette);
+    }
     setPalette(newPalette);
   };
 

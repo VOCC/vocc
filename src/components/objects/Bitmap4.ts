@@ -66,4 +66,9 @@ export default class Bitmap4 extends Bitmap {
     this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;
     this.imageCanvas.updatePixel(pos, color);
   }
+
+  public updatePalette(newPalette: Palette): void {
+    this.palette = newPalette;
+    this.imageCanvas.redrawImage(this);
+  }
 }

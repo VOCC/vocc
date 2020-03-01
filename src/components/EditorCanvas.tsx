@@ -125,7 +125,11 @@ export default function EditorCanvas({
    * Draw the image whenever the image, imageCanvas, context, scale, or editor
    * settings change.
    */
-  useLayoutEffect(() => drawImageOnCanvas(), [drawImageOnCanvas, canvasSize]);
+  useLayoutEffect(() => drawImageOnCanvas(), [
+    drawImageOnCanvas,
+    palette,
+    canvasSize
+  ]);
 
   /////////////////////////////////////////////////////////////////////////////
   // Drawing Tool
