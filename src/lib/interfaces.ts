@@ -22,9 +22,11 @@ export enum EditorMode {
 
 export enum DropdownMenu {
   None,
+  New,
+  Edit,
   Import,
   Export,
-  Settings
+  Help
 }
 
 export interface Drawable {

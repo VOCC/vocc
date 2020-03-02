@@ -15,8 +15,13 @@
   border-bottom: 1px solid $border-color;
   color: $text-color;
   .title {
+    padding-top: 1px;;
+    padding-left: 0.5rem;
     padding-right: 1rem;
+    letter-spacing: 2px;
+    font-size: 15pt;
     font-weight: 900;
+    color: $teal;
   }
   .subtitle {
     flex-grow: 1;
@@ -40,6 +45,7 @@
   border-left: 1px solid $border-color;
   max-width: 256px;
   min-width: 256px;
+  text-align: center;
 }
 
 .image-container {

@@ -31,6 +31,16 @@ input[type="file"] {
   @extend .button;
 }
 
+.dd-button {
+  @extend .button;
+  border: 0;
+  padding-top: 2px;
+  padding-right: 0.5rem;
+  line-height: 15pt;
+  font-size: 12pt;
+  color: $dgray4;
+}
+
 .quantize-container {
   width: 100%;
   text-align: center;

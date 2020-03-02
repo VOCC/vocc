@@ -150,9 +150,9 @@ function App(): JSX.Element {
     <div className="app-container">
       <div className="navbar">
         <span className="title">VOCC</span>
-        <span className="subtitle">
+        {/* <span className="subtitle">
           Game Boy Advance Image Editor and Converter
-        </span>
+        </span> */}
         <Dropdown 
           type={dropdown}
           onTypeChange={handleDropdownChange}  
