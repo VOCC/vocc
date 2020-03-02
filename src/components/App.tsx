@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { EditorSettings, EditorMode, DropdownMenu } from "../lib/interfaces";
+import { EditorSettings, EditorMode } from "../lib/interfaces";
 import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
@@ -34,18 +34,9 @@ function App(): JSX.Element {
     editorMode: EditorMode.Bitmap
   });
 
-  const [dropdown, setDropdown] = useState<DropdownMenu>(DropdownMenu.None);
-
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
 
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
-
-  const handleDropdownChange = useCallback(
-    (newType: DropdownMenu) => {
-      setDropdown(newType);
-    },
-    []
-  );
 
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
@@ -64,7 +55,7 @@ function App(): JSX.Element {
         editorMode: editorSettings.editorMode
       });
     },
-    [editorSettings.grid]
+    [editorSettings]
   );
 
   const handleQuantize = (newColorDepth: number): void => {
@@ -83,8 +74,8 @@ function App(): JSX.Element {
       console.log("Loading palette...");
       let palette = await loadNewPalette(palFile);
       if (palette) setPalette(palette);
-    }  
-  }
+    }
+  };
 
   const handleImageExport = async (type: string) => {
     if (!image) {
@@ -150,18 +141,16 @@ function App(): JSX.Element {
     <div className="app-container">
       <div className="navbar">
         <span className="title">VOCC</span>
-        {/* <span className="subtitle">
+        <span className="subtitle">
           Game Boy Advance Image Editor and Converter
-        </span> */}
-        <Dropdown 
-          type={dropdown}
-          onTypeChange={handleDropdownChange}  
-        />
+        </span>
+        <Dropdown>
+          <div>Hello world</div>
+        </Dropdown>
         IMG ->
         <ImportButton onFileChange={handleImageLoad} />
         PAL ->
         <ImportButton onFileChange={handlePaletteLoad} />
-
         GBA ->
         <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
         Pal ->

@@ -7,8 +7,7 @@ import {
   faSearchPlus,
   faEyeDropper,
   faLayerGroup,
-  faCode,
-  faDiceThree
+  faCode
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faCircle,
@@ -94,7 +93,8 @@ export default function ToolsPanel({
       </Toggle>
       <div className="heading">Settings</div>
       <div>
-        Mode: {settings.mode}<br></br>
+        Mode: {settings.mode}
+        <br></br>
         {settings.editorMode.toString()}
       </div>
     </div>
