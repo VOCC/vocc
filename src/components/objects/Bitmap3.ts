@@ -1,10 +1,7 @@
+import { Color, Dimensions, ImageCoordinates } from "../../lib/interfaces";
 import {
-  Color,
-  Dimensions,
-  ImageCoordinates
-} from "../../lib/interfaces";
-import {
-  generateHeaderString, generateCSourceFileString
+  generateHeaderString,
+  generateCSourceFileString
 } from "../../lib/exportUtils";
 import * as Loader from "../../lib/fileLoadUtils";
 import Bitmap from "./Bitmap";
@@ -43,10 +40,7 @@ export default class Bitmap3 extends Bitmap {
     };
   }
 
-  public setPixelColor(
-    pos: ImageCoordinates,
-    color: Color
-  ): void {
+  public setPixelColor(pos: ImageCoordinates, color: Color): void {
     console.log("setting pixel color bmp3");
     super.updateImageData(pos, color);
     this.imageCanvas.updatePixel(pos, color);

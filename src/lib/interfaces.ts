@@ -7,6 +7,12 @@ export interface Color {
   a: number;
 }
 
+export interface Color32 {
+  r: number;
+  g: number;
+  b: number;
+}
+
 export interface Dimensions {
   height: number;
   width: number;
@@ -36,10 +42,7 @@ export interface Exportable {
 }
 
 export interface Modifiable {
-  setPixelColor: (
-    pos: ImageCoordinates,
-    color: Color
-  ) => void;
+  setPixelColor: (pos: ImageCoordinates, color: Color) => void;
 }
 
 export interface ImageInterface extends Drawable, Exportable, Modifiable {}

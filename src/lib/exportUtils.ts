@@ -1,4 +1,5 @@
 import { ImageInterface, Color, Dimensions, Mode } from "./interfaces";
+import { PALETTE_LENGTH } from "./consts";
 import Palette from "../components/objects/Palette";
 
 /*
@@ -176,10 +177,9 @@ export function generateMode4HeaderString({
     2}];\n\n`;
 
   // Palette length is uncompressed
-  const paletteLength = palette.dimensions.height * palette.dimensions.width;
-  const paletteLengthDefinition = `#define ${variableName.toUpperCase()}_PAL_SIZE ${paletteLength *
+  const paletteLengthDefinition = `#define ${variableName.toUpperCase()}_PAL_SIZE ${PALETTE_LENGTH *
     2}\n`;
-  const paletteDefinitionString = `extern const unsigned short ${variableName}Palette[${paletteLength}];\n\n`;
+  const paletteDefinitionString = `extern const unsigned short ${variableName}Palette[${PALETTE_LENGTH}];\n\n`;
 
   const headerString =
     bitmapLengthDefinition +
@@ -248,12 +248,11 @@ function colorToHex(color: Color): string {
   takes in a Palette and converts rgb into hex values 0x00rrggbb
   outputs string of the converted Palette colorArray
 */
-export function paletteToHex(pal: Palette): string {
-  const colorArray = pal.getColorArray();
+export function paletteToHex(palette: Palette): string {
   let palFile = "";
   let count = 1;
   const alignment = 4; //this number can change depending on how we want to format
-  colorArray.forEach(element => {
+  palette.forEach(element => {
     let hex = "0x00";
     hex +=
       element.r < 16 ? "0" + element.r.toString(16) : element.r.toString(16);
@@ -279,9 +278,8 @@ export function paletteToHex(pal: Palette): string {
   adds a declaration for the palette array in C
   outputs string with the declaration and converted Palette colorArray
 */
-function PaletteToGBA(pal: Palette): string {
-  const palArea = pal.dimensions.height * pal.dimensions.width;
-  const colorArray = pal.getColorArray();
+function PaletteToGBA(palette: Palette): string {
+  const palArea = PALETTE_LENGTH;
   const colAlignment = 8; //these numbers can change depending depending on how we want to format
   const rowAlignment = 8; //
 
@@ -290,8 +288,8 @@ function PaletteToGBA(pal: Palette): string {
     palArea +
     "] __attribute__((aligned(4)))=\n{\n";
 
-  for (let i = 1; i <= colorArray.length; i++) {
-    const element = colorArray[i - 1];
+  for (let i = 1; i <= palette.length; i++) {
+    const element = palette[i - 1];
     palC += colorToHex(element) + ",";
 
     if (i % colAlignment === 0) {

@@ -65,8 +65,7 @@ export const loadNewPalette = async (paletteFile: File): Promise<Palette | null>
     .replace(/\n/g, '');
   let colors: Color[] = new Array(256);
 
-  // we could add some "signature" to our palette export in order to check if file format is proper?
-  if (fileString) {     
+  if (fileString.substr(0, 4) === "0x00") {     
     console.log("Palette file is valid. Generating color array..."); 
 
     // string is in 0x00rrggbb format (length 10)
@@ -83,7 +82,7 @@ export const loadNewPalette = async (paletteFile: File): Promise<Palette | null>
       };
       colors[j] = color;
     }
-    return new Palette(colors);
+    return colors;
   }
   else {
     console.log("Invalid palette. Palette unchanged."); 
