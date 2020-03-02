@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { EditorSettings, ImageCoordinates, Color } from "../lib/interfaces";
 import Bitmap from "./objects/Bitmap";
-import Bitmap3 from "./objects/Bitmap3";
 import Palette from "./objects/Palette";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
@@ -184,15 +183,11 @@ export default function EditorCanvas({
     (e: MouseEvent) => {
       const newMousePos = getMousePos(e);
       if (isPainting && newMousePos) {
-        if (image instanceof Bitmap3) {
-          fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
-        } else {
-          console.warn(`Drawing not supported for ${typeof image}.`);
-        }
+        fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
         setMousePos(newMousePos);
       }
     },
-    [image, isPainting, fillPixel, getImageCoord, palette, selectedPaletteIndex]
+    [isPainting, fillPixel, getImageCoord, palette, selectedPaletteIndex]
   );
 
   const stopPaint = useCallback(() => {

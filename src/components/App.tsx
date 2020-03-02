@@ -63,6 +63,13 @@ function App(): JSX.Element {
     }
   };
 
+  const handleChangeSelectedColor = (newIndex: number) => {
+    setSelectedColorIndex(newIndex);
+    if (image instanceof Bitmap4) {
+      image.setPaletteIndex(newIndex);
+    }
+  };
+
   const handleColorChange = (newColor: Color): void => {
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
@@ -182,7 +189,7 @@ function App(): JSX.Element {
             palette={palette}
             updatePalette={setPalette}
             selectedColorIndex={selectedColorIndex}
-            onChangeSelectedColorIndex={setSelectedColorIndex}
+            onChangeSelectedColorIndex={handleChangeSelectedColor}
             onChangeColor={handleColorChange}
             handleQuantize={handleQuantize}
           />
