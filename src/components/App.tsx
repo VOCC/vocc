@@ -71,15 +71,16 @@ function App(): JSX.Element {
   const handlePaletteLoad = async (palFile: File | null) => {
     if (palFile) {
       console.log("Loading palette...");
-      let palette = await loadNewPalette(palFile);
-      if (palette) {
-        setPalette(palette);
+      let newPalette = await loadNewPalette(palFile);
+      if (newPalette) {
         if (image instanceof Bitmap4) {
-          image.updatePalette(palette);
+          image.updatePalette(newPalette);
         }
+        setPalette(newPalette);
       }
-    }  
-  }
+    }
+  };
+
   const handleChangeSelectedColor = (newIndex: number) => {
     setSelectedColorIndex(newIndex);
     if (image instanceof Bitmap4) {
