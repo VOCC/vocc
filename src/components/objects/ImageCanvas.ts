@@ -4,7 +4,7 @@ import {
   ImageInterface,
   ImageCoordinates
 } from "../../lib/interfaces";
-import { createHiddenCanvas } from "../../lib/imageLoadUtils";
+import { createHiddenCanvas } from "../../lib/fileLoadUtils";
 
 export default class ImageCanvas {
   public dimensions: Dimensions;

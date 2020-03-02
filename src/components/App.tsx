@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
 import { Color, EditorSettings } from "../lib/interfaces";
-import { loadNewImage } from "../lib/imageLoadUtils";
+import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
 import { Tool } from "../lib/consts";
@@ -64,6 +64,19 @@ function App(): JSX.Element {
         let { palette, sprite } = quantize(image, newColorDepth);
         setImage(sprite);
         setPalette(palette);
+      }
+    }
+  };
+
+  const handlePaletteLoad = async (palFile: File | null) => {
+    if (palFile) {
+      console.log("Loading palette...");
+      let newPalette = await loadNewPalette(palFile);
+      if (newPalette) {
+        if (image instanceof Bitmap4) {
+          image.updatePalette(newPalette);
+        }
+        setPalette(newPalette);
       }
     }
   };
@@ -151,7 +164,10 @@ function App(): JSX.Element {
         <span className="subtitle">
           Game Boy Advance Image Editor and Converter
         </span>
-        <ImportButton onImageChange={handleImageLoad} />
+        IMG ->
+        <ImportButton onFileChange={handleImageLoad} />
+        PAL ->
+        <ImportButton onFileChange={handlePaletteLoad} />
         GBA ->
         <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
         Pal ->
