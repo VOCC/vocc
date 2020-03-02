@@ -8,6 +8,7 @@ import React, {
 import { EditorSettings, ImageCoordinates, Color } from "../lib/interfaces";
 import Bitmap from "./objects/Bitmap";
 import Palette from "./objects/Palette";
+import { Tool } from "../lib/consts";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
@@ -167,17 +168,54 @@ export default function EditorCanvas({
     [drawImageOnCanvas, image]
   );
 
+  const bucketFill = useCallback(
+    (pos: ImageCoordinates, newColor: Color): void => {
+    // BFS fill
+    const color = image.getPixelColorAt(pos);
+    image.setPixelColor(pos, newColor);
+    // console.log(color);
+    let queue = new Array<ImageCoordinates>(pos);
+    let explored = new Array<ImageCoordinates>(pos);
+    while (queue[0] !== undefined) {
+      let curr = queue.shift() as ImageCoordinates;
+      console.log(curr);
+      let edges = new Array<ImageCoordinates>(0);
+      // add edges
+      if (curr.y > 0) { edges.push({x: curr.x, y: curr.y - 1}) }
+      if (curr.y < image.dimensions.height - 1) { 
+        edges.push({x: curr.x, y: curr.y + 1})
+      }
+      if (curr.x > 0) { edges.push({x: curr.x - 1, y: curr.y}) }
+      if (curr.x < image.dimensions.width - 1) {
+        edges.push({x: curr.x + 1, y: curr.y})
+      }
+      // console.log(edges);
+      ///
+      edges.filter(n => !explored.includes(n)).forEach(n => {
+        explored.push(n);
+        if (image.getPixelColorAt(n) === color) {
+          queue.push(n);
+          image.setPixelColor(n, newColor);
+        }
+      });
+    }
+
+    drawImageOnCanvas();
+  }, [image, drawImageOnCanvas]);
+
   const startPaint = useCallback((e: MouseEvent) => {
     const mousePosition = getMousePos(e);
     if (mousePosition) {
+      const tool = settings.currentTool;
       setMousePos(mousePosition);
-      // fillPixel(
-      //   getImageCoord(mousePosition),
-      //   palette.getColorAt(selectedPaletteIndex)
-      // );
-      setIsPainting(true);
+      if (tool === Tool.PENCIL) {
+        setIsPainting(true);
+      } else if (tool === Tool.BUCKET) {
+        bucketFill(getImageCoord(mousePosition), palette[selectedPaletteIndex])
+      }
     }
-  }, []);
+  }, [settings.currentTool, bucketFill
+    ,getImageCoord, palette, selectedPaletteIndex]);
 
   const paint = useCallback(
     (e: MouseEvent) => {
