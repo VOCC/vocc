@@ -10,6 +10,7 @@ import Bitmap from "./Bitmap";
 export default class Bitmap4 extends Bitmap {
   private data: number[];
   private palette: Palette;
+  private currentPaletteIndex: number;
 
   protected imageCanvas: ImageCanvas;
 
@@ -23,6 +24,7 @@ export default class Bitmap4 extends Bitmap {
     this.data = indexArray;
     this.palette = palette;
     this.imageCanvas = new ImageCanvas(this);
+    this.currentPaletteIndex = 0;
   }
 
   public getHeaderData(): string {
@@ -55,16 +57,24 @@ export default class Bitmap4 extends Bitmap {
         this.dimensions
       );
     }
-    return this.palette.getColorAt(
-      this.data[this.dimensions.width * pos.y + pos.x]
-    );
+    return this.palette[this.data[this.dimensions.width * pos.y + pos.x]];
   }
 
-  public setPixelColor(pos: ImageCoordinates, color: Color): void {
-    // console.log("setting pixel color bmp4");
-    const paletteIndex = 255;
-    this.palette.setColorAt(paletteIndex, color);
-    this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;
-    this.imageCanvas.updatePixel(pos, color);
+  // TODO: this is totally broken
+  public setPixelColor(pos: ImageCoordinates): void {
+    // // console.log("setting pixel color bmp4");
+    // const paletteIndex = 255;
+    this.data[pos.y * this.dimensions.width + pos.x] = this.currentPaletteIndex;
+    // this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;
+    this.imageCanvas.updatePixel(pos, this.palette[this.currentPaletteIndex]);
+  }
+
+  setPaletteIndex(newPaletteIndex: number) {
+    this.currentPaletteIndex = newPaletteIndex;
+  }
+
+  public updatePalette(newPalette: Palette): void {
+    this.palette = newPalette;
+    this.imageCanvas.redrawImage(this);
   }
 }

@@ -1,6 +1,6 @@
 import Palette from "../components/objects/Palette";
 
-const DEFAULT_PALETTE = new Palette([
+const DEFAULT_PALETTE: Palette = [
   { r: 0, g: 0, b: 0, a: 1 },
   { r: 128, g: 0, b: 0, a: 1 },
   { r: 0, g: 128, b: 0, a: 1 },
@@ -257,6 +257,6 @@ const DEFAULT_PALETTE = new Palette([
   { r: 238, g: 238, b: 238, a: 1 },
   { r: 246, g: 246, b: 246, a: 1 },
   { r: 255, g: 255, b: 255, a: 1 }
-]);
+];
 
 export default DEFAULT_PALETTE;
