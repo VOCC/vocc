@@ -57,9 +57,14 @@ function App(): JSX.Element {
     if (!(image instanceof Bitmap3)) {
       alert("Requantization of paletted images currently not supported!");
     } else {
-      let { palette, sprite } = quantize(image, newColorDepth);
-      setImage(sprite);
-      setPalette(palette);
+      let ok = window.confirm(
+        "(Don't panic!) Quantizing a bitmap will change it from mode 3 to mode 4. Is this okay?"
+      );
+      if (ok) {
+        let { palette, sprite } = quantize(image, newColorDepth);
+        setImage(sprite);
+        setPalette(palette);
+      }
     }
   };
 
