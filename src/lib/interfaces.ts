@@ -20,13 +20,6 @@ export enum EditorMode {
   Background = "Background"
 }
 
-export enum DropdownMenu {
-  None,
-  Import,
-  Export,
-  Settings
-}
-
 export interface Drawable {
   dimensions: Dimensions;
   getImageCanvasElement: () => HTMLCanvasElement;
@@ -49,10 +42,7 @@ export interface Exportable {
 }
 
 export interface Modifiable {
-  setPixelColor: (
-    pos: ImageCoordinates,
-    color: Color
-  ) => void;
+  setPixelColor: (pos: ImageCoordinates, color: Color) => void;
 }
 
 export interface ImageInterface extends Drawable, Exportable, Modifiable {}
