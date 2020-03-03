@@ -7,9 +7,10 @@
 
 .toggle {
   @extend .button;
-  margin: 4px;
-  height: 32px;
-  width: 32px;
+  margin: 3px;
+  padding-top: 4px;
+  height: 34px;
+  width: 34px;
 }
 
 .toggle-off {
@@ -18,14 +19,17 @@
 
 .toggle-on {
   @extend .toggle;
-  background-color: $button-highlight;
+  border-color: $dark-active;
+  background-color: $dark-active;
   color: $bg-color;
 }
 
 .heading {
-  // text-decoration: underline;
-  padding-top: 0.5rem;
+  padding-top: 0.75rem;
   padding-bottom: 0.15rem;
   text-align: center;
-  font-weight: bold;
+  letter-spacing: 0.5px;
+  font-weight: 900;
+  font-size: 9pt;
+  text-transform: uppercase;
 }

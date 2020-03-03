@@ -25,11 +25,25 @@ $purple: rgb(175, 82, 222);
 $red: rgb(255, 59, 48);
 $teal: rgb(90, 200, 250);
 $yellow: rgb(255, 204, 0);
-$sky: rgb(153, 214, 255);
 
-// Layout colors
+// Dark layout colors
 
-$bg-color: $white;
+$dark-bg: #252426;
+$dark-border: $gray;
+$dark-nav: #3c3c3c;
+$dark-nav-active: #505050;
+$dark-sidebar: #515151;
+$dark-sidebar2: #383838;
+$dark-active: #4d85ee;
+$dark-active2: #858585;
+$dark-inactive: #999999;
+$dark-inactive2: #666666;
+
+$dark-text: white;
+$dark-text-secondary: rgb(219, 202, 123);
+// Light layout colors
+
+$bg-color: white;
 $bg-color-secondary: $lgray5;
 
 $text-color: $dgray4;

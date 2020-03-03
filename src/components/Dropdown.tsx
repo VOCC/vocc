@@ -1,12 +1,16 @@
 import React, { useState, PropsWithChildren } from "react";
 
-export default function Dropdown({ children }: PropsWithChildren<{}>) {
+interface DropdownProps {
+  label: string;
+}
+
+export default function Dropdown({ label, children }: PropsWithChildren<DropdownProps>) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="dd-container">
       <button onClick={() => setOpen(!open)} className="dd-button">
-        Dropdown
+        {label}
       </button>
       <div
         id="myDropdown"
@@ -17,3 +21,4 @@ export default function Dropdown({ children }: PropsWithChildren<{}>) {
     </div>
   );
 }
+

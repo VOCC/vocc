@@ -141,11 +141,47 @@ function App(): JSX.Element {
     <div className="app-container">
       <div className="navbar">
         <span className="title">VOCC</span>
-        <span className="subtitle">
-          Game Boy Advance Image Editor and Converter
-        </span>
-        <Dropdown>
-          <div>Hello world</div>
+        <Dropdown label="New">
+          <div className="dd-content-header">Bitmap</div>
+            <div>Mode 3</div>
+            <div>Mode 4</div>
+          <div className="dd-divider"></div>
+          <div className="dd-content-header">Spritesheet</div>
+            <div>4 bpp</div>
+          <div className="dd-divider"></div>
+          <div className="dd-content-header">Background</div>
+            <div>Mode 0</div>
+        </Dropdown>
+        <Dropdown label="Edit">
+          <div>Undo</div>
+          <div>Redo</div>
+          <div className="dd-divider"></div>
+          <div>Clear All</div>
+        </Dropdown>
+        <Dropdown label="Import">
+          <div className="dd-content-header">Image</div>
+            <div>PNG Image (*.png)</div>
+            <div>Bitmap (*.bmp)</div>
+          <div className="dd-divider"></div>
+          <div>Color Palette (*.pal)</div>
+        </Dropdown>
+        <Dropdown label="Export">
+          <div className="dd-content-header">Image</div>
+            <div>PNG Image (*.png)</div>
+            <div>Bitmap (*.bmp)</div>
+          <div className="dd-divider"></div>
+          <div className="dd-content-header">GBA</div>
+            <div>C Source Code (*.c/.h)</div>
+          <div className="dd-divider"></div>
+          <div>Color Palette (*.pal)</div>
+        </Dropdown>
+        <Dropdown label="Help">
+          <div>Documentation</div>
+          <div>GBA Graphics 101</div>
+          <div className="dd-divider"></div>
+          <div>About VOCC</div>
+          <div className="dd-divider"></div>
+          <div>View on GitHub</div>
         </Dropdown>
         IMG ->
         <ImportButton onFileChange={handleImageLoad} />
@@ -186,7 +222,7 @@ function App(): JSX.Element {
           )}
         </div>
         <div className="right-panel">
-          <div className="panel-label">Color Palette</div>
+          <div className="panel-label">Palette</div>
           <div className="palette-container">
             <PaletteDisplay
               palette={palette}
