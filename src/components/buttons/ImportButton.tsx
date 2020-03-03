@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 type ImportFile = File | null;
 
 interface IProps {
+  buttonLabel: string;
   onFileChange: (imageFile: ImportFile) => void;
 }
 
@@ -11,7 +12,7 @@ interface IFile {
   hasLoadedFile: boolean;
 }
 
-function ImportButton({ onFileChange }: IProps): JSX.Element {
+function ImportButton({ onFileChange, buttonLabel }: IProps): JSX.Element {
   const [file, setFile] = useState<IFile>({
     fileName: "No file name",
     hasLoadedFile: false
@@ -31,27 +32,27 @@ function ImportButton({ onFileChange }: IProps): JSX.Element {
     }
   };
 
-  const renderLoaded = (fileTitle: string): JSX.Element => (
-    <div>
-      <button className="button import-button">
-      <label>
-        Import
-        <input
-          type="file"
-          accept=".png, .jpg, .jpeg, .bmp, .pal"
-          ref={fileInput}
-          onChange={handleSubmit}
-        />
-      </label>
-    </button>
-      Loaded <em>{fileTitle}</em>
-    </div>
-  );
+  // const renderLoaded = (fileTitle: string): JSX.Element => (
+  //   <div>
+  //     <button className="button import-button">
+  //     <label>
+  //       Import
+  //       <input
+  //         type="file"
+  //         accept=".png, .jpg, .jpeg, .bmp, .pal"
+  //         ref={fileInput}
+  //         onChange={handleSubmit}
+  //       />
+  //     </label>
+  //   </button>
+  //     Loaded <em>{fileTitle}</em>
+  //   </div>
+  // );
 
-  const renderUnloaded = (): JSX.Element => (
+  const render = (): JSX.Element => (
     <button className="button import-button">
       <label>
-        Import
+        {buttonLabel}
         <input
           type="file"
           accept=".png, .jpg, .jpeg, .bmp, .pal"
@@ -62,7 +63,7 @@ function ImportButton({ onFileChange }: IProps): JSX.Element {
     </button>
   );
 
-  return file.hasLoadedFile ? renderLoaded(file.fileName) : renderUnloaded();
+  return render();
 }
 
 export default ImportButton;

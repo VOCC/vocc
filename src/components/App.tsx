@@ -160,8 +160,12 @@ function App(): JSX.Element {
         </Dropdown>
         <Dropdown label="Import">
           <div className="dd-content-header">Image</div>
-            <div>PNG Image (*.png)</div>
+            <div>
+              PNG Image (*.png)
+              <ImportButton onFileChange={handleImageLoad} buttonLabel="Image"/>  
+            </div>
             <div>Bitmap (*.bmp)</div>
+            <div>JPEG Image (*.jpg)</div>
           <div className="dd-divider"></div>
           <div>Color Palette (*.pal)</div>
         </Dropdown>
@@ -184,9 +188,9 @@ function App(): JSX.Element {
           <div>View on GitHub</div>
         </Dropdown>
         IMG ->
-        <ImportButton onFileChange={handleImageLoad} />
+        <ImportButton onFileChange={handleImageLoad} buttonLabel="Image"/>
         PAL ->
-        <ImportButton onFileChange={handlePaletteLoad} />
+        <ImportButton onFileChange={handlePaletteLoad} buttonLabel="Palette"/>
         GBA ->
         <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
         Pal ->
