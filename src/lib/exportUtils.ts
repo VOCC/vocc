@@ -66,6 +66,37 @@ function generateMode4CSourceFileString(
     return generateMode3CSourceFileString(image);
   }
 
+
+  /*
+    generate export files for Spritesheets
+
+    WORK IN PROGESS - NOT FUNCTIONAL YET
+
+
+  */
+  function generateSpriteTileMapCSourceFileString(
+    iamge: ImageInterface,
+    palette?:Palette
+  ): string {
+
+    if (!palette) {
+      console.error("No palette found");
+      return generateMode3CSourceFileString(image);
+    }
+    const variableName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
+    const bitmapLength = image.dimensions.height * image.dimensions.width;
+    const imageTileString = `const unsigned short ${variableName}Tiles[${bitmapLength /
+    2}]__attribute__((aligned(4)))=\n{\n\t`;
+
+    const imageMapString = `const unsigned short ${variableName}Tiles[${bitmapLength /
+    64}]__attribute__((aligned(4)))=\n{\n\t`;
+    
+    let paletteString = PaletteToGBA(palette);
+
+    return paletteString;
+  }
+
+
   // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
   // into a short
   const variableName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
@@ -266,6 +297,41 @@ export function paletteToHex(palette: Palette): string {
       count = 1;
     } else {
       count++;
+    }
+  });
+  return palFile;
+}
+
+/*
+  tilePaletteToHex
+  
+  takes in a Palette and converts rgb into hex values 0x00rrggbb for tile mnap export
+  outputs string of the converted Palette colorArray
+*/
+export function tilePaletteToHex(palette: Palette): string {
+  let palFile = "";
+  let rowCount = 1;
+  let colCount = 1;
+  const alignment = 8; //this number can change depending on how we want to format
+  palette.forEach(element => {
+    let hex = "0x00";
+    hex +=
+      element.r < 16 ? "0" + element.r.toString(16) : element.r.toString(16);
+    hex +=
+      element.g < 16 ? "0" + element.g.toString(16) : element.g.toString(16);
+    hex +=
+      element.b < 16 ? "0" + element.b.toString(16) : element.b.toString(16);
+    palFile += hex + "\t";
+    if (colCount === alignment) {
+      palFile += "\n";
+      colCount = 1;
+      if (rowCount === alignment) {
+        palFile += "/n";
+        rowCount = 1;
+      } 
+    } else {
+      colCount++;
+      rowCount++;
     }
   });
   return palFile;
