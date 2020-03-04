@@ -94,7 +94,7 @@ export default function ToolsPanel({
       <div className="heading">Settings</div>
       <div>
         Mode: {settings.mode}
-        <br></br>
+        <br/>
         {settings.editorMode.toString()}
       </div>
     </div>

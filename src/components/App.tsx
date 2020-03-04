@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { EditorSettings, EditorMode } from "../lib/interfaces";
+import { EditorSettings, EditorMode, Mode } from "../lib/interfaces";
 import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
@@ -53,6 +53,18 @@ function App(): JSX.Element {
         currentTool: newTool,
         mode: editorSettings.mode,
         editorMode: editorSettings.editorMode
+      });
+    },
+    [editorSettings]
+  );
+
+  const handleEditorChange = useCallback(
+    (editorMode: EditorMode, mode: Mode) => {
+      setEditorSettings({
+        grid: editorSettings.grid,
+        currentTool: editorSettings.currentTool,
+        mode: mode,
+        editorMode: editorMode
       });
     },
     [editorSettings]
@@ -143,62 +155,57 @@ function App(): JSX.Element {
         <span className="title">VOCC</span>
         <Dropdown label="New">
           <div className="dd-content-header">Bitmap</div>
-            <div>Mode 3</div>
-            <div>Mode 4</div>
+            <button onClick={() => handleEditorChange(EditorMode.Bitmap, 3)}>Mode 3</button>
+            <button onClick={() => handleEditorChange(EditorMode.Bitmap, 4)}>Mode 4</button>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Spritesheet</div>
-            <div>4 bpp</div>
+            <button onClick = {() => handleEditorChange(EditorMode.Spritesheet, 4)}>4 bpp</button>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Background</div>
-            <div>Mode 0</div>
+            <button onClick={() => handleEditorChange(EditorMode.Background, 0)}>Mode 0</button>
         </Dropdown>
         <Dropdown label="Edit">
-          <div>Undo</div>
-          <div>Redo</div>
+          <button onClick={() => null}>Undo</button>
+          <button onClick={() => null}>Redo</button>
           <div className="dd-divider"></div>
-          <div>Clear All</div>
+          <button onClick={() => null}>Clear All</button>
         </Dropdown>
         <Dropdown label="Import">
           <div className="dd-content-header">Image</div>
-            <div>
-              PNG Image (*.png)
-              <ImportButton onFileChange={handleImageLoad} buttonLabel="Image"/>  
-            </div>
-            <div>Bitmap (*.bmp)</div>
-            <div>JPEG Image (*.jpg)</div>
+          <ImportButton onFileChange={handleImageLoad} buttonLabel="Image (*.png, *.bmp, *.jpg)"/>  
           <div className="dd-divider"></div>
-          <div>Color Palette (*.pal)</div>
+          <ImportButton onFileChange={handlePaletteLoad} buttonLabel="Palette (*.pal)"/>
         </Dropdown>
         <Dropdown label="Export">
           <div className="dd-content-header">Image</div>
-            <div>PNG Image (*.png)</div>
-            <div>Bitmap (*.bmp)</div>
+            <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} buttonLabel="PNG Image (*.png)"/>
+            <ExportButton startImageExport={handleImageExport.bind(null, "BMP")} buttonLabel="Bitmap (*.bmp)"/>
           <div className="dd-divider"></div>
           <div className="dd-content-header">GBA</div>
-            <div>C Source Code (*.c/.h)</div>
+            <div>
+              <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} buttonLabel="C Source Code (*.c/.h)"/>
+            </div>
           <div className="dd-divider"></div>
-          <div>Color Palette (*.pal)</div>
+          <div>
+            <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} buttonLabel="Color Palette (*.pal)"/>
+          </div>
         </Dropdown>
         <Dropdown label="Help">
-          <div>Documentation</div>
-          <div>GBA Graphics 101</div>
+          <form>
+            <button type="submit" formAction="" formTarget="">Documentation</button>
+          </form>
+          <form>
+            <button type="submit" formAction="https://www.coranac.com/tonc/text/" formTarget="_blank">GBA Graphics 101</button>
+          </form>
           <div className="dd-divider"></div>
-          <div>About VOCC</div>
+          <form>
+            <button type="submit" formAction="" formTarget="">About VOCC</button>
+          </form>
           <div className="dd-divider"></div>
-          <div>View on GitHub</div>
+          <form>
+            <button type="submit" formAction="https://github.com/lbussell/vocc" formTarget="_blank">View on GitHub</button>
+          </form>
         </Dropdown>
-        IMG ->
-        <ImportButton onFileChange={handleImageLoad} buttonLabel="Image"/>
-        PAL ->
-        <ImportButton onFileChange={handlePaletteLoad} buttonLabel="Palette"/>
-        GBA ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
-        Pal ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} />
-        PNG ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} />
-        BMP ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "BMP")} />
       </div>
       <div className="workspace-container">
         <div className="left-panel">
