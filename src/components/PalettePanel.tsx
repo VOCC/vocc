@@ -43,19 +43,19 @@ const MIN_COLOR_VAL = "0";
 const MAX_COLOR_VAL = "31";
 
 const color256to32 = (color: Color): Color => {
-    color.r = Math.ceil((color.r + 1) / 8) - 1;
-    color.g = Math.ceil((color.g + 1) / 8) - 1;
-    color.b = Math.ceil((color.b + 1) / 8) - 1;
+    const r = Math.ceil((color.r + 1) / 8) - 1;
+    const g = Math.ceil((color.g + 1) / 8) - 1;
+    const b = Math.ceil((color.b + 1) / 8) - 1;
 
-    return color;
+    return new Color(r, g, b, 1);
 };
 
 const color32to256 = (color: Color): Color => {
-  color.r = (color.r + 1) * 8 - 1;
-  color.g = (color.g + 1) * 8 - 1;
-  color.b = (color.b + 1) * 8 - 1;
+  const r = (color.r + 1) * 8 - 1;
+  const g = (color.g + 1) * 8 - 1;
+  const b = (color.b + 1) * 8 - 1;
 
-  return color;
+  return new Color(r, g, b, 1);
 };
 
 interface ColorInputProps {
