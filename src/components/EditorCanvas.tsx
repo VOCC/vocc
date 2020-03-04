@@ -173,7 +173,7 @@ export default function EditorCanvas({
     // BFS fill
     const color = image.getPixelColorAt(pos);
     image.setPixelColor(pos, newColor);
-    // console.log(color);
+    console.log(color);
     let queue = new Array<ImageCoordinates>(pos);
     let explored = new Array<ImageCoordinates>(pos);
     while (queue[0] !== undefined) {
@@ -189,11 +189,11 @@ export default function EditorCanvas({
       if (curr.x < image.dimensions.width - 1) {
         edges.push({x: curr.x + 1, y: curr.y})
       }
-      // console.log(edges);
       ///
       edges.filter(n => !explored.includes(n)).forEach(n => {
+        // console.log(image.getPixelColorAt(n).isEqual(color))
         explored.push(n);
-        if (image.getPixelColorAt(n) === color) {
+        if (image.getPixelColorAt(n).isEqual(color)) {
           queue.push(n);
           image.setPixelColor(n, newColor);
         }
