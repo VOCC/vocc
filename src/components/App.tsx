@@ -18,9 +18,12 @@ import ToolsPanel from "./ToolsPanel";
 import Dropdown from "./Dropdown";
 
 function scaleReducer(state: number, e: WheelEvent) {
-  let direction = e.deltaY < 0 ? -1 : 1;
-  let newScale = state + direction / 4;
-  return newScale < 1 ? 1 : newScale;
+  const direction = e.deltaY < 0 ? -1 : 1;
+  if (direction === 1) {
+    return state * 1.1;
+  } else {
+    return state / 1.1;
+  }
 }
 
 function App(): JSX.Element {
