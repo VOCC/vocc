@@ -3,7 +3,7 @@ import {
   generateHeaderString,
   generateCSourceFileString
 } from "../../lib/exportUtils";
-import * as Loader from "../../lib/imageLoadUtils";
+import * as Loader from "../../lib/fileLoadUtils";
 import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 

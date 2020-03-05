@@ -3,13 +3,17 @@
 }
 
 .palette-canvas {
+  padding-bottom: 0.5rem;
   height: 192px;
   width: 192px;
 }
 
 .panel-label {
-  padding-left: 1rem;
-  padding-top: 0.5rem;
-  font-weight: 600;
-  color: $text-color;
+  padding-top: 0.75rem;
+  padding-bottom: 0.5rem;
+  text-align: center;
+  letter-spacing: 0.5px;
+  font-weight: 900;
+  font-size: 9pt;
+  text-transform: uppercase;
 }
