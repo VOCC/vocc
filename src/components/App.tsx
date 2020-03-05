@@ -27,19 +27,34 @@ function scaleReducer(state: number, e: WheelEvent) {
 }
 
 function App(): JSX.Element {
-  const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [image, setImage] = useState<Bitmap>();
+  const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     currentTool: Tool.PENCIL,
-    mode: 3,
+    imageMode: 3,
     editorMode: EditorMode.Bitmap
   });
 
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
 
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
+
+  const handleFileInputChange = (
+    type: "Image" | "Palette",
+    element: HTMLInputElement | null,
+    event: React.FormEvent<HTMLInputElement>
+  ): void => {
+    event.preventDefault();
+    if (!element || !element.files) return;
+    switch (type) {
+      case "Image":
+        handleImageLoad(element.files[0]);
+      case "Palette":
+        handlePaletteLoad(element.files[0]);
+    }
+  };
 
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
@@ -54,7 +69,7 @@ function App(): JSX.Element {
       setEditorSettings({
         grid: editorSettings.grid,
         currentTool: newTool,
-        mode: editorSettings.mode,
+        imageMode: editorSettings.imageMode,
         editorMode: editorSettings.editorMode
       });
     },
@@ -66,7 +81,7 @@ function App(): JSX.Element {
       setEditorSettings({
         grid: editorSettings.grid,
         currentTool: editorSettings.currentTool,
-        mode: mode,
+        imageMode: mode,
         editorMode: editorMode
       });
     },
@@ -210,12 +225,12 @@ function App(): JSX.Element {
         <Dropdown label="Import">
           <div className="dd-content-header">Image</div>
           <ImportButton
-            onFileChange={handleImageLoad}
+            onFileInputChange={handleFileInputChange.bind(null, "Image")}
             buttonLabel="Image (*.png, *.bmp, *.jpg)"
           />
           <div className="dd-divider"></div>
           <ImportButton
-            onFileChange={handlePaletteLoad}
+            onFileInputChange={handleFileInputChange.bind(null, "Palette")}
             buttonLabel="Palette (*.pal)"
           />
         </Dropdown>

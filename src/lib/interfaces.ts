@@ -18,7 +18,7 @@ export interface Dimensions {
   width: number;
 }
 
-export type Mode = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7; 
+export type Mode = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export enum EditorMode {
   Bitmap = "Bitmap",
@@ -56,7 +56,7 @@ export interface ImageInterface extends Drawable, Exportable, Modifiable {}
 export interface EditorSettings {
   grid: boolean;
   currentTool: Tool;
-  mode: Mode;
+  imageMode: Mode;
   editorMode: EditorMode;
 }
 

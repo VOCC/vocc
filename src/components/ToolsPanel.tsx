@@ -93,8 +93,8 @@ export default function ToolsPanel({
       </Toggle>
       <div className="heading">Settings</div>
       <div>
-        Mode: {settings.mode}
-        <br/>
+        Mode: {settings.imageMode}
+        <br />
         {settings.editorMode.toString()}
       </div>
     </div>
