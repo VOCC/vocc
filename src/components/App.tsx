@@ -202,19 +202,15 @@ function App(): JSX.Element {
           />
           <div className="dd-divider"></div>
           <div className="dd-content-header">GBA</div>
-          <div>
             <ExportButton
               startImageExport={handleImageExport.bind(null, "GBA")}
               buttonLabel="C Source Code (*.c/.h)"
             />
-          </div>
           <div className="dd-divider"></div>
-          <div>
             <ExportButton
               startImageExport={handleImageExport.bind(null, "PAL")}
               buttonLabel="Color Palette (*.pal)"
             />
-          </div>
         </Dropdown>
         <Dropdown label="Help">
           <form>
@@ -252,13 +248,14 @@ function App(): JSX.Element {
       <div className="workspace-container">
         <div className="left-panel">
           <div className="tools-container">
-            {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
+            {/* {image ? <div> Scale: {scale.toFixed(2)}x </div> : null} */}
             <ToolsPanel
               settings={editorSettings}
               onSettingsChange={handleSettingsChange}
               onToolChange={handleToolChange}
             ></ToolsPanel>
           </div>
+          {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
         </div>
         <div className="image-container">
           {image ? (

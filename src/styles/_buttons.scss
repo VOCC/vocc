@@ -1,5 +1,5 @@
 .button {
-  margin: 0.5rem;
+  // margin: 0.5rem;
   margin-left: 0;
   border: 1px solid $dark-sidebar;
   border-radius: 4px;
@@ -63,38 +63,45 @@ input[type="file"] {
 .dd-content {
   padding-bottom: 0.15rem;
   display: none;
-  min-width: 160px;
+  min-width: fit-content;
   position: absolute;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  text-indent: 0.5rem;
+  // text-indent: 0.5rem;
   letter-spacing: 0.25px;
-  line-height: 21pt;
+  line-height: 18pt;
   font-size: 10pt;
   background-color: $dark-nav;
 }
 
 .dd-content button {
   @extend .dd-button;
+  margin: none;
+  padding-left: 0.6rem;
   width: 100%;
   border-radius: 0;
   text-align: left;
+  white-space: nowrap;
+}
+
+.dd-content form {
+  margin: none;
+  padding: none;
 }
 
 .dd-content-header {
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   font-size: 8pt;
   font-weight: bold;
   color: $lgray4;
 }
 
 .dd-divider {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-  margin-left: 4px;
+  margin: 0.25rem 0.5rem 0.25rem 0.5rem;
   border: 0.5px solid $gray;
-  width: 94%;
 }
 
 .dd-show {
