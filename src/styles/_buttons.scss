@@ -46,7 +46,11 @@ input[type="file"] {
     background-color: $dark-nav-active;
   }
   &:focus {
+    outline: none;
     background-color: $dark-nav-active;
+  }
+  &::-moz-focus-inner {
+    border: 0;
   }
   cursor: pointer;
 }
@@ -71,14 +75,12 @@ input[type="file"] {
 }
 
 .dd-content button {
-  padding: 12px 16px;
-  display: block;
-  &hover {
-    background-color: $gray;
-  }
-  text-decoration: none;
-  color: black;
+  @extend .dd-button;
+  width: 100%;
+  border-radius: 0;
+  text-align: left;
 }
+
 .dd-content-header {
   text-transform: uppercase;
   letter-spacing: 0.5px;

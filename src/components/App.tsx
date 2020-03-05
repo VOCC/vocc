@@ -155,14 +155,22 @@ function App(): JSX.Element {
         <span className="title">VOCC</span>
         <Dropdown label="New">
           <div className="dd-content-header">Bitmap</div>
-            <button onClick={() => handleEditorChange(EditorMode.Bitmap, 3)}>Mode 3</button>
-            <button onClick={() => handleEditorChange(EditorMode.Bitmap, 4)}>Mode 4</button>
+          <button onClick={() => handleEditorChange(EditorMode.Bitmap, 3)}>
+            Mode 3
+          </button>
+          <button onClick={() => handleEditorChange(EditorMode.Bitmap, 4)}>
+            Mode 4
+          </button>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Spritesheet</div>
-            <button onClick = {() => handleEditorChange(EditorMode.Spritesheet, 4)}>4 bpp</button>
+          <button onClick={() => handleEditorChange(EditorMode.Spritesheet, 4)}>
+            4 bpp
+          </button>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Background</div>
-            <button onClick={() => handleEditorChange(EditorMode.Background, 0)}>Mode 0</button>
+          <button onClick={() => handleEditorChange(EditorMode.Background, 0)}>
+            Mode 0
+          </button>
         </Dropdown>
         <Dropdown label="Edit">
           <button onClick={() => null}>Undo</button>
@@ -172,38 +180,72 @@ function App(): JSX.Element {
         </Dropdown>
         <Dropdown label="Import">
           <div className="dd-content-header">Image</div>
-          <ImportButton onFileChange={handleImageLoad} buttonLabel="Image (*.png, *.bmp, *.jpg)"/>  
+          <ImportButton
+            onFileChange={handleImageLoad}
+            buttonLabel="Image (*.png, *.bmp, *.jpg)"
+          />
           <div className="dd-divider"></div>
-          <ImportButton onFileChange={handlePaletteLoad} buttonLabel="Palette (*.pal)"/>
+          <ImportButton
+            onFileChange={handlePaletteLoad}
+            buttonLabel="Palette (*.pal)"
+          />
         </Dropdown>
         <Dropdown label="Export">
           <div className="dd-content-header">Image</div>
-            <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} buttonLabel="PNG Image (*.png)"/>
-            <ExportButton startImageExport={handleImageExport.bind(null, "BMP")} buttonLabel="Bitmap (*.bmp)"/>
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "PNG")}
+            buttonLabel="PNG Image (*.png)"
+          />
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "BMP")}
+            buttonLabel="Bitmap (*.bmp)"
+          />
           <div className="dd-divider"></div>
           <div className="dd-content-header">GBA</div>
-            <div>
-              <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} buttonLabel="C Source Code (*.c/.h)"/>
-            </div>
+          <div>
+            <ExportButton
+              startImageExport={handleImageExport.bind(null, "GBA")}
+              buttonLabel="C Source Code (*.c/.h)"
+            />
+          </div>
           <div className="dd-divider"></div>
           <div>
-            <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} buttonLabel="Color Palette (*.pal)"/>
+            <ExportButton
+              startImageExport={handleImageExport.bind(null, "PAL")}
+              buttonLabel="Color Palette (*.pal)"
+            />
           </div>
         </Dropdown>
         <Dropdown label="Help">
           <form>
-            <button type="submit" formAction="" formTarget="">Documentation</button>
+            <button type="submit" formAction="" formTarget="">
+              Documentation
+            </button>
           </form>
           <form>
-            <button type="submit" formAction="https://www.coranac.com/tonc/text/" formTarget="_blank">GBA Graphics 101</button>
+            <button
+              type="submit"
+              formAction="https://www.coranac.com/tonc/text/"
+              formTarget="_blank"
+            >
+              GBA Graphics 101
+            </button>
           </form>
           <div className="dd-divider"></div>
           <form>
-            <button type="submit" formAction="" formTarget="">About VOCC</button>
+            <button type="submit" formAction="" formTarget="">
+              About VOCC
+            </button>
           </form>
           <div className="dd-divider"></div>
           <form>
-            <button type="submit" formAction="https://github.com/lbussell/vocc" formTarget="_blank">View on GitHub</button>
+            <button
+              type="submit"
+              formAction="https://github.com/lbussell/vocc"
+              formTarget="_blank"
+            >
+              View on GitHub
+            </button>
           </form>
         </Dropdown>
       </div>
