@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 
 type ImportFile = File | null;
 
@@ -13,20 +13,12 @@ interface IFile {
 }
 
 function ImportButton({ onFileChange, buttonLabel }: IProps): JSX.Element {
-  const [file, setFile] = useState<IFile>({
-    fileName: "No file name",
-    hasLoadedFile: false
-  });
   const fileInput = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLInputElement>): void => {
     e.preventDefault();
     if (fileInput.current) {
       if (fileInput.current.files) {
-        setFile({
-          fileName: fileInput.current.files[0].name,
-          hasLoadedFile: true
-        });
         onFileChange(fileInput.current.files[0]);
       }
     }

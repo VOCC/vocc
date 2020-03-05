@@ -1,19 +1,19 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { EditorSettings, EditorMode, Mode } from "../lib/interfaces";
+import { EditorSettings, EditorMode, Mode, Color } from "../lib/interfaces";
 import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
 import { Tool } from "../lib/consts";
 import Bitmap from "./objects/Bitmap";
 import Bitmap3 from "./objects/Bitmap3";
+import Bitmap4 from "./objects/Bitmap4";
 import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
 import Palette from "./objects/Palette";
-import PaletteDisplay from "./PaletteDisplay";
-import QuantizeButton from "./buttons/QuantizeButton";
+import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
 import Dropdown from "./Dropdown";
 
@@ -75,9 +75,14 @@ function App(): JSX.Element {
     if (!(image instanceof Bitmap3)) {
       alert("Requantization of paletted images currently not supported!");
     } else {
-      let { palette, sprite } = quantize(image, newColorDepth);
-      setImage(sprite);
-      setPalette(palette);
+      let ok = window.confirm(
+        "(Don't panic!) Quantizing a bitmap will change it from mode 3 to mode 4. Is this okay?"
+      );
+      if (ok) {
+        let { palette, sprite } = quantize(image, newColorDepth);
+        setImage(sprite);
+        setPalette(palette);
+      }
     }
   };
 
@@ -87,6 +92,22 @@ function App(): JSX.Element {
       let palette = await loadNewPalette(palFile);
       if (palette) setPalette(palette);
     }
+  };
+
+  const handleChangeSelectedColor = (newIndex: number) => {
+    setSelectedColorIndex(newIndex);
+    if (image instanceof Bitmap4) {
+      image.setPaletteIndex(newIndex);
+    }
+  };
+
+  const handleColorChange = (newColor: Color): void => {
+    const newPalette = palette.slice();
+    newPalette[selectedColorIndex] = newColor;
+    if (image instanceof Bitmap4) {
+      image.updatePalette(newPalette);
+    }
+    setPalette(newPalette);
   };
 
   const handleImageExport = async (type: string) => {
@@ -202,15 +223,15 @@ function App(): JSX.Element {
           />
           <div className="dd-divider"></div>
           <div className="dd-content-header">GBA</div>
-            <ExportButton
-              startImageExport={handleImageExport.bind(null, "GBA")}
-              buttonLabel="C Source Code (*.c/.h)"
-            />
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "GBA")}
+            buttonLabel="C Source Code (*.c/.h)"
+          />
           <div className="dd-divider"></div>
-            <ExportButton
-              startImageExport={handleImageExport.bind(null, "PAL")}
-              buttonLabel="Color Palette (*.pal)"
-            />
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "PAL")}
+            buttonLabel="Color Palette (*.pal)"
+          />
         </Dropdown>
         <Dropdown label="Help">
           <form>
@@ -262,6 +283,8 @@ function App(): JSX.Element {
             <EditorCanvas
               image={image}
               settings={editorSettings}
+              palette={palette}
+              selectedPaletteIndex={selectedColorIndex}
               scale={scale}
               onMouseWheel={handleMouseWheelEvent}
             />
@@ -272,15 +295,14 @@ function App(): JSX.Element {
           )}
         </div>
         <div className="right-panel">
-          <div className="panel-label">Palette</div>
-          <div className="palette-container">
-            <PaletteDisplay
-              palette={palette}
-              selectedColorIndex={selectedColorIndex}
-              onChangeSelectedColorIndex={setSelectedColorIndex}
-            />
-          </div>
-          <QuantizeButton handleQuantize={handleQuantize} />
+          <PalettePanel
+            palette={palette}
+            updatePalette={setPalette}
+            selectedColorIndex={selectedColorIndex}
+            onChangeSelectedColorIndex={handleChangeSelectedColor}
+            onChangeColor={handleColorChange}
+            handleQuantize={handleQuantize}
+          />
         </div>
       </div>
     </div>

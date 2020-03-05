@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 
+const MIN_QUANTIZE = 1;
+const MAX_QUANTIZE = 256;
+
 interface ExportButtonProps {
   handleQuantize: (newColorDepth: number) => void;
 }
@@ -24,6 +27,8 @@ function ExportButton({ handleQuantize }: ExportButtonProps): JSX.Element {
         className="quantize-input"
         type="number"
         value={depth}
+        min={MIN_QUANTIZE}
+        max={MAX_QUANTIZE}
         onChange={e => setDepth(parseInt(e.target.value))}
       ></input>
     </div>

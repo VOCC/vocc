@@ -130,3 +130,32 @@ input[type="file"] {
   width: 64px;
   box-sizing: border-box;
 }
+
+@mixin track() {
+  background: $slider-handle; /* Green background */
+  width: 0.5em; /* Set a specific slider handle width */
+  height: 1em; /* Slider handle height */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.color-input-container {
+  width: 100%;
+  text-align: center;
+}
+
+.color-input {
+  appearance: none;
+  height: 0.5em;
+  margin: 1em;
+  width: 80%;
+  border-radius: 0.5em;
+  background: $slider-bg;
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    @include track();
+  }
+  &::-moz-range-thumb {
+    @include track();
+  }
+}

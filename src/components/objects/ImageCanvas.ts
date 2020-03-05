@@ -37,6 +37,24 @@ export default class ImageCanvas {
     this.drawPixel(pos, color);
   }
 
+  public updateRegion(
+    image: ImageInterface,
+    x: number,
+    y: number,
+    dx: number,
+    dy: number
+  ): void {
+    // for (let x = 0; x < image.dimensions.width; x++) {
+    //   for (let y = 0; y < image.dimensions.height; y++) {
+    //     this.drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
+    //   }
+    // }
+  }
+
+  public redrawImage(image: ImageInterface): void {
+    this.drawImageToHiddenCanvas(image);
+  }
+
   private drawPixel(pos: ImageCoordinates, color: Color): void {
     if (!this.context) return;
     let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
@@ -45,7 +63,6 @@ export default class ImageCanvas {
   }
 
   private drawImageToHiddenCanvas(image: ImageInterface) {
-    console.log("Drawing internal image.");
     for (let x = 0; x < image.dimensions.width; x++) {
       for (let y = 0; y < image.dimensions.height; y++) {
         this.drawPixel({ x, y }, image.getPixelColorAt({ x, y }));

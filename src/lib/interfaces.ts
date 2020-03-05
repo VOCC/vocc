@@ -7,6 +7,12 @@ export interface Color {
   a: number;
 }
 
+export interface Color32 {
+  r: number;
+  g: number;
+  b: number;
+}
+
 export interface Dimensions {
   height: number;
   width: number;
