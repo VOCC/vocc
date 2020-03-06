@@ -173,9 +173,8 @@ export default function EditorCanvas({
     // BFS fill
     const color = image.getPixelColorAt(pos);
     image.setPixelColor(pos, newColor);
-    console.log(color);
-    let queue = new Array<ImageCoordinates>(pos);
-    let explored = new Array<ImageCoordinates>(pos);
+    const queue = new Array<ImageCoordinates>(pos);
+    const explored = new Array<ImageCoordinates>(pos);
     while (queue[0] !== undefined) {
       let curr = queue.shift() as ImageCoordinates;
       console.log(curr);
@@ -191,7 +190,6 @@ export default function EditorCanvas({
       }
       ///
       edges.filter(n => !explored.includes(n)).forEach(n => {
-        // console.log(image.getPixelColorAt(n).isEqual(color))
         explored.push(n);
         if (image.getPixelColorAt(n).isEqual(color)) {
           queue.push(n);
@@ -208,10 +206,10 @@ export default function EditorCanvas({
     if (mousePosition) {
       const tool = settings.currentTool;
       setMousePos(mousePosition);
-      if (tool === Tool.PENCIL) {
-        setIsPainting(true);
-      } else if (tool === Tool.BUCKET) {
+      if (tool === Tool.BUCKET) {
         bucketFill(getImageCoord(mousePosition), palette[selectedPaletteIndex])
+      } else {
+        setIsPainting(true);
       }
     }
   }, [settings.currentTool, bucketFill
@@ -219,13 +217,20 @@ export default function EditorCanvas({
 
   const paint = useCallback(
     (e: MouseEvent) => {
+      const tool = settings.currentTool;
       const newMousePos = getMousePos(e);
       if (isPainting && newMousePos) {
-        fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
+        if (tool === Tool.PENCIL) {
+          fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
+        } else if (tool === Tool.SQUARE) {
+
+        } else if (tool === Tool.ELLIPSE) {
+          
+        }
         setMousePos(newMousePos);
       }
-    },
-    [isPainting, fillPixel, getImageCoord, palette, selectedPaletteIndex]
+    }, [isPainting, fillPixel, getImageCoord, palette
+      ,selectedPaletteIndex, settings.currentTool]
   );
 
   const stopPaint = useCallback(() => {
