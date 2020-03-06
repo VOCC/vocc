@@ -38,6 +38,10 @@ export default function EditorCanvas({
   const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(
     undefined
   );
+  const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
+    x: 0,
+    y: 0
+  });
   /////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
@@ -52,8 +56,8 @@ export default function EditorCanvas({
     // Draw the image at the correct position and scale
     context.drawImage(
       image.getImageCanvasElement(),
-      0,
-      0,
+      imagePosition.x,
+      imagePosition.y,
       image.dimensions.width * scale,
       image.dimensions.height * scale
     );
@@ -61,13 +65,13 @@ export default function EditorCanvas({
     if (settings.grid && scale >= PIXELGRID_ZOOM_LIMIT) {
       context.drawImage(
         image.getPixelGridCanvasElement(),
-        0,
-        0,
+        imagePosition.x,
+        imagePosition.y,
         image.dimensions.width * scale,
         image.dimensions.height * scale
       );
     }
-  }, [image, canvasRef, scale, settings.grid]);
+  }, [image, imagePosition, canvasRef, scale, settings.grid]);
 
   /**
    * Handle window resizing and set the new canvasSize state.
@@ -142,22 +146,25 @@ export default function EditorCanvas({
       return {
         x: (e.clientX - rect.left) * scaleX,
         y: (e.clientY - rect.top) * scaleY
-      };
+      }
     }
     return undefined;
   };
 
   const getImageCoord = useCallback(
-    (mousePos: ImageCoordinates): ImageCoordinates => {
-      const x = Math.floor(mousePos.x / scale);
-      const y = Math.floor(mousePos.y / scale);
+    (mousePos: ImageCoordinates): ImageCoordinates | undefined => {
+      const x = Math.floor((mousePos.x - imagePosition.x) / scale);
+      const y = Math.floor((mousePos.y - imagePosition.y) / scale);
+      if (x < 0 || x > image.dimensions.width
+        || y < 0 || y > image.dimensions.height) return undefined;
       return { x, y };
     },
-    [scale]
+    [scale, imagePosition]
   );
 
   const fillPixel = useCallback(
-    (pos: ImageCoordinates, color: Color): void => {
+    (pos: ImageCoordinates | undefined, color: Color): void => {
+      if (!pos) return;
       if (!canvasRef.current) return;
       const context = canvasRef.current.getContext("2d");
       if (!context) return;
@@ -169,68 +176,118 @@ export default function EditorCanvas({
   );
 
   const bucketFill = useCallback(
-    (pos: ImageCoordinates, newColor: Color): void => {
-    // BFS fill
-    const color = image.getPixelColorAt(pos);
-    image.setPixelColor(pos, newColor);
-    const queue = new Array<ImageCoordinates>(pos);
-    const explored = new Array<ImageCoordinates>(pos);
-    while (queue[0] !== undefined) {
-      let curr = queue.shift() as ImageCoordinates;
-      console.log(curr);
-      let edges = new Array<ImageCoordinates>(0);
-      // add edges
-      if (curr.y > 0) { edges.push({x: curr.x, y: curr.y - 1}) }
-      if (curr.y < image.dimensions.height - 1) { 
-        edges.push({x: curr.x, y: curr.y + 1})
-      }
-      if (curr.x > 0) { edges.push({x: curr.x - 1, y: curr.y}) }
-      if (curr.x < image.dimensions.width - 1) {
-        edges.push({x: curr.x + 1, y: curr.y})
-      }
-      ///
-      edges.filter(n => !explored.includes(n)).forEach(n => {
-        explored.push(n);
-        if (image.getPixelColorAt(n).isEqual(color)) {
-          queue.push(n);
-          image.setPixelColor(n, newColor);
+    (pos: ImageCoordinates | undefined, newColor: Color): void => {
+      // BFS fill
+      if (!pos) return;
+      const color = image.getPixelColorAt(pos);
+      if (color.isEqual(newColor)) return;
+      image.setPixelColor(pos, newColor);
+      console.log(color);
+      let queue = new Array<ImageCoordinates>(pos);
+      let explored = new Array<ImageCoordinates>(pos);
+      while (queue[0] !== undefined) {
+        let curr = queue.shift() as ImageCoordinates;
+        let edges = new Array<ImageCoordinates>(0);
+        // add edges
+        if (curr.y > 0) {
+          edges.push({ x: curr.x, y: curr.y - 1 });
         }
-      });
-    }
-
-    drawImageOnCanvas();
-  }, [image, drawImageOnCanvas]);
-
-  const startPaint = useCallback((e: MouseEvent) => {
-    const mousePosition = getMousePos(e);
-    if (mousePosition) {
-      const tool = settings.currentTool;
-      setMousePos(mousePosition);
-      if (tool === Tool.BUCKET) {
-        bucketFill(getImageCoord(mousePosition), palette[selectedPaletteIndex])
-      } else {
-        setIsPainting(true);
+        if (curr.y < image.dimensions.height - 1) {
+          edges.push({ x: curr.x, y: curr.y + 1 });
+        }
+        if (curr.x > 0) {
+          edges.push({ x: curr.x - 1, y: curr.y });
+        }
+        if (curr.x < image.dimensions.width - 1) {
+          edges.push({ x: curr.x + 1, y: curr.y });
+        }
+        ///
+        edges
+          .filter(n => !explored.includes(n))
+          .forEach(n => {
+            explored.push(n);
+            if (image.getPixelColorAt(n).isEqual(color)) {
+              queue.push(n);
+              image.setPixelColor(n, newColor);
+            }
+          });
       }
-    }
-  }, [settings.currentTool, bucketFill
-    ,getImageCoord, palette, selectedPaletteIndex]);
+
+      drawImageOnCanvas();
+    },
+    [image, drawImageOnCanvas]
+  );
+
+  const startPaint = useCallback(
+    (e: MouseEvent) => {
+      const mousePosition = getMousePos(e);
+      if (!mousePosition) return;
+      setMousePos(mousePosition);
+      const imageCoord = getImageCoord(mousePosition);
+      // if (!imageCoord) return;
+      switch (settings.currentTool) {
+        case Tool.PENCIL:
+          setIsPainting(true);
+          fillPixel(imageCoord, palette[selectedPaletteIndex]);
+          break;
+        case Tool.BUCKET:
+          bucketFill(
+            imageCoord,
+            palette[selectedPaletteIndex]
+          );
+          break;
+        case Tool.PAN:
+          setIsPainting(true);
+          break;
+      }
+    },
+    [
+      settings.currentTool,
+      bucketFill,
+      fillPixel,
+      getImageCoord,
+      palette,
+      selectedPaletteIndex
+    ]
+  );
 
   const paint = useCallback(
     (e: MouseEvent) => {
-      const tool = settings.currentTool;
       const newMousePos = getMousePos(e);
-      if (isPainting && newMousePos) {
-        if (tool === Tool.PENCIL) {
-          fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
-        } else if (tool === Tool.SQUARE) {
-          
-        } else if (tool === Tool.ELLIPSE) {
-
-        }
-        setMousePos(newMousePos);
+      if (!newMousePos) return;
+      const imageCoord = getImageCoord(newMousePos);
+      // if (!imageCoord) return;
+      switch (settings.currentTool) {
+        case Tool.PENCIL:
+          if (isPainting) {
+            fillPixel(
+              imageCoord,
+              palette[selectedPaletteIndex]
+            );
+          }
+          break;
+        case Tool.PAN:
+          if (isPainting && mousePos) {
+            const newImagePosition = {
+              x: imagePosition.x + (newMousePos.x - mousePos.x),
+              y: imagePosition.y + (newMousePos.y - mousePos.y)
+            };
+            setImagePosition(newImagePosition);
+          }
+          break;
       }
-    }, [isPainting, fillPixel, getImageCoord, palette
-      ,selectedPaletteIndex, settings.currentTool]
+      setMousePos(newMousePos);
+    },
+    [
+      isPainting,
+      fillPixel,
+      getImageCoord,
+      palette,
+      selectedPaletteIndex,
+      imagePosition,
+      mousePos,
+      settings.currentTool
+    ]
   );
 
   const stopPaint = useCallback(() => {
@@ -267,5 +324,23 @@ export default function EditorCanvas({
 
   /////////////////////////////////////////////////////////////////////////////
 
-  return <canvas ref={canvasRef} className="image-canvas" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className={generateEditorCanvasProps(settings.currentTool)}
+    />
+  );
 }
+
+const generateEditorCanvasProps = (tool: Tool): string => {
+  const base = "image-canvas ";
+  switch (tool) {
+    case Tool.PENCIL:
+      return base + "pencil";
+    case Tool.BUCKET:
+      return base + "bucket";
+    case Tool.PAN:
+      return base + "pan";
+  }
+  return base;
+};
