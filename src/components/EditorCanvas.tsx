@@ -317,5 +317,23 @@ export default function EditorCanvas({
 
   /////////////////////////////////////////////////////////////////////////////
 
-  return <canvas ref={canvasRef} className="image-canvas" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className={generateEditorCanvasProps(settings.currentTool)}
+    />
+  );
 }
+
+const generateEditorCanvasProps = (tool: Tool): string => {
+  const base = "image-canvas ";
+  switch (tool) {
+    case Tool.PENCIL:
+      return base + "pencil";
+    case Tool.BUCKET:
+      return base + "bucket";
+    case Tool.PAN:
+      return base + "pan";
+  }
+  return base;
+};
