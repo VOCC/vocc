@@ -103,7 +103,7 @@ function ColorInput({
   return (
     <div>
       <div>
-        <label>Red: </label>
+        <label>R</label>
         <input
           type="number"
           max={MAX_COLOR_VAL}
@@ -113,7 +113,7 @@ function ColorInput({
         ></input>
       </div>
       <div>
-        <label>Green: </label>
+        <label>G</label>
         <input
           type="number"
           max={MAX_COLOR_VAL}
@@ -123,7 +123,7 @@ function ColorInput({
         ></input>
       </div>
       <div>
-        <label>Blue: </label>
+        <label>B</label>
         <input
           type="number"
           max={MAX_COLOR_VAL}
