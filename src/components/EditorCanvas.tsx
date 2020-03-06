@@ -223,9 +223,9 @@ export default function EditorCanvas({
         if (tool === Tool.PENCIL) {
           fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
         } else if (tool === Tool.SQUARE) {
-
-        } else if (tool === Tool.ELLIPSE) {
           
+        } else if (tool === Tool.ELLIPSE) {
+
         }
         setMousePos(newMousePos);
       }

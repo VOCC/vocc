@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useReducer } from "react";
 import { exportImage, exportPalette } from "../lib/exportUtils";
-import { Color, EditorSettings } from "../lib/interfaces";
-import { loadNewImage } from "../lib/imageLoadUtils";
+import { EditorSettings, EditorMode, Mode, Color } from "../lib/interfaces";
+import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
 import { Tool } from "../lib/consts";
@@ -15,11 +15,15 @@ import ImportButton from "./buttons/ImportButton";
 import Palette from "./objects/Palette";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
+import Dropdown from "./Dropdown";
 
 function scaleReducer(state: number, e: WheelEvent) {
-  let direction = e.deltaY < 0 ? -1 : 1;
-  let newScale = state + direction / 4;
-  return newScale < 1 ? 1 : newScale;
+  const direction = e.deltaY < 0 ? -1 : 1;
+  if (direction === 1) {
+    return state * 1.1;
+  } else {
+    return state / 1.1;
+  }
 }
 
 function App(): JSX.Element {
@@ -28,8 +32,11 @@ function App(): JSX.Element {
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
-    currentTool: Tool.PENCIL
+    currentTool: Tool.PENCIL,
+    mode: 3,
+    editorMode: EditorMode.Bitmap
   });
+
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
 
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
@@ -46,10 +53,24 @@ function App(): JSX.Element {
     (newTool: Tool) => {
       setEditorSettings({
         grid: editorSettings.grid,
-        currentTool: newTool
+        currentTool: newTool,
+        mode: editorSettings.mode,
+        editorMode: editorSettings.editorMode
       });
     },
-    [editorSettings.grid]
+    [editorSettings]
+  );
+
+  const handleEditorChange = useCallback(
+    (editorMode: EditorMode, mode: Mode) => {
+      setEditorSettings({
+        grid: editorSettings.grid,
+        currentTool: editorSettings.currentTool,
+        mode: mode,
+        editorMode: editorMode
+      });
+    },
+    [editorSettings]
   );
 
   const handleQuantize = (newColorDepth: number): void => {
@@ -57,9 +78,27 @@ function App(): JSX.Element {
     if (!(image instanceof Bitmap3)) {
       alert("Requantization of paletted images currently not supported!");
     } else {
-      let { palette, sprite } = quantize(image, newColorDepth);
-      setImage(sprite);
-      setPalette(palette);
+      let ok = window.confirm(
+        "(Don't panic!) Quantizing a bitmap will change it from mode 3 to mode 4. Is this okay?"
+      );
+      if (ok) {
+        let { palette, sprite } = quantize(image, newColorDepth);
+        setImage(sprite);
+        setPalette(palette);
+      }
+    }
+  };
+
+  const handlePaletteLoad = async (palFile: File | null) => {
+    if (palFile) {
+      console.log("Loading palette...");
+      let newPalette = await loadNewPalette(palFile);
+      if (newPalette) {
+        if (image instanceof Bitmap4) {
+          image.updatePalette(newPalette);
+        }
+        setPalette(newPalette);
+      }
     }
   };
 
@@ -80,19 +119,25 @@ function App(): JSX.Element {
   };
 
   const handleImageExport = async (type: string) => {
-    if (!image) {
-      alert("No image to export! Try importing one first.");
-      return;
-    }
-    let fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
+    let fileName;
     let fileType = "";
     let blob: Blob | null;
+
+    if (image) {
+      fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."))
+    } else {
+      fileName = "default"
+    }
 
     const exportFailAlert = () =>
       alert("Failed to export image! Check console for more information.");
 
     switch (type) {
       case "GBA":
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //.c file
         fileType = ".c";
         let cBlob = new Blob([image.getCSourceData()]);
@@ -113,16 +158,28 @@ function App(): JSX.Element {
           break;
         }
       case "BMP":
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //.bmp file
         fileType = ".bmp";
         blob = await exportImage(image, type);
         break;
       case "PNG":
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //.png file
         fileType = ".png";
         blob = await exportImage(image, type);
         break;
       default:
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //default as .txt if unrecognized type is selected
         fileType = ".txt";
         blob = await exportImage(image, type);
@@ -143,30 +200,109 @@ function App(): JSX.Element {
     <div className="app-container">
       <div className="navbar">
         <span className="title">VOCC</span>
-        <span className="subtitle">
-          Game Boy Advance Image Editor and Converter
-        </span>
-        <ImportButton onImageChange={handleImageLoad} />
-        GBA ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "GBA")} />
-        Pal ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "PAL")} />
-        PNG ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "PNG")} />
-        BMP ->
-        <ExportButton startImageExport={handleImageExport.bind(null, "BMP")} />
+        <Dropdown label="New">
+          <div className="dd-content-header">Bitmap</div>
+          <button onClick={() => handleEditorChange(EditorMode.Bitmap, 3)}>
+            Mode 3
+          </button>
+          <button onClick={() => handleEditorChange(EditorMode.Bitmap, 4)}>
+            Mode 4
+          </button>
+          <div className="dd-divider"></div>
+          <div className="dd-content-header">Spritesheet</div>
+          <button onClick={() => handleEditorChange(EditorMode.Spritesheet, 4)}>
+            4 bpp
+          </button>
+          <div className="dd-divider"></div>
+          <div className="dd-content-header">Background</div>
+          <button onClick={() => handleEditorChange(EditorMode.Background, 0)}>
+            Mode 0
+          </button>
+        </Dropdown>
+        <Dropdown label="Edit">
+          <button onClick={() => null}>Undo</button>
+          <button onClick={() => null}>Redo</button>
+          <div className="dd-divider"></div>
+          <button onClick={() => null}>Clear All</button>
+        </Dropdown>
+        <Dropdown label="Import">
+          <div className="dd-content-header">Image</div>
+          <ImportButton
+            onFileChange={handleImageLoad}
+            buttonLabel="Image (*.png, *.bmp, *.jpg)"
+          />
+          <div className="dd-divider"></div>
+          <ImportButton
+            onFileChange={handlePaletteLoad}
+            buttonLabel="Palette (*.pal)"
+          />
+        </Dropdown>
+        <Dropdown label="Export">
+          <div className="dd-content-header">Image</div>
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "PNG")}
+            buttonLabel="PNG Image (*.png)"
+          />
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "BMP")}
+            buttonLabel="Bitmap (*.bmp)"
+          />
+          <div className="dd-divider"></div>
+          <div className="dd-content-header">GBA</div>
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "GBA")}
+            buttonLabel="C Source Code (*.c/.h)"
+          />
+          <div className="dd-divider"></div>
+          <ExportButton
+            startImageExport={handleImageExport.bind(null, "PAL")}
+            buttonLabel="Color Palette (*.pal)"
+          />
+        </Dropdown>
+        <Dropdown label="Help">
+          <form>
+            <button type="submit" formAction="" formTarget="">
+              Documentation
+            </button>
+          </form>
+          <form>
+            <button
+              type="submit"
+              formAction="https://www.coranac.com/tonc/text/"
+              formTarget="_blank"
+            >
+              GBA Graphics 101
+            </button>
+          </form>
+          <div className="dd-divider"></div>
+          <form>
+            <button type="submit" formAction="" formTarget="">
+              About VOCC
+            </button>
+          </form>
+          <div className="dd-divider"></div>
+          <form>
+            <button
+              type="submit"
+              formAction="https://github.com/lbussell/vocc"
+              formTarget="_blank"
+            >
+              View on GitHub
+            </button>
+          </form>
+        </Dropdown>
       </div>
       <div className="workspace-container">
         <div className="left-panel">
-          <div className="panel-label">Tools</div>
           <div className="tools-container">
-            {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
+            {/* {image ? <div> Scale: {scale.toFixed(2)}x </div> : null} */}
             <ToolsPanel
               settings={editorSettings}
               onSettingsChange={handleSettingsChange}
               onToolChange={handleToolChange}
             ></ToolsPanel>
           </div>
+          {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
         </div>
         <div className="image-container">
           {image ? (

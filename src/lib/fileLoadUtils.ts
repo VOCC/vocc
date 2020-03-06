@@ -1,6 +1,7 @@
-import { Dimensions, ImageCoordinates } from "./interfaces";
+import { Dimensions, ImageCoordinates, Color } from "./interfaces";
 import Bitmap from "../components/objects/Bitmap";
 import Bitmap3 from "../components/objects/Bitmap3";
+import Palette from "../components/objects/Palette";
 
 export const createHiddenCanvas = (d: Dimensions): HTMLCanvasElement => {
   let hiddenCanvas = document.createElement("canvas");
@@ -40,7 +41,7 @@ export const loadNewImage = async (imageFile: File): Promise<Bitmap> => {
     width: hiddenImage.naturalWidth
   };
   let hiddenCanvas = createHiddenCanvas(dimensions);
-  const context = hiddenCanvas.getContext('2d');
+  const context = hiddenCanvas.getContext("2d");
   if (context) context.drawImage(hiddenImage, 0, 0);
   let imageData = loadImageDataFromCanvas(hiddenCanvas, dimensions);
   return new Bitmap3(imageFile.name, dimensions, imageData);
@@ -48,3 +49,39 @@ export const loadNewImage = async (imageFile: File): Promise<Bitmap> => {
 
 export const offset = (pos: ImageCoordinates, d: Dimensions) =>
   4 * (pos.y * d.width + pos.x);
+
+/**
+ * loadNewPalette
+ * @param paletteFile .pal file being imported
+ * generates a Color[] by iterating through the File
+ * returns initialized palette
+ */
+export const loadNewPalette = async (
+  paletteFile: File
+): Promise<Palette | null> => {
+  let text = await new Response(paletteFile).text();
+  let fileString = text
+    .trim()
+    .replace(/\t/g, "")
+    .replace(/\n/g, "");
+  let colors: Color[] = new Array(256);
+
+  // checking to make sure string is properly formatted before iterating through it
+  if (fileString.substr(0, 4) === "0x00") {
+    console.log("Palette file is valid. Generating color array...");
+
+    // string is in 0x00rrggbb format (length 10)
+    for (let i = 0, j = 0; i < fileString.length; i += 10, j++) {
+      let red = parseInt(fileString.substr(i + 4, 2), 16);
+      let green = parseInt(fileString.substr(i + 6, 2), 16);
+      let blue = parseInt(fileString.substr(i + 8, 2), 16);
+
+      let color = new Color(red, green, blue, 1);
+      colors[j] = color;
+    }
+    return colors;
+  } else {
+    console.log("Invalid palette. Palette unchanged.");
+    return null;
+  }
+};
