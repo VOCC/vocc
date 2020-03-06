@@ -51,8 +51,10 @@ function App(): JSX.Element {
     switch (type) {
       case "Image":
         handleImageLoad(element.files[0]);
+        break;
       case "Palette":
         handlePaletteLoad(element.files[0]);
+        break;
     }
   };
 
