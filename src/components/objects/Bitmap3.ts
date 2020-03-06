@@ -32,12 +32,12 @@ export default class Bitmap3 extends Bitmap {
   }
 
   public getPixelColorAt(pos: ImageCoordinates): Color {
-    return {
-      r: this.imageData[Loader.offset(pos, this.dimensions)],
-      g: this.imageData[Loader.offset(pos, this.dimensions) + 1],
-      b: this.imageData[Loader.offset(pos, this.dimensions) + 2],
-      a: this.imageData[Loader.offset(pos, this.dimensions) + 3]
-    };
+      const r = this.imageData[Loader.offset(pos, this.dimensions)];
+      const g = this.imageData[Loader.offset(pos, this.dimensions) + 1];
+      const b = this.imageData[Loader.offset(pos, this.dimensions) + 2];
+      const a = this.imageData[Loader.offset(pos, this.dimensions) + 3];
+
+      return new Color(r, g, b, a);
   }
 
   public setPixelColor(pos: ImageCoordinates, color: Color): void {

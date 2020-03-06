@@ -42,22 +42,20 @@ export default function PalettePanel({
 const MIN_COLOR_VAL = "0";
 const MAX_COLOR_VAL = "31";
 
-const color256to32 = ({ r, g, b }: Color): Color => {
-  return {
-    r: Math.ceil((r + 1) / 8) - 1,
-    g: Math.ceil((g + 1) / 8) - 1,
-    b: Math.ceil((b + 1) / 8) - 1,
-    a: 1
-  };
+const color256to32 = (color: Color): Color => {
+    const r = Math.ceil((color.r + 1) / 8) - 1;
+    const g = Math.ceil((color.g + 1) / 8) - 1;
+    const b = Math.ceil((color.b + 1) / 8) - 1;
+
+    return new Color(r, g, b, 1);
 };
 
-const color32to256 = ({ r, g, b }: Color): Color => {
-  return {
-    r: (r + 1) * 8 - 1,
-    g: (g + 1) * 8 - 1,
-    b: (b + 1) * 8 - 1,
-    a: 1
-  };
+const color32to256 = (color: Color): Color => {
+  const r = (color.r + 1) * 8 - 1;
+  const g = (color.g + 1) * 8 - 1;
+  const b = (color.b + 1) * 8 - 1;
+
+  return new Color(r, g, b, 1);
 };
 
 interface ColorInputProps {
@@ -85,32 +83,20 @@ function ColorInput({
   const color32 = color256to32(currentColor);
 
   const handleRChange = (newRValue: number) => {
-    const color256 = color32to256({
-      r: newRValue,
-      g: color32.g,
-      b: color32.b,
-      a: 1
-    });
+    color32.r = newRValue;
+    const color256 = color32to256(color32);
     onChangeColor(color256);
   };
 
   const handleGChange = (newGValue: number) => {
-    const color256 = color32to256({
-      r: color32.r,
-      g: newGValue,
-      b: color32.b,
-      a: 1
-    });
+    color32.g = newGValue;
+    const color256 = color32to256(color32);
     onChangeColor(color256);
   };
 
   const handleBChange = (newBValue: number) => {
-    const color256 = color32to256({
-      r: color32.r,
-      g: color32.g,
-      b: newBValue,
-      a: 1
-    });
+    color32.b = newBValue;
+    const color256 = color32to256(color32);
     onChangeColor(color256);
   };
 

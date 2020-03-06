@@ -3,12 +3,7 @@ import Palette from "../components/objects/Palette";
 import { Color } from "./interfaces";
 import Bitmap from "../components/objects/Bitmap";
 
-const BLACK: Color = {
-  r: 0,
-  g: 0,
-  b: 0,
-  a: 1
-};
+const BLACK: Color = new Color(0, 0, 0, 1);
 
 export function quantize(
   image: Bitmap,
@@ -81,12 +76,12 @@ export function quantize(
   //clusters: [center[r,g,b]], [point 1[r,g,b]], ...]
   let i = 0;
   for (i; i < clusters.length && i < MaxPalSize; i++) {
-    let center: Color = {
-      r: clusters[i][0][0],
-      g: clusters[i][0][1],
-      b: clusters[i][0][2],
-      a: 1
-    };
+    let center: Color = new Color(
+      clusters[i][0][0],
+      clusters[i][0][1],
+      clusters[i][0][2],
+      1
+    );
     palette[i] = center;
     for (let j = 1; j < clusters[i].length; j++) {
       let imageIndex = getColorIndex(imageArr, clusters[i][j]);

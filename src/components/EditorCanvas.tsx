@@ -8,6 +8,7 @@ import React, {
 import { EditorSettings, ImageCoordinates, Color } from "../lib/interfaces";
 import Bitmap from "./objects/Bitmap";
 import Palette from "./objects/Palette";
+import { Tool } from "../lib/consts";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
@@ -37,6 +38,10 @@ export default function EditorCanvas({
   const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(
     undefined
   );
+  const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
+    x: 0,
+    y: 0
+  });
   /////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
@@ -51,8 +56,8 @@ export default function EditorCanvas({
     // Draw the image at the correct position and scale
     context.drawImage(
       image.getImageCanvasElement(),
-      0,
-      0,
+      imagePosition.x,
+      imagePosition.y,
       image.dimensions.width * scale,
       image.dimensions.height * scale
     );
@@ -60,13 +65,13 @@ export default function EditorCanvas({
     if (settings.grid && scale >= PIXELGRID_ZOOM_LIMIT) {
       context.drawImage(
         image.getPixelGridCanvasElement(),
-        0,
-        0,
+        imagePosition.x,
+        imagePosition.y,
         image.dimensions.width * scale,
         image.dimensions.height * scale
       );
     }
-  }, [image, canvasRef, scale, settings.grid]);
+  }, [image, imagePosition, canvasRef, scale, settings.grid]);
 
   /**
    * Handle window resizing and set the new canvasSize state.
@@ -148,11 +153,11 @@ export default function EditorCanvas({
 
   const getImageCoord = useCallback(
     (mousePos: ImageCoordinates): ImageCoordinates => {
-      const x = Math.floor(mousePos.x / scale);
-      const y = Math.floor(mousePos.y / scale);
+      const x = Math.floor((mousePos.x - imagePosition.x) / scale);
+      const y = Math.floor((mousePos.y - imagePosition.y) / scale);
       return { x, y };
     },
-    [scale]
+    [scale, imagePosition]
   );
 
   const fillPixel = useCallback(
@@ -167,27 +172,115 @@ export default function EditorCanvas({
     [drawImageOnCanvas, image]
   );
 
-  const startPaint = useCallback((e: MouseEvent) => {
-    const mousePosition = getMousePos(e);
-    if (mousePosition) {
-      setMousePos(mousePosition);
-      // fillPixel(
-      //   getImageCoord(mousePosition),
-      //   palette.getColorAt(selectedPaletteIndex)
-      // );
-      setIsPainting(true);
-    }
-  }, []);
+  const bucketFill = useCallback(
+    (pos: ImageCoordinates, newColor: Color): void => {
+      // BFS fill
+      const color = image.getPixelColorAt(pos);
+      image.setPixelColor(pos, newColor);
+      console.log(color);
+      let queue = new Array<ImageCoordinates>(pos);
+      let explored = new Array<ImageCoordinates>(pos);
+      while (queue[0] !== undefined) {
+        let curr = queue.shift() as ImageCoordinates;
+        console.log(curr);
+        let edges = new Array<ImageCoordinates>(0);
+        // add edges
+        if (curr.y > 0) {
+          edges.push({ x: curr.x, y: curr.y - 1 });
+        }
+        if (curr.y < image.dimensions.height - 1) {
+          edges.push({ x: curr.x, y: curr.y + 1 });
+        }
+        if (curr.x > 0) {
+          edges.push({ x: curr.x - 1, y: curr.y });
+        }
+        if (curr.x < image.dimensions.width - 1) {
+          edges.push({ x: curr.x + 1, y: curr.y });
+        }
+        ///
+        edges
+          .filter(n => !explored.includes(n))
+          .forEach(n => {
+            // console.log(image.getPixelColorAt(n).isEqual(color))
+            explored.push(n);
+            if (image.getPixelColorAt(n).isEqual(color)) {
+              queue.push(n);
+              image.setPixelColor(n, newColor);
+            }
+          });
+      }
+
+      drawImageOnCanvas();
+    },
+    [image, drawImageOnCanvas]
+  );
+
+  const startPaint = useCallback(
+    (e: MouseEvent) => {
+      const mousePosition = getMousePos(e);
+      if (mousePosition) {
+        setMousePos(mousePosition);
+        switch (settings.currentTool) {
+          case Tool.PENCIL:
+            setIsPainting(true);
+            fillPixel(mousePosition, palette[selectedPaletteIndex]);
+            break;
+          case Tool.BUCKET:
+            bucketFill(
+              getImageCoord(mousePosition),
+              palette[selectedPaletteIndex]
+            );
+            break;
+          case Tool.PAN:
+            setIsPainting(true);
+            break;
+        }
+      }
+    },
+    [
+      settings.currentTool,
+      bucketFill,
+      fillPixel,
+      getImageCoord,
+      palette,
+      selectedPaletteIndex
+    ]
+  );
 
   const paint = useCallback(
     (e: MouseEvent) => {
       const newMousePos = getMousePos(e);
-      if (isPainting && newMousePos) {
-        fillPixel(getImageCoord(newMousePos), palette[selectedPaletteIndex]);
-        setMousePos(newMousePos);
+      switch (settings.currentTool) {
+        case Tool.PENCIL:
+          if (isPainting && newMousePos) {
+            fillPixel(
+              getImageCoord(newMousePos),
+              palette[selectedPaletteIndex]
+            );
+          }
+          break;
+        case Tool.PAN:
+          if (isPainting && mousePos && newMousePos) {
+            const newImagePosition = {
+              x: imagePosition.x + (newMousePos.x - mousePos.x),
+              y: imagePosition.y + (newMousePos.y - mousePos.y)
+            };
+            setImagePosition(newImagePosition);
+            setMousePos(newMousePos);
+          }
+          break;
       }
     },
-    [isPainting, fillPixel, getImageCoord, palette, selectedPaletteIndex]
+    [
+      isPainting,
+      fillPixel,
+      getImageCoord,
+      palette,
+      selectedPaletteIndex,
+      imagePosition,
+      mousePos,
+      settings.currentTool
+    ]
   );
 
   const stopPaint = useCallback(() => {
@@ -224,5 +317,23 @@ export default function EditorCanvas({
 
   /////////////////////////////////////////////////////////////////////////////
 
-  return <canvas ref={canvasRef} className="image-canvas" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className={generateEditorCanvasProps(settings.currentTool)}
+    />
+  );
 }
+
+const generateEditorCanvasProps = (tool: Tool): string => {
+  const base = "image-canvas ";
+  switch (tool) {
+    case Tool.PENCIL:
+      return base + "pencil";
+    case Tool.BUCKET:
+      return base + "bucket";
+    case Tool.PAN:
+      return base + "pan";
+  }
+  return base;
+};
