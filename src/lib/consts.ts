@@ -1,10 +1,10 @@
-import { Dimensions } from "./interfaces";
+import { Dimensions, Color } from "./interfaces";
 
 export const COLORS = {
-  black: { r: 0, g: 0, b: 0, a: 1 },
-  red: { r: 255, g: 0, b: 0, a: 1 },
-  blue: { r: 0, g: 255, b: 0, a: 1 },
-  green: { r: 0, g: 0, b: 255, a: 1 },
+  black: new Color(0, 0, 0, 1),
+  red: new Color(255, 0, 0, 1),
+  blue: new Color(0, 255, 0, 1),
+  green: new Color(0, 0, 255, 1)
 };
 
 export const PALETTE_SIZE: Dimensions = { height: 16, width: 16 };

@@ -158,7 +158,6 @@ function PaletteDisplay({
     drawGrid();
     drawSelectedColorHighlight(selectedColorIndex);
   }, [
-    palette,
     selectedColorIndex,
     drawPalette,
     drawGrid,
