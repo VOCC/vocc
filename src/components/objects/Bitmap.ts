@@ -5,7 +5,7 @@ import {
   ImageCoordinates
 } from "../../lib/interfaces";
 import ImageCanvas from "./ImageCanvas";
-import * as Loader from "../../lib/imageLoadUtils";
+import * as Loader from "../../lib/fileLoadUtils";
 
 export default abstract class Bitmap implements ImageInterface {
   public  fileName: string;

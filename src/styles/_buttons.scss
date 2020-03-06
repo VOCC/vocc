@@ -1,13 +1,16 @@
 .button {
-  margin: 0.5rem;
+  // margin: 0.5rem;
   margin-left: 0;
-  line-height: 20pt;
-  background-color: $bg-color;
-  border: 1px solid $button-highlight;
-  color: $button-highlight;
+  border: 1px solid $dark-sidebar;
   border-radius: 4px;
+  line-height: 24px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  font-size: 10pt;
+  background-color: $dark-sidebar2;
+  color: $dark-text;
   &:hover {
-    background-color: $button-highlight;
+    background-color: $dark-active;
     color: $bg-color;
   }
   transition: 0.1s;
@@ -18,17 +21,91 @@ input[type="file"] {
 }
 
 .import-button {
-  @extend .button;
+  @extend .dd-button;
 }
 
 .import-loaded {
   margin-right: 0.5rem;
-  color: $text-color-secondary;
   font-size: 10pt;
 }
 
 .export-button {
+  @extend .dd-button;
+}
+
+.dd-button {
   @extend .button;
+  margin-top: 1px;
+  margin-bottom: 0.25rem;
+  border: none;
+  padding: 12px 12px;
+  padding-top: 14px;
+  line-height: 2px;
+  background-color: $dark-nav;
+  &:hover {
+    background-color: $dark-nav-active;
+  }
+  &:focus {
+    outline: none;
+    background-color: $dark-nav-active;
+  }
+  &::-moz-focus-inner {
+    border: 0;
+  }
+  cursor: pointer;
+}
+
+.dd-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dd-content {
+  padding-bottom: 0.15rem;
+  display: none;
+  min-width: fit-content;
+  position: absolute;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  // text-indent: 0.5rem;
+  letter-spacing: 0.25px;
+  line-height: 18pt;
+  font-size: 10pt;
+  background-color: $dark-nav;
+}
+
+.dd-content button {
+  @extend .dd-button;
+  margin: none;
+  padding-left: 0.6rem;
+  width: 100%;
+  border-radius: 0;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.dd-content form {
+  margin: none;
+  padding: none;
+}
+
+.dd-content-header {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 8pt;
+  font-weight: bold;
+  color: $lgray4;
+}
+
+.dd-divider {
+  margin: 0.25rem 0.5rem 0.25rem 0.5rem;
+  border: 0.5px solid $gray;
+}
+
+.dd-show {
+  display: block;
 }
 
 .quantize-container {
@@ -36,7 +113,19 @@ input[type="file"] {
   text-align: center;
 }
 
+.quantize-button {
+  @extend .button;
+  border: none;
+  padding-top: 3px;
+  padding-left: 12px;
+  padding-right: 12px;
+  text-align: center;
+  font-weight: 500;
+  background-color: $dark-sidebar2;
+}
+
 .quantize-input {
+  margin-left: 0.75rem;
   border-radius: 4px;
   width: 64px;
   box-sizing: border-box;
