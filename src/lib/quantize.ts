@@ -98,9 +98,9 @@ export function quantize(
 
   let sprite = new Bitmap4(
     image.fileName,
-    spriteIndexArray,
     palette,
-    image.dimensions
+    image.dimensions,
+    spriteIndexArray
   );
   return { sprite, palette };
 }

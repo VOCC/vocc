@@ -7,13 +7,13 @@ import * as Loader from "../lib/fileLoadUtils";
 import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 
-export default class Bitmap3 extends Bitmap {
+class Bitmap3 extends Bitmap {
   protected imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
     dimensions: Dimensions,
-    imageData: Uint8ClampedArray
+    imageData?: Uint8ClampedArray
   ) {
     super(fileName, dimensions, imageData);
 
@@ -46,3 +46,5 @@ export default class Bitmap3 extends Bitmap {
     this.imageCanvas.updatePixel(pos, color);
   }
 }
+
+export default Bitmap3;

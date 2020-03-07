@@ -57,7 +57,7 @@ export default class ImageCanvas {
 
   private drawPixel(pos: ImageCoordinates, color: Color): void {
     if (!this.context) return;
-    let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, 1)`;
     this.context.fillStyle = colorString;
     this.context.fillRect(pos.x, pos.y, 1, 1);
   }
