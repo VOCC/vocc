@@ -3,8 +3,8 @@ import {
   Dimensions,
   ImageInterface,
   ImageCoordinates
-} from "../lib/interfaces";
-import { createHiddenCanvas } from "../lib/fileLoadUtils";
+} from "../util/interfaces";
+import { createHiddenCanvas } from "../util/fileLoadUtils";
 
 export default class ImageCanvas {
   public dimensions: Dimensions;

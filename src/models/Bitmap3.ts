@@ -1,9 +1,9 @@
-import { Color, Dimensions, ImageCoordinates } from "../lib/interfaces";
+import { Color, Dimensions, ImageCoordinates } from "../util/interfaces";
 import {
   generateHeaderString,
   generateCSourceFileString
-} from "../lib/exportUtils";
-import * as Loader from "../lib/fileLoadUtils";
+} from "../util/exportUtils";
+import * as Loader from "../util/fileLoadUtils";
 import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 

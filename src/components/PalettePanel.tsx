@@ -2,7 +2,7 @@ import React from "react";
 import Palette from "../models/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
-import { Color } from "../lib/interfaces";
+import { Color } from "../util/interfaces";
 
 interface PalettePanelProps {
   palette: Palette;

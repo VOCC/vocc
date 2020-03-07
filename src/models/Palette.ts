@@ -1,6 +1,6 @@
-import { Color } from "../lib/interfaces";
-import { PALETTE_SIZE, PALETTE_LENGTH } from "../lib/consts";
-import { createHiddenCanvas } from "../lib/fileLoadUtils";
+import { Color } from "../util/interfaces";
+import { PALETTE_SIZE, PALETTE_LENGTH } from "../util/consts";
+import { createHiddenCanvas } from "../util/fileLoadUtils";
 import { PixelGrid } from "./ImageCanvas";
 
 // interface IPalette {

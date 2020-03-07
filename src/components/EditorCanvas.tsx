@@ -5,10 +5,10 @@ import React, {
   useCallback,
   useLayoutEffect
 } from "react";
-import { EditorSettings, ImageCoordinates, Color } from "../lib/interfaces";
+import { EditorSettings, ImageCoordinates, Color } from "../util/interfaces";
 import Bitmap from "../models/Bitmap";
 import Palette from "../models/Palette";
-import { Tool } from "../lib/consts";
+import { Tool } from "../util/consts";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;

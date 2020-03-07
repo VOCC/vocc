@@ -1,17 +1,17 @@
 import { saveAs } from "file-saver";
 import React, { useCallback, useReducer, useState } from "react";
-import { Tool } from "../lib/consts";
-import DEFAULT_PALETTE from "../lib/defaultPalette";
-import { exportImage, exportPalette } from "../lib/exportUtils";
-import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
+import { Tool } from "../util/consts";
+import DEFAULT_PALETTE from "../util/defaultPalette";
+import { exportImage, exportPalette } from "../util/exportUtils";
+import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
 import {
   Color,
   Dimensions,
   EditorMode,
   EditorSettings,
   Mode
-} from "../lib/interfaces";
-import { quantize } from "../lib/quantize";
+} from "../util/interfaces";
+import { quantize } from "../util/quantize";
 import Bitmap from "../models/Bitmap";
 import Bitmap3 from "../models/Bitmap3";
 import Bitmap4 from "../models/Bitmap4";
