@@ -22,6 +22,8 @@ import Dropdown from "./Dropdown";
 import EditorCanvas from "./EditorCanvas";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
+import Modal from "./modals/Modal";
+import useModal from "./hooks/useModal";
 
 function scaleReducer(state: number, e: WheelEvent) {
   const direction = e.deltaY < 0 ? -1 : 1;
@@ -43,8 +45,9 @@ function App(): JSX.Element {
     editorMode: EditorMode.Bitmap
   });
 
-  const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
+  const { isShowing, toggle } = useModal();
 
+  const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
 
   const handleFileInputChange = (
@@ -137,18 +140,6 @@ function App(): JSX.Element {
         break;
     }
   };
-
-  const handleEditorChange = useCallback(
-    (editorMode: EditorMode, mode: Mode) => {
-      setEditorSettings({
-        grid: editorSettings.grid,
-        currentTool: editorSettings.currentTool,
-        imageMode: mode,
-        editorMode: editorMode
-      });
-    },
-    [editorSettings]
-  );
 
   const handleQuantize = (newColorDepth: number): void => {
     newColorDepth = Math.floor(newColorDepth); // just in case of a float
@@ -266,9 +257,8 @@ function App(): JSX.Element {
         <span className="title">VOCC</span>
         <Dropdown label="New">
           <div className="dd-content-header">Bitmap</div>
-          <button onClick={() => handleNew(EditorMode.Bitmap, 3)}>
-            Mode 3
-          </button>
+          <button onClick={toggle}>Mode 3</button>
+          <Modal isShowing={isShowing} hide={toggle} />
           <button onClick={() => handleNew(EditorMode.Bitmap, 4)}>
             Mode 4
           </button>
