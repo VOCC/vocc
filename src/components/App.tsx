@@ -22,7 +22,7 @@ import Dropdown from "./Dropdown";
 import EditorCanvas from "./EditorCanvas";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
-import Modal from "./modals/Modal";
+import NewImageModal from "./modals/NewImageModal";
 import useModal from "./hooks/useModal";
 
 function scaleReducer(state: number, e: WheelEvent) {
@@ -45,7 +45,14 @@ function App(): JSX.Element {
     editorMode: EditorMode.Bitmap
   });
 
-  const { isShowing, toggle } = useModal();
+  const {
+    isShowing: isMode3BitmapModalShowing,
+    toggle: toggleMode3BitmpModal
+  } = useModal();
+  const {
+    isShowing: isMode4BitmapModalShowing,
+    toggle: toggleMode4BitmpModal
+  } = useModal();
 
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
@@ -109,7 +116,12 @@ function App(): JSX.Element {
    * @param imageMode The image mode to edit in. Can be any of the GBA Modes,
    * although only 0, 3, and 4 are supported.
    */
-  const handleNew = (editorMode: EditorMode, imageMode: Mode) => {
+  const handleNewBitmap = (
+    editorMode: EditorMode,
+    imageMode: Mode,
+    fileName: string,
+    dimensions: Dimensions
+  ) => {
     if (image) {
       let accept = window.confirm(
         "Are you sure you want to create a new image? You will lose all unsaved work."
@@ -119,8 +131,6 @@ function App(): JSX.Element {
     switch (editorMode) {
       case EditorMode.Bitmap:
         // Open a modal dialog to query for image filename and dimensions
-        const dimensions: Dimensions = { width: 32, height: 32 };
-        const fileName: string = "img";
         switch (imageMode) {
           case 3: // Set up the editor for working on a mode 3 bitmap
             setImage(new Bitmap3(fileName, dimensions));
@@ -257,19 +267,32 @@ function App(): JSX.Element {
         <span className="title">VOCC</span>
         <Dropdown label="New">
           <div className="dd-content-header">Bitmap</div>
-          <button onClick={toggle}>Mode 3</button>
-          <Modal isShowing={isShowing} hide={toggle} />
-          <button onClick={() => handleNew(EditorMode.Bitmap, 4)}>
-            Mode 4
-          </button>
+          <button onClick={toggleMode3BitmpModal}>Mode 3</button>
+          <NewImageModal
+            isShowing={isMode3BitmapModalShowing}
+            hide={toggleMode3BitmpModal}
+            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 3)}
+          ></NewImageModal>
+          <button onClick={toggleMode4BitmpModal}>Mode 4</button>
+          <NewImageModal
+            isShowing={isMode4BitmapModalShowing}
+            hide={toggleMode4BitmpModal}
+            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 4)}
+          ></NewImageModal>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Spritesheet</div>
-          <button onClick={() => handleNew(EditorMode.Spritesheet, 4)}>
+          <button
+            onClick={() =>
+              alert("Spritesheet editing not currently supported.")
+            }
+          >
             4 bpp
           </button>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Background</div>
-          <button onClick={() => handleNew(EditorMode.Background, 0)}>
+          <button
+            onClick={() => alert("Background editing not currently supported.")}
+          >
             Mode 0
           </button>
         </Dropdown>

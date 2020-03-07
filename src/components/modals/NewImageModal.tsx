@@ -1,20 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { Dimensions } from "../../util/interfaces";
 
 const MIN_IMG_SIZE = 1;
-const DEFAULT_IMG_SIZE = 32;
 
 interface NewImageModalProps {
   onAccept: (fileName: string, dimensions: Dimensions) => void;
-  onCancel: () => void;
   isShowing: boolean;
   hide: () => void;
 }
 
-const handleSubmit = (e: React.FormEvent) => {};
+interface NewImageFormProps {
+  onAccept: (fileName: string, dimensions: Dimensions) => void;
+}
 
-const NewImageModal = ({ isShowing, hide }: NewImageModalProps) =>
+const NewImageModal = ({ onAccept, isShowing, hide }: NewImageModalProps) =>
   isShowing
     ? ReactDOM.createPortal(
         <React.Fragment>
@@ -28,30 +28,71 @@ const NewImageModal = ({ isShowing, hide }: NewImageModalProps) =>
           >
             <div className="modal">
               New Image
-              <form onSubmit={handleSubmit}>
-                <label htmlFor="filename">Enter file name</label>
-                <input id="filename" name="filename" type="text" />
-                <label htmlFor="height">Height</label>
-                <input
-                  id="height"
-                  type="number"
-                  min={MIN_IMG_SIZE}
-                  value={DEFAULT_IMG_SIZE}
-                ></input>
-                <label htmlFor="width">Width</label>
-                <input
-                  id="width"
-                  type="number"
-                  min={MIN_IMG_SIZE}
-                  value={DEFAULT_IMG_SIZE}
-                ></input>
-                <button>Create Image</button>
-              </form>
+              <NewImageForm
+                onAccept={(fileName, dimensions) => {
+                  onAccept(fileName, dimensions);
+                  hide();
+                }}
+              ></NewImageForm>
+              <button onClick={hide}>Cancel</button>
             </div>
           </div>
         </React.Fragment>,
         document.body
       )
     : null;
+
+const NewImageForm = ({ onAccept }: NewImageFormProps) => {
+  const [fileName, setFileName] = useState<string>("img");
+  const [height, setHeight] = useState<number>(32);
+  const [width, setWidth] = useState<number>(32);
+
+  const handleFileNameChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setFileName(e.target.value);
+
+  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setHeight(parseInt(e.target.value));
+
+  const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setWidth(parseInt(e.target.value));
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAccept(fileName, { height, width });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="filename">Enter file name</label>
+      <input
+        id="filename"
+        name="filename"
+        type="text"
+        value={fileName}
+        onChange={handleFileNameChange}
+      />
+      <br />
+      <label htmlFor="height">Height</label>
+      <input
+        id="height"
+        type="number"
+        min={MIN_IMG_SIZE}
+        value={height}
+        onChange={handleHeightChange}
+      />
+      <br />
+      <label htmlFor="width">Width</label>
+      <input
+        id="width"
+        type="number"
+        min={MIN_IMG_SIZE}
+        value={width}
+        onChange={handleWidthChange}
+      />
+      <br />
+      <button>Create Image</button>
+    </form>
+  );
+};
 
 export default NewImageModal;
