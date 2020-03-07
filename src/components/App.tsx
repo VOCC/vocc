@@ -5,14 +5,14 @@ import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
 import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
 import { Tool } from "../lib/consts";
-import Bitmap from "./objects/Bitmap";
-import Bitmap3 from "./objects/Bitmap3";
-import Bitmap4 from "./objects/Bitmap4";
+import Bitmap from "../models/Bitmap";
+import Bitmap3 from "../models/Bitmap3";
+import Bitmap4 from "../models/Bitmap4";
 import DEFAULT_PALETTE from "../lib/defaultPalette";
 import EditorCanvas from "./EditorCanvas";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
-import Palette from "./objects/Palette";
+import Palette from "../models/Palette";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
 import Dropdown from "./Dropdown";
@@ -141,9 +141,9 @@ function App(): JSX.Element {
     let blob: Blob | null;
 
     if (image) {
-      fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."))
+      fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
     } else {
-      fileName = "default"
+      fileName = "default";
     }
 
     const exportFailAlert = () =>
