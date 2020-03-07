@@ -136,19 +136,25 @@ function App(): JSX.Element {
   };
 
   const handleImageExport = async (type: string) => {
-    if (!image) {
-      alert("No image to export! Try importing one first.");
-      return;
-    }
-    let fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
+    let fileName;
     let fileType = "";
     let blob: Blob | null;
+
+    if (image) {
+      fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."))
+    } else {
+      fileName = "default"
+    }
 
     const exportFailAlert = () =>
       alert("Failed to export image! Check console for more information.");
 
     switch (type) {
       case "GBA":
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //.c file
         fileType = ".c";
         let cBlob = new Blob([image.getCSourceData()]);
@@ -169,16 +175,28 @@ function App(): JSX.Element {
           break;
         }
       case "BMP":
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //.bmp file
         fileType = ".bmp";
         blob = await exportImage(image, type);
         break;
       case "PNG":
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //.png file
         fileType = ".png";
         blob = await exportImage(image, type);
         break;
       default:
+        if (!image) {
+          alert("No image to export! Try importing one first.");
+          return;
+        }
         //default as .txt if unrecognized type is selected
         fileType = ".txt";
         blob = await exportImage(image, type);

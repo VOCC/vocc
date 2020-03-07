@@ -76,12 +76,7 @@ export const loadNewPalette = async (
       let green = parseInt(fileString.substr(i + 6, 2), 16);
       let blue = parseInt(fileString.substr(i + 8, 2), 16);
 
-      let color: Color = {
-        r: red,
-        g: green,
-        b: blue,
-        a: 1
-      };
+      let color = new Color(red, green, blue, 1);
       colors[j] = color;
     }
     return colors;

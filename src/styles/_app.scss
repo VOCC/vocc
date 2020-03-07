@@ -39,7 +39,7 @@
 }
 
 .left-panel {
-  border-right: 1px solid $border-color;
+  border-right: 1px solid $dark-nav-active;
   min-width: 106px;
   text-align: center;
   background-color: $dark-sidebar;
@@ -48,7 +48,7 @@
 }
 
 .right-panel {
-  border-left: 1px solid $border-color;
+  border-left: 1px solid $dark-nav-active;
   max-width: 256px;
   min-width: 256px;
   text-align: center;
@@ -61,7 +61,7 @@
   margin: 0;
   padding: 0;
   flex-grow: 1;
-  background-color: $bg-color-secondary;
+  background-color: $dark-bg;
   position: relative;
 }
 

@@ -159,7 +159,7 @@ input[type="file"] {
   height: 0.5em;
   margin: 1em;
   width: 80%;
-  border-radius: 0.5em;
+  border-radius: 4px;
   background: $slider-bg;
   &::-webkit-slider-thumb {
     -webkit-appearance: none; /* Override default look */
