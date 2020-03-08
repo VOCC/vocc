@@ -115,6 +115,7 @@ input[type="file"] {
 
 .quantize-button {
   @extend .button;
+  margin-top: 1rem;
   border: none;
   padding-top: 3px;
   padding-left: 12px;

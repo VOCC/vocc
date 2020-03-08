@@ -295,7 +295,6 @@ function App(): JSX.Element {
       <div className="workspace-container">
         <div className="left-panel">
           <div className="tools-container">
-            {/* {image ? <div> Scale: {scale.toFixed(2)}x </div> : null} */}
             <ToolsPanel
               settings={editorSettings}
               onSettingsChange={handleSettingsChange}
@@ -328,6 +327,8 @@ function App(): JSX.Element {
             onChangeSelectedColorIndex={handleChangeSelectedColor}
             onChangeColor={handleColorChange}
             handleQuantize={handleQuantize}
+            settings={editorSettings}
+            onSettingsChange={handleSettingsChange}
           />
         </div>
       </div>
