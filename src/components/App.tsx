@@ -89,7 +89,7 @@ function App(): JSX.Element {
 
   const handlePaletteChange = (newPalette: Palette) => {
     window.localStorage.setItem(STORAGE.palette, JSON.stringify(newPalette));
-    setPalette(palette);
+    setPalette(newPalette);
   };
 
   const handleSettingsChange = (newSettings: EditorSettings) => {
@@ -210,6 +210,7 @@ function App(): JSX.Element {
   };
 
   const handleColorChange = (newColor: Color): void => {
+    console.log("changing color");
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
     if (image instanceof Bitmap4) {
@@ -293,9 +294,10 @@ function App(): JSX.Element {
 
   useEffect(() => {
     const loadedSettings = window.localStorage.getItem(STORAGE.editorSettings);
-    if (loadedSettings) {
-      setEditorSettings(JSON.parse(loadedSettings));
-    }
+    const loadedPalette = window.localStorage.getItem(STORAGE.palette);
+    // const loadedImage = window.localStorage.getItem(STORAGE.image);
+    if (loadedSettings) setEditorSettings(JSON.parse(loadedSettings));
+    if (loadedPalette) setPalette(JSON.parse(loadedPalette));
   }, []);
 
   return (
