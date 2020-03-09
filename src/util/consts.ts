@@ -19,3 +19,10 @@ export enum Tool {
   PAN,
   DROPPER
 }
+
+export const STORAGE = {
+  image: "image",
+  palette: "palette",
+  imageMode: "imageMode",
+  editorSettings: "editorSettings"
+};

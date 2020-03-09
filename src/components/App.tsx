@@ -1,6 +1,6 @@
 import { saveAs } from "file-saver";
-import React, { useCallback, useReducer, useState } from "react";
-import { Tool } from "../util/consts";
+import React, { useCallback, useReducer, useState, useEffect } from "react";
+import { Tool, STORAGE } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
 import { exportImage, exportPalette } from "../util/exportUtils";
 import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
@@ -82,6 +82,26 @@ function App(): JSX.Element {
     }
   };
 
+  const handleImageChange = (newImage: Bitmap3 | Bitmap4) => {
+    window.localStorage.setItem(STORAGE.image, JSON.stringify(newImage));
+    setImage(newImage);
+  };
+
+  const handlePaletteChange = (newPalette: Palette) => {
+    window.localStorage.setItem(STORAGE.palette, JSON.stringify(newPalette));
+    setPalette(palette);
+  };
+
+  const handleSettingsChange = (newSettings: EditorSettings) => {
+    window.localStorage.setItem(
+      STORAGE.editorSettings,
+      JSON.stringify(newSettings)
+    );
+    setEditorSettings(newSettings);
+  };
+
+  const handleClearLocalStorage = () => window.localStorage.clear();
+
   const handlePaletteLoad = async (palFile: File | null) => {
     if (palFile) {
       console.log("Loading palette...");
@@ -90,7 +110,7 @@ function App(): JSX.Element {
         if (image instanceof Bitmap4) {
           image.updatePalette(newPalette);
         }
-        setPalette(newPalette);
+        handlePaletteChange(newPalette);
       }
     }
   };
@@ -106,7 +126,7 @@ function App(): JSX.Element {
 
   const handleToolChange = useCallback(
     (newTool: Tool) => {
-      setEditorSettings({
+      handleSettingsChange({
         grid: editorSettings.grid,
         currentTool: newTool,
         imageMode: editorSettings.imageMode,
@@ -144,14 +164,14 @@ function App(): JSX.Element {
           case 3: // Set up the editor for working on a mode 3 bitmap
             editorSettings.editorMode = EditorMode.Bitmap;
             editorSettings.imageMode = 3;
-            setEditorSettings(editorSettings);
-            setImage(new Bitmap3(fileName, dimensions));
+            handleSettingsChange(editorSettings);
+            handleImageChange(new Bitmap3(fileName, dimensions));
             break;
           case 4: // Set up the editor for working on a mode 4 paletted bitmap
             editorSettings.editorMode = EditorMode.Bitmap;
             editorSettings.imageMode = 4;
-            setEditorSettings(editorSettings);
-            setImage(new Bitmap4(fileName, palette, dimensions));
+            handleSettingsChange(editorSettings);
+            handleImageChange(new Bitmap4(fileName, palette, dimensions));
             break;
           default:
             alert("Unsupported image mode!");
@@ -176,8 +196,8 @@ function App(): JSX.Element {
       );
       if (ok) {
         let { palette, sprite } = quantize(image, newColorDepth);
-        setImage(sprite);
-        setPalette(palette);
+        handleImageChange(sprite);
+        handlePaletteChange(palette);
       }
     }
   };
@@ -195,7 +215,7 @@ function App(): JSX.Element {
     if (image instanceof Bitmap4) {
       image.updatePalette(newPalette);
     }
-    setPalette(newPalette);
+    handlePaletteChange(newPalette);
   };
 
   const handleImageExport = async (type: string) => {
@@ -271,10 +291,12 @@ function App(): JSX.Element {
     }
   };
 
-  const handleSettingsChange = useCallback(
-    (newSettings: EditorSettings): void => setEditorSettings(newSettings),
-    []
-  );
+  useEffect(() => {
+    const loadedSettings = window.localStorage.getItem(STORAGE.editorSettings);
+    if (loadedSettings) {
+      setEditorSettings(JSON.parse(loadedSettings));
+    }
+  }, []);
 
   return (
     <div className="app-container">
@@ -382,6 +404,7 @@ function App(): JSX.Element {
               View on GitHub
             </button>
           </form>
+          <button onClick={handleClearLocalStorage}>Clear Local Storage</button>
         </Dropdown>
       </div>
       <div className="workspace-container">
@@ -414,7 +437,7 @@ function App(): JSX.Element {
         <div className="right-panel">
           <PalettePanel
             palette={palette}
-            updatePalette={setPalette}
+            updatePalette={handlePaletteChange}
             selectedColorIndex={selectedColorIndex}
             onChangeSelectedColorIndex={handleChangeSelectedColor}
             onChangeColor={handleColorChange}
