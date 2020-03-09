@@ -39,7 +39,7 @@ export default function PalettePanel({
         onChangeColor={onChangeColor}
       ></ColorInput>
       <QuantizeButton handleQuantize={handleQuantize} />
-      <div className="panel-header">Settings</div>
+      <div className="panel-header">Properties</div>
       <div className="settings-container">
         <div>
           Mode: &nbsp; {settings.mode}
@@ -114,7 +114,6 @@ function ColorInput({
 
   return (
     <div className="rgb-container">
-      {/* <div> */}
         <label className="rgb-label">R</label>
         <input
           className="rgb-input"
@@ -124,8 +123,6 @@ function ColorInput({
           value={color32.r}
           onChange={e => handleRChange(parseInt(e.target.value))}
         ></input>
-      {/* </div> */}
-      {/* <div> */}
         <label className="rgb-label">G</label>
         <input
           className="rgb-input"
@@ -135,8 +132,6 @@ function ColorInput({
           value={color32.g}
           onChange={e => handleGChange(parseInt(e.target.value))}
         ></input>
-      {/* </div> */}
-      {/* <div> */}
         <label className="rgb-label">B</label>
         <input
           className="rgb-input"
@@ -146,7 +141,6 @@ function ColorInput({
           value={color32.b}
           onChange={e => handleBChange(parseInt(e.target.value))}
         ></input>
-      {/* </div> */}
     </div>
   );
 }
