@@ -95,6 +95,15 @@ function App(): JSX.Element {
     }
   };
 
+  const handlePaletteImport = (
+    oldPal: Palette,
+    newPal: Palette,
+    oldStartRow: number,
+    newStartRow: number,
+    numRows: number,
+    overwrite: boolean
+  ) => {};
+
   const handleToolChange = useCallback(
     (newTool: Tool) => {
       setEditorSettings({
@@ -133,9 +142,15 @@ function App(): JSX.Element {
         // Open a modal dialog to query for image filename and dimensions
         switch (imageMode) {
           case 3: // Set up the editor for working on a mode 3 bitmap
+            editorSettings.editorMode = EditorMode.Bitmap;
+            editorSettings.imageMode = 3;
+            setEditorSettings(editorSettings);
             setImage(new Bitmap3(fileName, dimensions));
             break;
           case 4: // Set up the editor for working on a mode 4 paletted bitmap
+            editorSettings.editorMode = EditorMode.Bitmap;
+            editorSettings.imageMode = 4;
+            setEditorSettings(editorSettings);
             setImage(new Bitmap4(fileName, palette, dimensions));
             break;
           default:
