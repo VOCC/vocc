@@ -9,7 +9,8 @@ import {
   Dimensions,
   EditorMode,
   EditorSettings,
-  Mode
+  Mode,
+  ImageDataStore
 } from "../util/interfaces";
 import { quantize } from "../util/quantize";
 import Bitmap from "../models/Bitmap";
@@ -82,8 +83,11 @@ function App(): JSX.Element {
     }
   };
 
-  const handleImageChange = (newImage: Bitmap3 | Bitmap4) => {
-    window.localStorage.setItem(STORAGE.image, JSON.stringify(newImage));
+  const handleImageChange = (newImage: Bitmap) => {
+    window.localStorage.setItem(
+      STORAGE.imageData,
+      JSON.stringify(newImage.getImageDataStore())
+    );
     setImage(newImage);
   };
 
@@ -295,9 +299,42 @@ function App(): JSX.Element {
   useEffect(() => {
     const loadedSettings = window.localStorage.getItem(STORAGE.editorSettings);
     const loadedPalette = window.localStorage.getItem(STORAGE.palette);
-    // const loadedImage = window.localStorage.getItem(STORAGE.image);
-    if (loadedSettings) setEditorSettings(JSON.parse(loadedSettings));
-    if (loadedPalette) setPalette(JSON.parse(loadedPalette));
+    const loadedImage = window.localStorage.getItem(STORAGE.imageData);
+
+    if (loadedSettings && loadedImage) {
+      const newSettings = JSON.parse(loadedSettings) as EditorSettings;
+      const imgData = JSON.parse(loadedImage);
+
+      switch (newSettings.imageMode) {
+        case 3:
+          const img3: ImageDataStore = imgData as ImageDataStore;
+          const bitmap = new Bitmap3(
+            img3.fileName,
+            img3.dimensions,
+            img3.imageData as Uint8ClampedArray
+          );
+          setImage(bitmap);
+          setEditorSettings(newSettings);
+          break;
+        case 4:
+          if (loadedPalette) {
+            const img4: ImageDataStore = imgData as ImageDataStore;
+            const newPalette = JSON.parse(loadedPalette) as Palette;
+            const bitmap = new Bitmap4(
+              img4.fileName,
+              newPalette,
+              img4.dimensions,
+              img4.imageData as number[]
+            );
+            setImage(bitmap);
+            setEditorSettings(newSettings);
+            setPalette(newPalette);
+          }
+          break;
+        default:
+          console.error("No data found in localstorage!");
+      }
+    }
   }, []);
 
   return (
@@ -428,6 +465,7 @@ function App(): JSX.Element {
               palette={palette}
               selectedPaletteIndex={selectedColorIndex}
               scale={scale}
+              onChangeImage={handleImageChange}
               onMouseWheel={handleMouseWheelEvent}
             />
           ) : (

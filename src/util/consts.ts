@@ -22,6 +22,7 @@ export enum Tool {
 
 export const STORAGE = {
   image: "image",
+  imageData: "imageData",
   palette: "palette",
   imageMode: "imageMode",
   editorSettings: "editorSettings"
