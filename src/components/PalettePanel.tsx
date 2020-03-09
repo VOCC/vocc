@@ -26,7 +26,7 @@ export default function PalettePanel({
 }: PalettePanelProps): JSX.Element {
   return (
     <div>
-      <div className="panel-label">Color Palette</div>
+      <div className="panel-header-top">Palette</div>
       <div className="palette-container">
         <PaletteDisplay
           palette={palette}
@@ -39,11 +39,13 @@ export default function PalettePanel({
         onChangeColor={onChangeColor}
       ></ColorInput>
       <QuantizeButton handleQuantize={handleQuantize} />
-      <div className="heading">Settings</div>
-      <div>
-        Mode: {settings.mode}
-        <br/>
-        {settings.editorMode.toString()}
+      <div className="panel-header">Settings</div>
+      <div className="settings-container">
+        <div>
+          Mode: &nbsp; {settings.mode}
+          <br/>
+          Type: &nbsp; {settings.editorMode.toString()}
+        </div>
       </div>
     </div>
   );
@@ -111,37 +113,40 @@ function ColorInput({
   };
 
   return (
-    <div>
-      <div>
-        <label>R</label>
+    <div className="rgb-container">
+      {/* <div> */}
+        <label className="rgb-label">R</label>
         <input
+          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
           value={color32.r}
           onChange={e => handleRChange(parseInt(e.target.value))}
         ></input>
-      </div>
-      <div>
-        <label>G</label>
+      {/* </div> */}
+      {/* <div> */}
+        <label className="rgb-label">G</label>
         <input
+          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
           value={color32.g}
           onChange={e => handleGChange(parseInt(e.target.value))}
         ></input>
-      </div>
-      <div>
-        <label>B</label>
+      {/* </div> */}
+      {/* <div> */}
+        <label className="rgb-label">B</label>
         <input
+          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
           value={color32.b}
           onChange={e => handleBChange(parseInt(e.target.value))}
         ></input>
-      </div>
+      {/* </div> */}
     </div>
   );
 }

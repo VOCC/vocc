@@ -7,7 +7,9 @@ import {
   faSearchPlus,
   faEyeDropper,
   faLayerGroup,
-  faCode
+  faCode,
+  faPlusSquare,
+  faFileImage
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faCircle,
@@ -31,7 +33,7 @@ export default function ToolsPanel({
 }: ToolsPanelProps) {
   return (
     <div>
-      <div className="heading">Tools</div>
+      <div className="panel-header-top">Tools</div>
       <Toggle
         state={settings.currentTool === Tool.PENCIL}
         onClick={() => onToolChange(Tool.PENCIL)}
@@ -74,7 +76,13 @@ export default function ToolsPanel({
       >
         <FontAwesomeIcon icon={faEyeDropper} />
       </Toggle>
-      <div className="heading">View</div>
+      <Toggle
+        state={settings.currentTool === Tool.LAYER}
+        onClick={() => onToolChange(Tool.LAYER)}
+      >
+        <FontAwesomeIcon icon={faPlusSquare} />
+      </Toggle>
+      <div className="panel-header">View</div>
       <Toggle
         state={settings.grid}
         onClick={() => {
@@ -89,14 +97,11 @@ export default function ToolsPanel({
         <FontAwesomeIcon icon={faLayerGroup} />
       </Toggle>
       <Toggle state={false} onClick={() => null}>
+        <FontAwesomeIcon icon={faFileImage} />
+      </Toggle>
+      <Toggle state={false} onClick={() => null}>
         <FontAwesomeIcon icon={faCode} />
       </Toggle>
-      {/* <div className="heading">Settings</div>
-      <div>
-        Mode: {settings.mode}
-        <br/>
-        {settings.editorMode.toString()}
-      </div> */}
     </div>
   );
 }

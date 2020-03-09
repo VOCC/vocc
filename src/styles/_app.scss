@@ -7,26 +7,24 @@
 }
 
 .navbar {
-  border-bottom: 1px solid $dark-nav-active;
+  border-bottom: 1px solid $dgray3;
   padding-left: 1rem;
   display: flex;
   height: 32pt;
   flex-direction: row;
   line-height: 32pt;
+  font-family:'Open Sans', sans-serif;
   font-size: 10pt;
   background-color: $dark-nav;
-  color: $dark-text;
   .title {
-    padding-top: 1px;;
-    padding-left: 0.15rem;
-    padding-right: 1rem;
-    letter-spacing: 3px;
+    padding: 0.1rem 1.75rem 0rem 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 16pt;
-    font-weight: 900;
-    color: $teal;
-  }
-  .subtitle {
-    flex-grow: 1;
+    font-style: italic;
+    font-weight: 800;
+    color: $dark-text;
   }
 }
 
@@ -36,6 +34,23 @@
   display: flex;
   flex-direction: row;
   flex-grow: 1;
+}
+
+.panel-header {
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family:'Open Sans', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: $dark-subtitle;
+}
+
+.panel-header-top {
+  @extend .panel-header;
+  margin-top: 0.75rem;
 }
 
 .left-panel {
