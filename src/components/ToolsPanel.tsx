@@ -1,5 +1,5 @@
 import React from "react";
-import { EditorSettings } from "../lib/interfaces";
+import { EditorSettings } from "../util/interfaces";
 import {
   faBorderAll,
   faPen,
@@ -15,7 +15,7 @@ import {
   faHandPaper
 } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tool } from "../lib/consts";
+import { Tool } from "../util/consts";
 import Toggle from "./buttons/Toggle";
 
 type ToolsPanelProps = {
@@ -93,8 +93,8 @@ export default function ToolsPanel({
       </Toggle>
       {/* <div className="heading">Settings</div>
       <div>
-        Mode: {settings.mode}
-        <br/>
+        Mode: {settings.imageMode}
+        <br />
         {settings.editorMode.toString()}
       </div> */}
     </div>

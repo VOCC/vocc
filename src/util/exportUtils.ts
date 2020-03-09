@@ -1,6 +1,6 @@
 import { ImageInterface, Color, Dimensions, Mode } from "./interfaces";
 import { PALETTE_LENGTH } from "./consts";
-import Palette from "../components/objects/Palette";
+import Palette from "../models/Palette";
 
 /*
   getGBAImageString

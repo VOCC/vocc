@@ -84,6 +84,17 @@ input[type="file"] {
   white-space: nowrap;
 }
 
+.dd-content label {
+  @extend .dd-button;
+  display: inline-block;
+  margin: none;
+  padding-left: 0.6rem;
+  width: 100%;
+  border-radius: 0;
+  text-align: left;
+  white-space: nowrap;
+}
+
 .dd-content form {
   margin: none;
   padding: none;

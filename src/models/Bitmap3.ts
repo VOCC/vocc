@@ -1,19 +1,19 @@
-import { Color, Dimensions, ImageCoordinates } from "../../lib/interfaces";
+import { Color, Dimensions, ImageCoordinates } from "../util/interfaces";
 import {
   generateHeaderString,
   generateCSourceFileString
-} from "../../lib/exportUtils";
-import * as Loader from "../../lib/fileLoadUtils";
+} from "../util/exportUtils";
+import * as Loader from "../util/fileLoadUtils";
 import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 
-export default class Bitmap3 extends Bitmap {
+class Bitmap3 extends Bitmap {
   protected imageCanvas: ImageCanvas;
 
   constructor(
     fileName: string,
     dimensions: Dimensions,
-    imageData: Uint8ClampedArray
+    imageData?: Uint8ClampedArray
   ) {
     super(fileName, dimensions, imageData);
 
@@ -32,12 +32,12 @@ export default class Bitmap3 extends Bitmap {
   }
 
   public getPixelColorAt(pos: ImageCoordinates): Color {
-      const r = this.imageData[Loader.offset(pos, this.dimensions)];
-      const g = this.imageData[Loader.offset(pos, this.dimensions) + 1];
-      const b = this.imageData[Loader.offset(pos, this.dimensions) + 2];
-      const a = this.imageData[Loader.offset(pos, this.dimensions) + 3];
+    const r = this.imageData[Loader.offset(pos, this.dimensions)];
+    const g = this.imageData[Loader.offset(pos, this.dimensions) + 1];
+    const b = this.imageData[Loader.offset(pos, this.dimensions) + 2];
+    const a = this.imageData[Loader.offset(pos, this.dimensions) + 3];
 
-      return new Color(r, g, b, a);
+    return new Color(r, g, b, a);
   }
 
   public setPixelColor(pos: ImageCoordinates, color: Color): void {
@@ -46,3 +46,5 @@ export default class Bitmap3 extends Bitmap {
     this.imageCanvas.updatePixel(pos, color);
   }
 }
+
+export default Bitmap3;

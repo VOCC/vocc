@@ -1,4 +1,4 @@
-import Palette from "../components/objects/Palette";
+import Palette from "../models/Palette";
 import { Color } from "./interfaces";
 
 const DEFAULT_PALETTE: Palette = [

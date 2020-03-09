@@ -1,8 +1,8 @@
 import React from "react";
-import Palette from "./objects/Palette";
+import Palette from "../models/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
-import { Color, EditorSettings } from "../lib/interfaces";
+import { Color, EditorSettings } from "../util/interfaces";
 
 interface PalettePanelProps {
   palette: Palette;
@@ -41,8 +41,8 @@ export default function PalettePanel({
       <QuantizeButton handleQuantize={handleQuantize} />
       <div className="heading">Settings</div>
       <div>
-        Mode: {settings.mode}
-        <br/>
+        Mode: {settings.editorMode}
+        <br />
         {settings.editorMode.toString()}
       </div>
     </div>
@@ -53,11 +53,11 @@ const MIN_COLOR_VAL = "0";
 const MAX_COLOR_VAL = "31";
 
 const color256to32 = (color: Color): Color => {
-    const r = Math.ceil((color.r + 1) / 8) - 1;
-    const g = Math.ceil((color.g + 1) / 8) - 1;
-    const b = Math.ceil((color.b + 1) / 8) - 1;
+  const r = Math.ceil((color.r + 1) / 8) - 1;
+  const g = Math.ceil((color.g + 1) / 8) - 1;
+  const b = Math.ceil((color.b + 1) / 8) - 1;
 
-    return new Color(r, g, b, 1);
+  return new Color(r, g, b, 1);
 };
 
 const color32to256 = (color: Color): Color => {

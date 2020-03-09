@@ -1,21 +1,29 @@
-import React, { useCallback, useState, useReducer } from "react";
-import { exportImage, exportPalette } from "../lib/exportUtils";
-import { EditorSettings, EditorMode, Mode, Color } from "../lib/interfaces";
-import { loadNewImage, loadNewPalette } from "../lib/fileLoadUtils";
-import { quantize } from "../lib/quantize";
 import { saveAs } from "file-saver";
-import { Tool } from "../lib/consts";
-import Bitmap from "./objects/Bitmap";
-import Bitmap3 from "./objects/Bitmap3";
-import Bitmap4 from "./objects/Bitmap4";
-import DEFAULT_PALETTE from "../lib/defaultPalette";
-import EditorCanvas from "./EditorCanvas";
+import React, { useCallback, useReducer, useState } from "react";
+import { Tool } from "../util/consts";
+import DEFAULT_PALETTE from "../util/defaultPalette";
+import { exportImage, exportPalette } from "../util/exportUtils";
+import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
+import {
+  Color,
+  Dimensions,
+  EditorMode,
+  EditorSettings,
+  Mode
+} from "../util/interfaces";
+import { quantize } from "../util/quantize";
+import Bitmap from "../models/Bitmap";
+import Bitmap3 from "../models/Bitmap3";
+import Bitmap4 from "../models/Bitmap4";
+import Palette from "../models/Palette";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
-import Palette from "./objects/Palette";
+import Dropdown from "./Dropdown";
+import EditorCanvas from "./EditorCanvas";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
-import Dropdown from "./Dropdown";
+import NewImageModal from "./modals/NewImageModal";
+import useModal from "./hooks/useModal";
 
 function scaleReducer(state: number, e: WheelEvent) {
   const direction = e.deltaY < 0 ? -1 : 1;
@@ -27,19 +35,44 @@ function scaleReducer(state: number, e: WheelEvent) {
 }
 
 function App(): JSX.Element {
-  const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [image, setImage] = useState<Bitmap>();
+  const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
     grid: true,
     currentTool: Tool.PENCIL,
-    mode: 3,
+    imageMode: 3,
     editorMode: EditorMode.Bitmap
   });
 
-  const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
+  const {
+    isShowing: isMode3BitmapModalShowing,
+    toggle: toggleMode3BitmpModal
+  } = useModal();
+  const {
+    isShowing: isMode4BitmapModalShowing,
+    toggle: toggleMode4BitmpModal
+  } = useModal();
 
+  const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
+
+  const handleFileInputChange = (
+    type: "Image" | "Palette",
+    element: HTMLInputElement | null,
+    event: React.FormEvent<HTMLInputElement>
+  ): void => {
+    event.preventDefault();
+    if (!element || !element.files) return;
+    switch (type) {
+      case "Image":
+        handleImageLoad(element.files[0]);
+        break;
+      case "Palette":
+        handlePaletteLoad(element.files[0]);
+        break;
+    }
+  };
 
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
@@ -49,29 +82,89 @@ function App(): JSX.Element {
     }
   };
 
+  const handlePaletteLoad = async (palFile: File | null) => {
+    if (palFile) {
+      console.log("Loading palette...");
+      let newPalette = await loadNewPalette(palFile);
+      if (newPalette) {
+        if (image instanceof Bitmap4) {
+          image.updatePalette(newPalette);
+        }
+        setPalette(newPalette);
+      }
+    }
+  };
+
+  const handlePaletteImport = (
+    oldPal: Palette,
+    newPal: Palette,
+    oldStartRow: number,
+    newStartRow: number,
+    numRows: number,
+    overwrite: boolean
+  ) => {};
+
   const handleToolChange = useCallback(
     (newTool: Tool) => {
       setEditorSettings({
         grid: editorSettings.grid,
         currentTool: newTool,
-        mode: editorSettings.mode,
+        imageMode: editorSettings.imageMode,
         editorMode: editorSettings.editorMode
       });
     },
     [editorSettings]
   );
 
-  const handleEditorChange = useCallback(
-    (editorMode: EditorMode, mode: Mode) => {
-      setEditorSettings({
-        grid: editorSettings.grid,
-        currentTool: editorSettings.currentTool,
-        mode: mode,
-        editorMode: editorMode
-      });
-    },
-    [editorSettings]
-  );
+  /**
+   * Call this function when initializing a new "project" or whatever you want
+   * to call it. You will be greeted with a blank image to work on.
+   *
+   * @param editorMode The mode to set up the editor in. Can be either bitmap,
+   * spritesheet, or background.
+   * @param imageMode The image mode to edit in. Can be any of the GBA Modes,
+   * although only 0, 3, and 4 are supported.
+   */
+  const handleNewBitmap = (
+    editorMode: EditorMode,
+    imageMode: Mode,
+    fileName: string,
+    dimensions: Dimensions
+  ) => {
+    if (image) {
+      let accept = window.confirm(
+        "Are you sure you want to create a new image? You will lose all unsaved work."
+      );
+      if (!accept) return;
+    }
+    switch (editorMode) {
+      case EditorMode.Bitmap:
+        // Open a modal dialog to query for image filename and dimensions
+        switch (imageMode) {
+          case 3: // Set up the editor for working on a mode 3 bitmap
+            editorSettings.editorMode = EditorMode.Bitmap;
+            editorSettings.imageMode = 3;
+            setEditorSettings(editorSettings);
+            setImage(new Bitmap3(fileName, dimensions));
+            break;
+          case 4: // Set up the editor for working on a mode 4 paletted bitmap
+            editorSettings.editorMode = EditorMode.Bitmap;
+            editorSettings.imageMode = 4;
+            setEditorSettings(editorSettings);
+            setImage(new Bitmap4(fileName, palette, dimensions));
+            break;
+          default:
+            alert("Unsupported image mode!");
+            break;
+        }
+        break;
+      case EditorMode.Spritesheet:
+      case EditorMode.Background:
+      default:
+        alert("Unsupported editing mode!");
+        break;
+    }
+  };
 
   const handleQuantize = (newColorDepth: number): void => {
     newColorDepth = Math.floor(newColorDepth); // just in case of a float
@@ -85,19 +178,6 @@ function App(): JSX.Element {
         let { palette, sprite } = quantize(image, newColorDepth);
         setImage(sprite);
         setPalette(palette);
-      }
-    }
-  };
-
-  const handlePaletteLoad = async (palFile: File | null) => {
-    if (palFile) {
-      console.log("Loading palette...");
-      let newPalette = await loadNewPalette(palFile);
-      if (newPalette) {
-        if (image instanceof Bitmap4) {
-          image.updatePalette(newPalette);
-        }
-        setPalette(newPalette);
       }
     }
   };
@@ -124,9 +204,9 @@ function App(): JSX.Element {
     let blob: Blob | null;
 
     if (image) {
-      fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."))
+      fileName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
     } else {
-      fileName = "default"
+      fileName = "default";
     }
 
     const exportFailAlert = () =>
@@ -202,20 +282,32 @@ function App(): JSX.Element {
         <span className="title">VOCC</span>
         <Dropdown label="New">
           <div className="dd-content-header">Bitmap</div>
-          <button onClick={() => handleEditorChange(EditorMode.Bitmap, 3)}>
-            Mode 3
-          </button>
-          <button onClick={() => handleEditorChange(EditorMode.Bitmap, 4)}>
-            Mode 4
-          </button>
+          <button onClick={toggleMode3BitmpModal}>Mode 3</button>
+          <NewImageModal
+            isShowing={isMode3BitmapModalShowing}
+            hide={toggleMode3BitmpModal}
+            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 3)}
+          ></NewImageModal>
+          <button onClick={toggleMode4BitmpModal}>Mode 4</button>
+          <NewImageModal
+            isShowing={isMode4BitmapModalShowing}
+            hide={toggleMode4BitmpModal}
+            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 4)}
+          ></NewImageModal>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Spritesheet</div>
-          <button onClick={() => handleEditorChange(EditorMode.Spritesheet, 4)}>
+          <button
+            onClick={() =>
+              alert("Spritesheet editing not currently supported.")
+            }
+          >
             4 bpp
           </button>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Background</div>
-          <button onClick={() => handleEditorChange(EditorMode.Background, 0)}>
+          <button
+            onClick={() => alert("Background editing not currently supported.")}
+          >
             Mode 0
           </button>
         </Dropdown>
@@ -228,12 +320,12 @@ function App(): JSX.Element {
         <Dropdown label="Import">
           <div className="dd-content-header">Image</div>
           <ImportButton
-            onFileChange={handleImageLoad}
+            onFileInputChange={handleFileInputChange.bind(null, "Image")}
             buttonLabel="Image (*.png, *.bmp, *.jpg)"
           />
           <div className="dd-divider"></div>
           <ImportButton
-            onFileChange={handlePaletteLoad}
+            onFileInputChange={handleFileInputChange.bind(null, "Palette")}
             buttonLabel="Palette (*.pal)"
           />
         </Dropdown>

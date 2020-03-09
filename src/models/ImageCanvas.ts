@@ -3,8 +3,8 @@ import {
   Dimensions,
   ImageInterface,
   ImageCoordinates
-} from "../../lib/interfaces";
-import { createHiddenCanvas } from "../../lib/fileLoadUtils";
+} from "../util/interfaces";
+import { createHiddenCanvas } from "../util/fileLoadUtils";
 
 export default class ImageCanvas {
   public dimensions: Dimensions;
@@ -57,7 +57,7 @@ export default class ImageCanvas {
 
   private drawPixel(pos: ImageCoordinates, color: Color): void {
     if (!this.context) return;
-    let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, 1)`;
     this.context.fillStyle = colorString;
     this.context.fillRect(pos.x, pos.y, 1, 1);
   }

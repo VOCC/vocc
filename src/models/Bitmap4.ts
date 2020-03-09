@@ -1,8 +1,8 @@
-import { Color, Dimensions, ImageCoordinates } from "../../lib/interfaces";
+import { Color, Dimensions, ImageCoordinates } from "../util/interfaces";
 import {
   generateHeaderString,
   generateCSourceFileString
-} from "../../lib/exportUtils";
+} from "../util/exportUtils";
 import Palette from "./Palette";
 import ImageCanvas from "./ImageCanvas";
 import Bitmap from "./Bitmap";
@@ -16,12 +16,16 @@ export default class Bitmap4 extends Bitmap {
 
   constructor(
     fileName: string,
-    indexArray: number[],
     palette: Palette,
-    dimensions: Dimensions
+    dimensions: Dimensions,
+    indexArray?: number[]
   ) {
     super(fileName, dimensions);
-    this.data = indexArray;
+    if (indexArray) {
+      this.data = indexArray;
+    } else {
+      this.data = Array<number>(dimensions.height * dimensions.width).fill(0);
+    }
     this.palette = palette;
     this.imageCanvas = new ImageCanvas(this);
     this.currentPaletteIndex = 0;
