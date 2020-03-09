@@ -2,7 +2,7 @@ import React from "react";
 import Palette from "../models/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
-import { Color } from "../util/interfaces";
+import { Color, EditorSettings } from "../util/interfaces";
 
 interface PalettePanelProps {
   palette: Palette;
@@ -11,6 +11,8 @@ interface PalettePanelProps {
   onChangeSelectedColorIndex: (newIndex: number) => void;
   onChangeColor: (newColor: Color) => void;
   handleQuantize: (newColorDepth: number) => void;
+  settings: EditorSettings;
+  onSettingsChange: (newSettings: EditorSettings) => void;
 }
 
 export default function PalettePanel({
@@ -18,7 +20,9 @@ export default function PalettePanel({
   selectedColorIndex,
   onChangeSelectedColorIndex,
   onChangeColor,
-  handleQuantize
+  handleQuantize,
+  settings,
+  onSettingsChange
 }: PalettePanelProps): JSX.Element {
   return (
     <div>
@@ -35,6 +39,12 @@ export default function PalettePanel({
         onChangeColor={onChangeColor}
       ></ColorInput>
       <QuantizeButton handleQuantize={handleQuantize} />
+      <div className="heading">Settings</div>
+      <div>
+        Mode: {settings.editorMode}
+        <br />
+        {settings.editorMode.toString()}
+      </div>
     </div>
   );
 }

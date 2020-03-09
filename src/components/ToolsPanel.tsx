@@ -91,12 +91,12 @@ export default function ToolsPanel({
       <Toggle state={false} onClick={() => null}>
         <FontAwesomeIcon icon={faCode} />
       </Toggle>
-      <div className="heading">Settings</div>
+      {/* <div className="heading">Settings</div>
       <div>
         Mode: {settings.imageMode}
         <br />
         {settings.editorMode.toString()}
-      </div>
+      </div> */}
     </div>
   );
 }
