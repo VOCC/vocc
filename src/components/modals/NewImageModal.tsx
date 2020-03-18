@@ -27,14 +27,16 @@ const NewImageModal = ({ onAccept, isShowing, hide }: NewImageModalProps) =>
             role="dialog"
           >
             <div className="modal">
-              New Image
+              <div className="modal-header">Create a New Image</div>
               <NewImageForm
                 onAccept={(fileName, dimensions) => {
                   onAccept(fileName, dimensions);
                   hide();
                 }}
               ></NewImageForm>
-              <button onClick={hide}>Cancel</button>
+              <div className="modal-button-right">
+                <button onClick={hide} className="modal-button">Cancel</button>
+              </div>
             </div>
           </div>
         </React.Fragment>,
@@ -43,7 +45,7 @@ const NewImageModal = ({ onAccept, isShowing, hide }: NewImageModalProps) =>
     : null;
 
 const NewImageForm = ({ onAccept }: NewImageFormProps) => {
-  const [fileName, setFileName] = useState<string>("img");
+  const [fileName, setFileName] = useState<string>("untitled");
   const [height, setHeight] = useState<number>(32);
   const [width, setWidth] = useState<number>(32);
 
@@ -63,34 +65,43 @@ const NewImageForm = ({ onAccept }: NewImageFormProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="filename">Enter file name</label>
-      <input
-        id="filename"
-        name="filename"
-        type="text"
-        value={fileName}
-        onChange={handleFileNameChange}
-      />
+      <div className="modal-input-text">
+        <label htmlFor="filename" className="modal-label">Name:</label>
+        <input
+          id="filename"
+          name="filename"
+          type="text"
+          value={fileName}
+          onChange={handleFileNameChange}
+        />
+      </div>
       <br />
-      <label htmlFor="height">Height</label>
-      <input
-        id="height"
-        type="number"
-        min={MIN_IMG_SIZE}
-        value={height}
-        onChange={handleHeightChange}
-      />
+      <label className="modal-label">Image Size</label>
+      <div className="modal-input-num">
+        <label htmlFor="height" className="modal-label-num">Height:</label>
+        <input
+          id="height"
+          type="number"
+          min={MIN_IMG_SIZE}
+          value={height}
+          onChange={handleHeightChange}
+        />
+        <label>&nbsp;px</label>
+        <br />
+        <label htmlFor="width" className="modal-label-num">Width:</label>
+        <input
+          id="width"
+          type="number"
+          min={MIN_IMG_SIZE}
+          value={width}
+          onChange={handleWidthChange}
+        />
+        <label>&nbsp;px</label>
+      </div>
       <br />
-      <label htmlFor="width">Width</label>
-      <input
-        id="width"
-        type="number"
-        min={MIN_IMG_SIZE}
-        value={width}
-        onChange={handleWidthChange}
-      />
-      <br />
-      <button>Create Image</button>
+      <div className="modal-button-left">
+      <button className="modal-button">OK</button>
+      </div>
     </form>
   );
 };

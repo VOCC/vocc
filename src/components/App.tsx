@@ -326,7 +326,7 @@ function App(): JSX.Element {
           <div className="dd-divider"></div>
           <ImportButton
             onFileInputChange={handleFileInputChange.bind(null, "Palette")}
-            buttonLabel="Palette (*.pal)"
+            buttonLabel="Color Palette (*.pal)"
           />
         </Dropdown>
         <Dropdown label="Export">
