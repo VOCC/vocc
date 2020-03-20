@@ -1,4 +1,9 @@
-import { Color, Dimensions, ImageCoordinates } from "../util/interfaces";
+import {
+  Color,
+  Dimensions,
+  ImageCoordinates,
+  ImageDataStore
+} from "../util/interfaces";
 import {
   generateHeaderString,
   generateCSourceFileString
@@ -29,6 +34,13 @@ export default class Bitmap4 extends Bitmap {
     this.palette = palette;
     this.imageCanvas = new ImageCanvas(this);
     this.currentPaletteIndex = 0;
+  }
+
+  static fromDataStore(
+    { imageData, dimensions, fileName }: ImageDataStore,
+    palette: Palette
+  ): Bitmap4 {
+    return new Bitmap4(fileName, palette, dimensions, imageData as number[]);
   }
 
   public getHeaderData(): string {
@@ -65,7 +77,6 @@ export default class Bitmap4 extends Bitmap {
   }
 
   public setPixelColor(pos: ImageCoordinates): void {
-    console.log("setting pixel color bmp4");
     this.data[pos.y * this.dimensions.width + pos.x] = this.currentPaletteIndex;
     this.imageCanvas.updatePixel(pos, this.palette[this.currentPaletteIndex]);
   }
@@ -77,5 +88,13 @@ export default class Bitmap4 extends Bitmap {
   public updatePalette(newPalette: Palette): void {
     this.palette = newPalette;
     this.imageCanvas.redrawImage(this);
+  }
+
+  public getImageDataStore(): ImageDataStore {
+    return {
+      imageData: this.data,
+      dimensions: this.dimensions,
+      fileName: this.fileName
+    };
   }
 }

@@ -1,6 +1,6 @@
 import { saveAs } from "file-saver";
 import React, { useCallback, useReducer, useState, useEffect } from "react";
-import { Tool, STORAGE } from "../util/consts";
+import { Tool, STORAGE, DEFAULT_SETTINGS } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
 import { exportImage, exportPalette } from "../util/exportUtils";
 import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
@@ -77,7 +77,7 @@ function App(): JSX.Element {
 
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
-      console.log("Loading image...");
+      console.log("Loading image from file...");
       let image = await loadNewImage(imageFile);
       setImage(image);
     }
@@ -98,8 +98,12 @@ function App(): JSX.Element {
 
   const handleSettingsChange = (newSettings: EditorSettings) => {
     window.localStorage.setItem(
-      STORAGE.editorSettings,
-      JSON.stringify(newSettings)
+      STORAGE.imageMode,
+      newSettings.imageMode.toString()
+    );
+    window.localStorage.setItem(
+      STORAGE.imageType,
+      newSettings.editorMode.toString()
     );
     setEditorSettings(newSettings);
   };
@@ -108,7 +112,7 @@ function App(): JSX.Element {
 
   const handlePaletteLoad = async (palFile: File | null) => {
     if (palFile) {
-      console.log("Loading palette...");
+      console.log("Loading palette from file...");
       let newPalette = await loadNewPalette(palFile);
       if (newPalette) {
         if (image instanceof Bitmap4) {
@@ -170,12 +174,14 @@ function App(): JSX.Element {
             editorSettings.imageMode = 3;
             handleSettingsChange(editorSettings);
             handleImageChange(new Bitmap3(fileName, dimensions));
+            handlePaletteChange(palette);
             break;
           case 4: // Set up the editor for working on a mode 4 paletted bitmap
             editorSettings.editorMode = EditorMode.Bitmap;
             editorSettings.imageMode = 4;
             handleSettingsChange(editorSettings);
             handleImageChange(new Bitmap4(fileName, palette, dimensions));
+            handlePaletteChange(palette);
             break;
           default:
             alert("Unsupported image mode!");
@@ -214,7 +220,6 @@ function App(): JSX.Element {
   };
 
   const handleColorChange = (newColor: Color): void => {
-    console.log("changing color");
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
     if (image instanceof Bitmap4) {
@@ -297,42 +302,54 @@ function App(): JSX.Element {
   };
 
   useEffect(() => {
-    const loadedSettings = window.localStorage.getItem(STORAGE.editorSettings);
+    const alertBadFormatting = () =>
+      alert("Image data incorrectly formatted. Aborting load operation.");
+    const askLoadImage = () =>
+      window.confirm(
+        "Found automatically saved image data from your last session in storage. Would you like to load it? If not, it will be deleted."
+      );
+
+    const loadedImageMode = window.localStorage.getItem(STORAGE.imageMode);
+    const loadedImageType = window.localStorage.getItem(STORAGE.imageType);
     const loadedPalette = window.localStorage.getItem(STORAGE.palette);
     const loadedImage = window.localStorage.getItem(STORAGE.imageData);
 
-    if (loadedSettings && loadedImage) {
-      const newSettings = JSON.parse(loadedSettings) as EditorSettings;
-      const imgData = JSON.parse(loadedImage);
+    if (loadedImageMode && loadedImageType && loadedImage) {
+      let loadImage = askLoadImage();
 
-      switch (newSettings.imageMode) {
+      if (!loadImage) {
+        window.localStorage.clear();
+        return;
+      }
+
+      const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
+      const parsedImageMode: Mode = parseInt(loadedImageMode) as Mode;
+      const parsedImageType: EditorMode = loadedImageType as EditorMode;
+
+      switch (parsedImageMode) {
         case 3:
-          const img3: ImageDataStore = imgData as ImageDataStore;
-          const bitmap = new Bitmap3(
-            img3.fileName,
-            img3.dimensions,
-            img3.imageData as Uint8ClampedArray
-          );
-          setImage(bitmap);
-          setEditorSettings(newSettings);
+          setImage(Bitmap3.fromDataStore(parsedImage));
+          let newEditorSettings = DEFAULT_SETTINGS;
+          newEditorSettings.imageMode = parsedImageMode;
+          newEditorSettings.editorMode = parsedImageType;
+          setEditorSettings(newEditorSettings);
           break;
         case 4:
-          if (loadedPalette) {
-            const img4: ImageDataStore = imgData as ImageDataStore;
-            const newPalette = JSON.parse(loadedPalette) as Palette;
-            const bitmap = new Bitmap4(
-              img4.fileName,
-              newPalette,
-              img4.dimensions,
-              img4.imageData as number[]
-            );
-            setImage(bitmap);
-            setEditorSettings(newSettings);
-            setPalette(newPalette);
+          if (!loadedPalette) {
+            alertBadFormatting();
+            return;
+          } else {
+            const parsedPalette = JSON.parse(loadedPalette) as Palette;
+            setImage(Bitmap4.fromDataStore(parsedImage, parsedPalette));
+            setPalette(parsedPalette);
+            let newEditorSettings = DEFAULT_SETTINGS;
+            newEditorSettings.imageMode = parsedImageMode;
+            newEditorSettings.editorMode = parsedImageType;
+            setEditorSettings(newEditorSettings);
           }
           break;
         default:
-          console.error("No data found in localstorage!");
+          alertBadFormatting();
       }
     }
   }, []);

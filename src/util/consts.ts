@@ -1,4 +1,4 @@
-import { Dimensions, Color } from "./interfaces";
+import { Dimensions, Color, EditorMode, EditorSettings } from "./interfaces";
 
 export const COLORS = {
   black: new Color(0, 0, 0, 1),
@@ -25,5 +25,12 @@ export const STORAGE = {
   imageData: "imageData",
   palette: "palette",
   imageMode: "imageMode",
-  editorSettings: "editorSettings"
+  imageType: "imageType"
+};
+
+export const DEFAULT_SETTINGS: EditorSettings = {
+  grid: true,
+  currentTool: Tool.PENCIL,
+  imageMode: 3,
+  editorMode: EditorMode.Bitmap
 };
