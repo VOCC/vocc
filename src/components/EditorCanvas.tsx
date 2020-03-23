@@ -19,6 +19,7 @@ interface EditorCanvasProps {
   selectedPaletteIndex: number;
   settings: EditorSettings;
   scale: number;
+  onChangeImage: (newImage: Bitmap) => void;
   onMouseWheel: (e: WheelEvent) => void;
 }
 
@@ -28,6 +29,7 @@ export default function EditorCanvas({
   selectedPaletteIndex,
   settings,
   scale,
+  onChangeImage,
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -292,7 +294,8 @@ export default function EditorCanvas({
   const stopPaint = useCallback(() => {
     setMousePos(undefined);
     setIsPainting(false);
-  }, []);
+    onChangeImage(image);
+  }, [image, onChangeImage]);
 
   useEffect(() => {
     if (!canvasRef.current) return;

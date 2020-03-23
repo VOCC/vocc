@@ -21,8 +21,12 @@ export class Color {
       return false;
     }
     const that: Color = other as Color;
-    return (this.r === that.r && this.g === that.g
-      && this.b === that.b && this.a === that.a);
+    return (
+      this.r === that.r &&
+      this.g === that.g &&
+      this.b === that.b &&
+      this.a === that.a
+    );
   }
 }
 
@@ -59,7 +63,7 @@ export interface Drawable {
  */
 export interface Exportable {
   fileName: string;
-  getImageData: () => Uint8ClampedArray;
+  getImageDataStore: () => ImageDataStore;
   getImageFileBlob: () => Promise<Blob | null>;
   getHeaderData: () => string;
   getCSourceData: () => string;
@@ -82,4 +86,10 @@ export interface EditorSettings {
 export interface ImageCoordinates {
   x: number;
   y: number;
+}
+
+export interface ImageDataStore {
+  fileName: string;
+  dimensions: Dimensions;
+  imageData: Uint8ClampedArray | number[];
 }

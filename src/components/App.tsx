@@ -1,6 +1,6 @@
 import { saveAs } from "file-saver";
-import React, { useCallback, useReducer, useState } from "react";
-import { Tool } from "../util/consts";
+import React, { useCallback, useReducer, useState, useEffect } from "react";
+import { Tool, STORAGE, DEFAULT_SETTINGS } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
 import { exportImage, exportPalette } from "../util/exportUtils";
 import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
@@ -9,7 +9,8 @@ import {
   Dimensions,
   EditorMode,
   EditorSettings,
-  Mode
+  Mode,
+  ImageDataStore
 } from "../util/interfaces";
 import { quantize } from "../util/quantize";
 import Bitmap from "../models/Bitmap";
@@ -76,21 +77,48 @@ function App(): JSX.Element {
 
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
-      console.log("Loading image...");
+      console.log("Loading image from file...");
       let image = await loadNewImage(imageFile);
       setImage(image);
     }
   };
 
+  const handleImageChange = (newImage: Bitmap) => {
+    window.localStorage.setItem(
+      STORAGE.imageData,
+      JSON.stringify(newImage.getImageDataStore())
+    );
+    setImage(newImage);
+  };
+
+  const handlePaletteChange = (newPalette: Palette) => {
+    window.localStorage.setItem(STORAGE.palette, JSON.stringify(newPalette));
+    setPalette(newPalette);
+  };
+
+  const handleSettingsChange = (newSettings: EditorSettings) => {
+    window.localStorage.setItem(
+      STORAGE.imageMode,
+      newSettings.imageMode.toString()
+    );
+    window.localStorage.setItem(
+      STORAGE.imageType,
+      newSettings.editorMode.toString()
+    );
+    setEditorSettings(newSettings);
+  };
+
+  const handleClearLocalStorage = () => window.localStorage.clear();
+
   const handlePaletteLoad = async (palFile: File | null) => {
     if (palFile) {
-      console.log("Loading palette...");
+      console.log("Loading palette from file...");
       let newPalette = await loadNewPalette(palFile);
       if (newPalette) {
         if (image instanceof Bitmap4) {
           image.updatePalette(newPalette);
         }
-        setPalette(newPalette);
+        handlePaletteChange(newPalette);
       }
     }
   };
@@ -106,7 +134,7 @@ function App(): JSX.Element {
 
   const handleToolChange = useCallback(
     (newTool: Tool) => {
-      setEditorSettings({
+      handleSettingsChange({
         grid: editorSettings.grid,
         currentTool: newTool,
         imageMode: editorSettings.imageMode,
@@ -144,14 +172,16 @@ function App(): JSX.Element {
           case 3: // Set up the editor for working on a mode 3 bitmap
             editorSettings.editorMode = EditorMode.Bitmap;
             editorSettings.imageMode = 3;
-            setEditorSettings(editorSettings);
-            setImage(new Bitmap3(fileName, dimensions));
+            handleSettingsChange(editorSettings);
+            handleImageChange(new Bitmap3(fileName, dimensions));
+            handlePaletteChange(palette);
             break;
           case 4: // Set up the editor for working on a mode 4 paletted bitmap
             editorSettings.editorMode = EditorMode.Bitmap;
             editorSettings.imageMode = 4;
-            setEditorSettings(editorSettings);
-            setImage(new Bitmap4(fileName, palette, dimensions));
+            handleSettingsChange(editorSettings);
+            handleImageChange(new Bitmap4(fileName, palette, dimensions));
+            handlePaletteChange(palette);
             break;
           default:
             alert("Unsupported image mode!");
@@ -176,8 +206,8 @@ function App(): JSX.Element {
       );
       if (ok) {
         let { palette, sprite } = quantize(image, newColorDepth);
-        setImage(sprite);
-        setPalette(palette);
+        handleImageChange(sprite);
+        handlePaletteChange(palette);
       }
     }
   };
@@ -195,7 +225,7 @@ function App(): JSX.Element {
     if (image instanceof Bitmap4) {
       image.updatePalette(newPalette);
     }
-    setPalette(newPalette);
+    handlePaletteChange(newPalette);
   };
 
   const handleImageExport = async (type: string) => {
@@ -271,10 +301,58 @@ function App(): JSX.Element {
     }
   };
 
-  const handleSettingsChange = useCallback(
-    (newSettings: EditorSettings): void => setEditorSettings(newSettings),
-    []
-  );
+  useEffect(() => {
+    const alertBadFormatting = () =>
+      alert("Image data incorrectly formatted. Aborting load operation.");
+    const askLoadImage = () =>
+      window.confirm(
+        "Found automatically saved image data from your last session in storage. Would you like to load it? If not, it will be deleted."
+      );
+
+    const loadedImageMode = window.localStorage.getItem(STORAGE.imageMode);
+    const loadedImageType = window.localStorage.getItem(STORAGE.imageType);
+    const loadedPalette = window.localStorage.getItem(STORAGE.palette);
+    const loadedImage = window.localStorage.getItem(STORAGE.imageData);
+
+    if (loadedImageMode && loadedImageType && loadedImage) {
+      let loadImage = askLoadImage();
+
+      if (!loadImage) {
+        window.localStorage.clear();
+        return;
+      }
+
+      const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
+      const parsedImageMode: Mode = parseInt(loadedImageMode) as Mode;
+      const parsedImageType: EditorMode = loadedImageType as EditorMode;
+
+      switch (parsedImageMode) {
+        case 3:
+          setImage(Bitmap3.fromDataStore(parsedImage));
+          let newEditorSettings = DEFAULT_SETTINGS;
+          newEditorSettings.imageMode = parsedImageMode;
+          newEditorSettings.editorMode = parsedImageType;
+          setEditorSettings(newEditorSettings);
+          break;
+        case 4:
+          if (!loadedPalette) {
+            alertBadFormatting();
+            return;
+          } else {
+            const parsedPalette = JSON.parse(loadedPalette) as Palette;
+            setImage(Bitmap4.fromDataStore(parsedImage, parsedPalette));
+            setPalette(parsedPalette);
+            let newEditorSettings = DEFAULT_SETTINGS;
+            newEditorSettings.imageMode = parsedImageMode;
+            newEditorSettings.editorMode = parsedImageType;
+            setEditorSettings(newEditorSettings);
+          }
+          break;
+        default:
+          alertBadFormatting();
+      }
+    }
+  }, []);
 
   return (
     <div className="app-container">
@@ -382,6 +460,7 @@ function App(): JSX.Element {
               View on GitHub
             </button>
           </form>
+          <button onClick={handleClearLocalStorage}>Clear Local Storage</button>
         </Dropdown>
       </div>
       <div className="workspace-container">
@@ -403,6 +482,7 @@ function App(): JSX.Element {
               palette={palette}
               selectedPaletteIndex={selectedColorIndex}
               scale={scale}
+              onChangeImage={handleImageChange}
               onMouseWheel={handleMouseWheelEvent}
             />
           ) : (
@@ -414,7 +494,7 @@ function App(): JSX.Element {
         <div className="right-panel">
           <PalettePanel
             palette={palette}
-            updatePalette={setPalette}
+            updatePalette={handlePaletteChange}
             selectedColorIndex={selectedColorIndex}
             onChangeSelectedColorIndex={handleChangeSelectedColor}
             onChangeColor={handleColorChange}

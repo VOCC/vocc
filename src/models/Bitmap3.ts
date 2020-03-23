@@ -1,4 +1,9 @@
-import { Color, Dimensions, ImageCoordinates } from "../util/interfaces";
+import {
+  Color,
+  Dimensions,
+  ImageCoordinates,
+  ImageDataStore
+} from "../util/interfaces";
 import {
   generateHeaderString,
   generateCSourceFileString
@@ -18,6 +23,14 @@ class Bitmap3 extends Bitmap {
     super(fileName, dimensions, imageData);
 
     this.imageCanvas = new ImageCanvas(this);
+  }
+
+  static fromDataStore({
+    imageData,
+    dimensions,
+    fileName
+  }: ImageDataStore): Bitmap3 {
+    return new Bitmap3(fileName, dimensions, imageData as Uint8ClampedArray);
   }
 
   public getCSourceData(): string {
@@ -41,7 +54,6 @@ class Bitmap3 extends Bitmap {
   }
 
   public setPixelColor(pos: ImageCoordinates, color: Color): void {
-    console.log("setting pixel color bmp3");
     super.updateImageData(pos, color);
     this.imageCanvas.updatePixel(pos, color);
   }
