@@ -22,26 +22,125 @@
 }
 
 .modal {
-  z-index: 100;
-  background: white;
+  margin: 2.5rem auto;
+  border-radius: 9px;
   position: relative;
-  margin: 1.75rem auto;
-  border-radius: 3px;
+  z-index: 100;
+  min-height: 290px;
   max-width: 500px;
-  padding: 2rem;
+  letter-spacing: 0.5px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 10pt;
+  background-color: $dark-modal;
+  color: $dark-text;
 }
 
 .modal-header {
   display: flex;
-  justify-content: flex-end;
+  padding: 1.75rem;
+  height: fit-content;
+  justify-content: center;
+  min-width: 100%;
+  letter-spacing: 2px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 9pt;
 }
 
-.modal-close-button {
-  font-size: 1.4rem;
-  font-weight: 700;
-  line-height: 1;
-  color: #000;
-  opacity: 0.3;
-  cursor: pointer;
-  border: none;
+.modal-label {
+  padding: 0rem 0.5rem 0rem 2rem;
+  letter-spacing: 0.5px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 10pt;
+  font-weight: bold;
 }
+
+.modal-label-num {
+  padding: 0rem 0.5rem 0rem 2.5rem;
+  display: inline-block;
+  width: 100px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+  font-size: 10pt;
+}
+
+.modal-button {
+  @extend .button;
+  margin: 0.5rem 0rem;
+  border: none;
+  padding: 0.5rem 0rem;
+  float: right;
+  min-width: 80px;
+  max-width: 80px;
+  line-height: 10pt;
+  letter-spacing: 0.5px;
+  text-align: center;
+  background-color: $dark-button;
+  &:hover {
+    background-color: $dark-active;
+  }
+  &:focus {
+    outline: none;
+    background-color: $dark-nav-active;
+  }
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.modal-button-left {
+  margin-left: 30%;
+  float: left;
+}
+
+.modal-button-right {
+  margin-right: 30%;
+  float: right;
+}
+
+input[type="text"] {
+  margin-left: 0.25rem;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  width: 75%;
+  text-align: left;
+  letter-spacing: 0.5pt;
+  font-family: "Open Sans", sans-serif;
+  background-color: $dark-modal-input;
+  color: $dark-text;
+}
+
+input[type="number"] {
+  margin-top: 0.25rem;
+  margin-right: 2px;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  min-width: 50px;
+  max-width: 50px;
+  font-family: "Open Sans", sans-serif;
+  background-color: $dark-modal-input;
+  color: $dark-text;
+  &::-webkit-inner-spin-button {
+    opacity: 0;
+  }
+}
+
+.modal-input-text {
+  justify-content: center;
+}
+
+.modal-input-num {
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+// .modal-close-button {
+//   font-size: 1.4rem;
+//   font-weight: 700;
+//   line-height: 1;
+//   color: #000;
+//   opacity: 0.3;
+//   cursor: pointer;
+//   border: none;
+// }

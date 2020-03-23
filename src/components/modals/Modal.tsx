@@ -22,7 +22,7 @@ const Modal = ({ isShowing, hide }: ModalProps) =>
               <div className="modal-header">
                 <button
                   type="button"
-                  className="modal-close-button"
+                  className="modal-button"
                   data-dismiss="modal"
                   aria-label="Close"
                   onClick={hide}
