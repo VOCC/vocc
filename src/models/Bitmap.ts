@@ -48,8 +48,14 @@ export default abstract class Bitmap implements ImageInterface {
     return {
       fileName: this.fileName,
       dimensions: this.dimensions,
-      imageData: this.imageData
+      imageData: this.imageData.slice()
     };
+  }
+
+  public updateFromStore(store: ImageDataStore): void {
+    this.dimensions = store.dimensions;
+    this.fileName = store.fileName;
+    this.imageData = store.imageData as Uint8ClampedArray;
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {

@@ -46,6 +46,13 @@ function App(): JSX.Element {
     editorMode: EditorMode.Bitmap
   });
 
+  /**
+   * The undo stack will hold stringified ImageDataStore objects ONLY. They will
+   * be decoded on undo.
+   */
+  const [undoStack, setUndoStack] = useState<Array<string>>([]);
+  const [undoPointer, setUndoPointer] = useState<number>(-1);
+
   const {
     isShowing: isMode3BitmapModalShowing,
     toggle: toggleMode3BitmpModal
@@ -84,12 +91,35 @@ function App(): JSX.Element {
   };
 
   const handleImageChange = (newImage: Bitmap) => {
-    window.localStorage.setItem(
-      STORAGE.imageData,
-      JSON.stringify(newImage.getImageDataStore())
-    );
+    const store = newImage.getImageDataStore();
+    window.localStorage.setItem(STORAGE.imageData, JSON.stringify(store));
+    pushUndoStack(store);
     setImage(newImage);
   };
+
+  const pushUndoStack = (newData: ImageDataStore) => {
+    let newStack = undoStack.slice(0, undoPointer + 1);
+    newStack.push(JSON.stringify(newData));
+    setUndoStack(newStack);
+    setUndoPointer(newStack.length - 1);
+  };
+
+  const handleUndo = useCallback(() => {
+    console.log("trying to undo");
+    if (image && undoPointer >= 1) {
+      image.updateFromStore(JSON.parse(undoStack[undoPointer - 1]));
+      setUndoPointer(undoPointer - 1);
+      setImage(image);
+    }
+  }, [undoStack, undoPointer, image]);
+
+  const handleRedo = useCallback(() => {
+    console.log("trying to redo");
+    if (image && undoPointer < undoStack.length) {
+      image.updateFromStore(JSON.parse(undoStack[undoPointer + 1]));
+      setUndoPointer(undoPointer + 1);
+    }
+  }, [image, undoPointer, undoStack]);
 
   const handlePaletteChange = (newPalette: Palette) => {
     window.localStorage.setItem(STORAGE.palette, JSON.stringify(newPalette));
@@ -202,7 +232,7 @@ function App(): JSX.Element {
       alert("Requantization of paletted images currently not supported!");
     } else {
       let ok = window.confirm(
-        "(Don't panic!) Quantizing a bitmap will change it from mode 3 to mode 4. Is this okay?"
+        "Quantizing a bitmap will change it from mode 3 to mode 4. Is this okay?"
       );
       if (ok) {
         let { palette, sprite } = quantize(image, newColorDepth);
@@ -301,6 +331,25 @@ function App(): JSX.Element {
     }
   };
 
+  /**
+   * Set up listeners for undo and redo.
+   */
+  useEffect(() => {
+    const keydownHandler = (e: KeyboardEvent) => {
+      if (e.keyCode === 89 && e.ctrlKey) {
+      } else if (e.keyCode === 90 && e.ctrlKey && e.shiftKey) {
+        handleRedo();
+      } else if (e.keyCode === 90 && e.ctrlKey) {
+        handleUndo();
+      }
+    };
+    document.addEventListener("keydown", keydownHandler);
+    return () => document.removeEventListener("keydown", keydownHandler);
+  }, [handleUndo, handleRedo]);
+
+  /**
+   * Load Images from local storage.
+   */
   useEffect(() => {
     const alertBadFormatting = () =>
       alert("Image data incorrectly formatted. Aborting load operation.");
@@ -390,8 +439,8 @@ function App(): JSX.Element {
           </button>
         </Dropdown>
         <Dropdown label="Edit">
-          <button onClick={() => null}>Undo</button>
-          <button onClick={() => null}>Redo</button>
+          <button onClick={() => handleUndo()}>Undo</button>
+          <button onClick={() => handleRedo()}>Redo</button>
           <div className="dd-divider"></div>
           <button onClick={() => null}>Clear All</button>
         </Dropdown>

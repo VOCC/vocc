@@ -74,7 +74,15 @@ export interface Modifiable {
   setPixelColor: (pos: ImageCoordinates, color: Color) => void;
 }
 
-export interface ImageInterface extends Drawable, Exportable, Modifiable {}
+export interface Undoable {
+  updateFromStore: (store: ImageDataStore) => void;
+}
+
+export interface ImageInterface
+  extends Drawable,
+    Exportable,
+    Modifiable,
+    Undoable {}
 
 export interface EditorSettings {
   grid: boolean;

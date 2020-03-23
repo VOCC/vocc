@@ -43,6 +43,11 @@ export default class Bitmap4 extends Bitmap {
     return new Bitmap4(fileName, palette, dimensions, imageData as number[]);
   }
 
+  public updateFromStore({ imageData }: ImageDataStore): void {
+    this.data = imageData as number[];
+    this.imageCanvas.redrawImage(this);
+  }
+
   public getHeaderData(): string {
     return generateHeaderString(
       {
@@ -92,7 +97,7 @@ export default class Bitmap4 extends Bitmap {
 
   public getImageDataStore(): ImageDataStore {
     return {
-      imageData: this.data,
+      imageData: this.data.slice(),
       dimensions: this.dimensions,
       fileName: this.fileName
     };
