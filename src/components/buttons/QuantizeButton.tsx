@@ -20,7 +20,7 @@ function ExportButton({ handleQuantize }: ExportButtonProps): JSX.Element {
 
   return (
     <div className="quantize-container">
-      <button className="button export-button" onClick={handleClick}>
+      <button className="quantize-button" onClick={handleClick}>
         Quantize
       </button>
       <input

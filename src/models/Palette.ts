@@ -1,6 +1,6 @@
-import { Color } from "../../lib/interfaces";
-import { PALETTE_SIZE, PALETTE_LENGTH } from "../../lib/consts";
-import { createHiddenCanvas } from "../../lib/fileLoadUtils";
+import { Color } from "../util/interfaces";
+import { PALETTE_SIZE, PALETTE_LENGTH } from "../util/consts";
+import { createHiddenCanvas } from "../util/fileLoadUtils";
 import { PixelGrid } from "./ImageCanvas";
 
 // interface IPalette {
@@ -11,7 +11,7 @@ import { PixelGrid } from "./ImageCanvas";
 //   getColorArray: () => Color[];
 // }
 
-export type Palette = Color[];
+type Palette = Color[];
 
 export interface PaletteDrawables {
   readonly pixelGrid: PixelGrid;
@@ -56,6 +56,7 @@ export function setPaletteColorAndRedraw(
 }
 
 export default Palette;
+
 // export default class Palette implements IPalette {
 //   public dimensions: Dimensions;
 //   private colorArray: Color[];

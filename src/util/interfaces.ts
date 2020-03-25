@@ -1,10 +1,33 @@
 import { Tool } from "./consts";
 
-export interface Color {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
+export class Color {
+  public r: number;
+  public g: number;
+  public b: number;
+  public a: number;
+
+  constructor(r: number, g: number, b: number, a: number) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+    this.a = a;
+  }
+
+  public isEqual(other: Object): boolean {
+    if (other === this) {
+      return true;
+    }
+    if (!(other instanceof Color)) {
+      return false;
+    }
+    const that: Color = other as Color;
+    return (
+      this.r === that.r &&
+      this.g === that.g &&
+      this.b === that.b &&
+      this.a === that.a
+    );
+  }
 }
 
 export interface Color32 {
@@ -20,6 +43,12 @@ export interface Dimensions {
 
 export type Mode = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
+export enum EditorMode {
+  Bitmap = "Bitmap",
+  Spritesheet = "Spritesheet",
+  Background = "Background"
+}
+
 export interface Drawable {
   dimensions: Dimensions;
   getImageCanvasElement: () => HTMLCanvasElement;
@@ -34,7 +63,7 @@ export interface Drawable {
  */
 export interface Exportable {
   fileName: string;
-  getImageData: () => Uint8ClampedArray;
+  getImageDataStore: () => ImageDataStore;
   getImageFileBlob: () => Promise<Blob | null>;
   getHeaderData: () => string;
   getCSourceData: () => string;
@@ -45,14 +74,30 @@ export interface Modifiable {
   setPixelColor: (pos: ImageCoordinates, color: Color) => void;
 }
 
-export interface ImageInterface extends Drawable, Exportable, Modifiable {}
+export interface Undoable {
+  updateFromStore: (store: ImageDataStore) => void;
+}
+
+export interface ImageInterface
+  extends Drawable,
+    Exportable,
+    Modifiable,
+    Undoable {}
 
 export interface EditorSettings {
   grid: boolean;
   currentTool: Tool;
+  imageMode: Mode;
+  editorMode: EditorMode;
 }
 
 export interface ImageCoordinates {
   x: number;
   y: number;
+}
+
+export interface ImageDataStore {
+  fileName: string;
+  dimensions: Dimensions;
+  imageData: Uint8ClampedArray | number[];
 }

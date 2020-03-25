@@ -1,5 +1,5 @@
 import React from "react";
-import { EditorSettings } from "../lib/interfaces";
+import { EditorSettings } from "../util/interfaces";
 import {
   faBorderAll,
   faPen,
@@ -15,7 +15,7 @@ import {
   faHandPaper
 } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tool } from "../lib/consts";
+import { Tool } from "../util/consts";
 import Toggle from "./buttons/Toggle";
 
 type ToolsPanelProps = {
@@ -31,6 +31,7 @@ export default function ToolsPanel({
 }: ToolsPanelProps) {
   return (
     <div>
+      <div className="heading">Tools</div>
       <Toggle
         state={settings.currentTool === Tool.PENCIL}
         onClick={() => onToolChange(Tool.PENCIL)}
@@ -73,7 +74,7 @@ export default function ToolsPanel({
       >
         <FontAwesomeIcon icon={faEyeDropper} />
       </Toggle>
-      <div>View</div>
+      <div className="heading">View</div>
       <Toggle
         state={settings.grid}
         onClick={() => {
@@ -90,6 +91,12 @@ export default function ToolsPanel({
       <Toggle state={false} onClick={() => null}>
         <FontAwesomeIcon icon={faCode} />
       </Toggle>
+      {/* <div className="heading">Settings</div>
+      <div>
+        Mode: {settings.imageMode}
+        <br />
+        {settings.editorMode.toString()}
+      </div> */}
     </div>
   );
 }

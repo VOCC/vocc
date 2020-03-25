@@ -7,16 +7,23 @@
 }
 
 .navbar {
-  display: flex;
-  flex-direction: row;
-  height: 32pt;
-  line-height: 32pt;
+  border-bottom: 1px solid $dark-nav-active;
   padding-left: 1rem;
-  border-bottom: 1px solid $border-color;
-  color: $text-color;
+  display: flex;
+  height: 32pt;
+  flex-direction: row;
+  line-height: 32pt;
+  font-size: 10pt;
+  background-color: $dark-nav;
+  color: $dark-text;
   .title {
+    padding-top: 1px;;
+    padding-left: 0.15rem;
     padding-right: 1rem;
+    letter-spacing: 3px;
+    font-size: 16pt;
     font-weight: 900;
+    color: $teal;
   }
   .subtitle {
     flex-grow: 1;
@@ -32,21 +39,29 @@
 }
 
 .left-panel {
-  border-right: 1px solid $border-color;
+  border-right: 1px solid $dark-nav-active;
   min-width: 106px;
+  text-align: center;
+  background-color: $dark-sidebar;
+  color: $dark-text;
+  font-size: 10pt;
 }
 
 .right-panel {
-  border-left: 1px solid $border-color;
+  border-left: 1px solid $dark-nav-active;
   max-width: 256px;
   min-width: 256px;
+  text-align: center;
+  background-color: $dark-sidebar;
+  color: $dark-text;
+  font-size: 10pt;
 }
 
 .image-container {
   margin: 0;
   padding: 0;
   flex-grow: 1;
-  background-color: $bg-color-secondary;
+  background-color: $dark-bg;
   position: relative;
 }
 

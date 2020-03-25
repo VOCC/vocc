@@ -1,8 +1,13 @@
-import { Color, Dimensions, ImageCoordinates } from "../../lib/interfaces";
+import {
+  Color,
+  Dimensions,
+  ImageCoordinates,
+  ImageDataStore
+} from "../util/interfaces";
 import {
   generateHeaderString,
   generateCSourceFileString
-} from "../../lib/exportUtils";
+} from "../util/exportUtils";
 import Palette from "./Palette";
 import ImageCanvas from "./ImageCanvas";
 import Bitmap from "./Bitmap";
@@ -16,15 +21,31 @@ export default class Bitmap4 extends Bitmap {
 
   constructor(
     fileName: string,
-    indexArray: number[],
     palette: Palette,
-    dimensions: Dimensions
+    dimensions: Dimensions,
+    indexArray?: number[]
   ) {
     super(fileName, dimensions);
-    this.data = indexArray;
+    if (indexArray) {
+      this.data = indexArray;
+    } else {
+      this.data = Array<number>(dimensions.height * dimensions.width).fill(0);
+    }
     this.palette = palette;
     this.imageCanvas = new ImageCanvas(this);
     this.currentPaletteIndex = 0;
+  }
+
+  static fromDataStore(
+    { imageData, dimensions, fileName }: ImageDataStore,
+    palette: Palette
+  ): Bitmap4 {
+    return new Bitmap4(fileName, palette, dimensions, imageData as number[]);
+  }
+
+  public updateFromStore({ imageData }: ImageDataStore): void {
+    this.data = imageData as number[];
+    this.imageCanvas.redrawImage(this);
   }
 
   public getHeaderData(): string {
@@ -60,12 +81,8 @@ export default class Bitmap4 extends Bitmap {
     return this.palette[this.data[this.dimensions.width * pos.y + pos.x]];
   }
 
-  // TODO: this is totally broken
   public setPixelColor(pos: ImageCoordinates): void {
-    // // console.log("setting pixel color bmp4");
-    // const paletteIndex = 255;
     this.data[pos.y * this.dimensions.width + pos.x] = this.currentPaletteIndex;
-    // this.data[pos.y * this.dimensions.width + pos.x] = paletteIndex;
     this.imageCanvas.updatePixel(pos, this.palette[this.currentPaletteIndex]);
   }
 
@@ -76,5 +93,13 @@ export default class Bitmap4 extends Bitmap {
   public updatePalette(newPalette: Palette): void {
     this.palette = newPalette;
     this.imageCanvas.redrawImage(this);
+  }
+
+  public getImageDataStore(): ImageDataStore {
+    return {
+      imageData: this.data.slice(),
+      dimensions: this.dimensions,
+      fileName: this.fileName
+    };
   }
 }
