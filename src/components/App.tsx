@@ -86,7 +86,8 @@ function App(): JSX.Element {
     if (imageFile) {
       console.log("Loading image from file...");
       let image = await loadNewImage(imageFile);
-      setImage(image);
+      resetUndo();
+      handleImageChange(image);
     }
   };
 
@@ -107,7 +108,9 @@ function App(): JSX.Element {
   const handleUndo = useCallback(() => {
     console.log("trying to undo");
     if (image && undoPointer >= 1) {
-      image.updateFromStore(JSON.parse(undoStack[undoPointer - 1]));
+      const newStore = JSON.parse(undoStack[undoPointer - 1]);
+      window.localStorage.setItem(STORAGE.imageData, newStore);
+      image.updateFromStore(newStore);
       setUndoPointer(undoPointer - 1);
       setImage(image);
     }
@@ -120,6 +123,11 @@ function App(): JSX.Element {
       setUndoPointer(undoPointer + 1);
     }
   }, [image, undoPointer, undoStack]);
+
+  const resetUndo = () => {
+    setUndoStack([]);
+    setUndoPointer(-1);
+  };
 
   const handlePaletteChange = (newPalette: Palette) => {
     window.localStorage.setItem(STORAGE.palette, JSON.stringify(newPalette));
