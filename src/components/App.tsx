@@ -92,15 +92,15 @@ function App(): JSX.Element {
   };
 
   const handleImageChange = (newImage: Bitmap) => {
-    const store = newImage.getImageDataStore();
-    window.localStorage.setItem(STORAGE.imageData, JSON.stringify(store));
+    const store = JSON.stringify(newImage.getImageDataStore());
+    window.localStorage.setItem(STORAGE.imageData, store);
     pushUndoStack(store);
     setImage(newImage);
   };
 
-  const pushUndoStack = (newData: ImageDataStore) => {
+  const pushUndoStack = (imageDataStoreString: string) => {
     let newStack = undoStack.slice(0, undoPointer + 1);
-    newStack.push(JSON.stringify(newData));
+    newStack.push(imageDataStoreString);
     setUndoStack(newStack);
     setUndoPointer(newStack.length - 1);
   };
@@ -108,8 +108,9 @@ function App(): JSX.Element {
   const handleUndo = useCallback(() => {
     console.log("trying to undo");
     if (image && undoPointer >= 1) {
-      const newStore = JSON.parse(undoStack[undoPointer - 1]);
-      window.localStorage.setItem(STORAGE.imageData, newStore);
+      const newStoreString = undoStack[undoPointer - 1];
+      const newStore = JSON.parse(newStoreString);
+      window.localStorage.setItem(STORAGE.imageData, newStoreString);
       image.updateFromStore(newStore);
       setUndoPointer(undoPointer - 1);
       setImage(image);
