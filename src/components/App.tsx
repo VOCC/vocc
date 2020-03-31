@@ -25,6 +25,8 @@ import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
 import NewImageModal from "./modals/NewImageModal";
 import useModal from "./hooks/useModal";
+import ImportPaletteModal from "./modals/ImportPaletteModal";
+import { combinePals } from "../util/combinePals";
 
 function scaleReducer(state: number, e: WheelEvent) {
   const direction = e.deltaY < 0 ? -1 : 1;
@@ -54,6 +56,11 @@ function App(): JSX.Element {
     isShowing: isMode4BitmapModalShowing,
     toggle: toggleMode4BitmpModal
   } = useModal();
+ const {
+   isShowing: isPaletteModalShowing,
+   toggle: togglePaletteModal
+  } = useModal();
+
 
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
   const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
@@ -124,13 +131,17 @@ function App(): JSX.Element {
   };
 
   const handlePaletteImport = (
-    oldPal: Palette,
-    newPal: Palette,
-    oldStartRow: number,
-    newStartRow: number,
+    pal: Palette,
+    startRow: number,
     numRows: number,
-    overwrite: boolean
-  ) => {};
+  ) => {
+    combinePals(palette, pal, startRow, numRows);
+
+    if (image instanceof Bitmap4) {
+      image.updatePalette(pal);
+    }
+    handlePaletteChange(pal);
+  };
 
   const handleToolChange = useCallback(
     (newTool: Tool) => {
@@ -402,10 +413,17 @@ function App(): JSX.Element {
             buttonLabel="Image (*.png, *.bmp, *.jpg)"
           />
           <div className="dd-divider"></div>
-          <ImportButton
+          {/* <ImportButton
             onFileInputChange={handleFileInputChange.bind(null, "Palette")}
             buttonLabel="Color Palette (*.pal)"
-          />
+          /> */}
+
+          <button onClick={togglePaletteModal}>Palette</button>
+          <ImportPaletteModal
+            isShowing={isPaletteModalShowing}
+            hide={togglePaletteModal}
+            onAccept={handlePaletteImport}
+          ></ImportPaletteModal>
         </Dropdown>
         <Dropdown label="Export">
           <div className="dd-content-header">Image</div>
