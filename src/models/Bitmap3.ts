@@ -1,14 +1,10 @@
+import Color from "../models/Color";
 import {
-  Color,
-  Dimensions,
-  ImageCoordinates,
-  ImageDataStore
-} from "../util/types";
-import {
-  generateHeaderString,
-  generateCSourceFileString
+  generateCSourceFileString,
+  generateHeaderString
 } from "../util/exportUtils";
 import * as Loader from "../util/fileLoadUtils";
+import { Dimensions, ImageCoordinates, ImageDataStore } from "../util/types";
 import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 

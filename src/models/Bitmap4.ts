@@ -1,16 +1,12 @@
+import Color from "../models/Color";
 import {
-  Color,
-  Dimensions,
-  ImageCoordinates,
-  ImageDataStore
-} from "../util/types";
-import {
-  generateHeaderString,
-  generateCSourceFileString
+  generateCSourceFileString,
+  generateHeaderString
 } from "../util/exportUtils";
-import Palette from "./Palette";
-import ImageCanvas from "./ImageCanvas";
+import { Dimensions, ImageCoordinates, ImageDataStore } from "../util/types";
 import Bitmap from "./Bitmap";
+import ImageCanvas from "./ImageCanvas";
+import Palette from "./Palette";
 
 export default class Bitmap4 extends Bitmap {
   private data: number[];

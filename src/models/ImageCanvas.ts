@@ -1,10 +1,6 @@
-import {
-  Color,
-  Dimensions,
-  ImageInterface,
-  ImageCoordinates
-} from "../util/types";
+import Color from "../models/Color";
 import { createHiddenCanvas } from "../util/fileLoadUtils";
+import { Dimensions, ImageCoordinates, ImageInterface } from "../util/types";
 
 export default class ImageCanvas {
   public dimensions: Dimensions;

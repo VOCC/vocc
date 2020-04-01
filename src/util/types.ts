@@ -1,34 +1,5 @@
 import { Tool } from "./consts";
-
-export class Color {
-  public r: number;
-  public g: number;
-  public b: number;
-  public a: number;
-
-  constructor(r: number, g: number, b: number, a: number) {
-    this.r = r;
-    this.g = g;
-    this.b = b;
-    this.a = a;
-  }
-
-  public isEqual(other: Object): boolean {
-    if (other === this) {
-      return true;
-    }
-    if (!(other instanceof Color)) {
-      return false;
-    }
-    const that: Color = other as Color;
-    return (
-      this.r === that.r &&
-      this.g === that.g &&
-      this.b === that.b &&
-      this.a === that.a
-    );
-  }
-}
+import Color from "../models/Color";
 
 export interface Color32 {
   r: number;
@@ -40,6 +11,23 @@ export interface Dimensions {
   height: number;
   width: number;
 }
+
+export type SpriteDimensions =
+  // Square sizes
+  | { height: 8; width: 8 }
+  | { height: 16; width: 16 }
+  | { height: 32; width: 32 }
+  | { height: 64; width: 64 }
+  // Not square sizes
+  | { height: 16; width: 8 }
+  | { height: 32; width: 8 }
+  | { height: 32; width: 16 }
+  | { height: 64; width: 32 }
+  // Same as above but rotated 90 degrees
+  | { height: 8; width: 16 }
+  | { height: 8; width: 32 }
+  | { height: 16; width: 32 }
+  | { height: 32; width: 64 };
 
 export type Mode = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 

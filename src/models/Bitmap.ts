@@ -1,12 +1,12 @@
+import Color from "../models/Color";
+import * as Loader from "../util/fileLoadUtils";
 import {
-  Color,
   Dimensions,
-  ImageInterface,
   ImageCoordinates,
-  ImageDataStore
+  ImageDataStore,
+  ImageInterface
 } from "../util/types";
 import ImageCanvas from "./ImageCanvas";
-import * as Loader from "../util/fileLoadUtils";
 
 export default abstract class Bitmap implements ImageInterface {
   public fileName: string;

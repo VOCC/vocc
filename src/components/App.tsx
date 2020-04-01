@@ -1,30 +1,30 @@
 import { saveAs } from "file-saver";
-import React, { useCallback, useReducer, useState, useEffect } from "react";
-import { Tool, STORAGE, DEFAULT_SETTINGS } from "../util/consts";
-import DEFAULT_PALETTE from "../util/defaultPalette";
-import { exportImage, exportPalette } from "../util/exportUtils";
-import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
-import {
-  Color,
-  Dimensions,
-  EditorMode,
-  EditorSettings,
-  Mode,
-  ImageDataStore
-} from "../util/types";
-import { quantize } from "../util/quantize";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import Bitmap from "../models/Bitmap";
 import Bitmap3 from "../models/Bitmap3";
 import Bitmap4 from "../models/Bitmap4";
+import Color from "../models/Color";
 import Palette from "../models/Palette";
+import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
+import DEFAULT_PALETTE from "../util/defaultPalette";
+import { exportImage, exportPalette } from "../util/exportUtils";
+import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
+import { quantize } from "../util/quantize";
+import {
+  Dimensions,
+  EditorMode,
+  EditorSettings,
+  ImageDataStore,
+  Mode
+} from "../util/types";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
 import Dropdown from "./Dropdown";
 import EditorCanvas from "./EditorCanvas";
+import useModal from "./hooks/useModal";
+import NewImageModal from "./modals/NewImageModal";
 import PalettePanel from "./PalettePanel";
 import ToolsPanel from "./ToolsPanel";
-import NewImageModal from "./modals/NewImageModal";
-import useModal from "./hooks/useModal";
 
 function scaleReducer(state: number, e: WheelEvent) {
   const direction = e.deltaY < 0 ? -1 : 1;

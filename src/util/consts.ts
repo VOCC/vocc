@@ -1,4 +1,5 @@
-import { Dimensions, Color, EditorMode, EditorSettings } from "./types";
+import Color from "../models/Color";
+import { Dimensions, EditorMode, EditorSettings } from "./types";
 
 export const COLORS = {
   black: new Color(0, 0, 0, 1),
