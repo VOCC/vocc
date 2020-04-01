@@ -38,6 +38,10 @@ export default function EditorCanvas({
   const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(
     undefined
   );
+  const [startPos, setStartPos] = useState<ImageCoordinates>({
+    x: 0,
+    y: 0
+  });
   const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
     x: 0,
     y: 0
@@ -218,12 +222,37 @@ export default function EditorCanvas({
     [image, drawImageOnCanvas]
   );
 
+  const rectangle = useCallback((pos: ImageCoordinates | undefined): void => {
+    if (!pos) return;
+    if (!canvasRef.current) return;
+    const context = canvasRef.current.getContext('2d');
+    if (!context) return;
+    drawImageOnCanvas();
+    const color = palette[selectedPaletteIndex];
+    const colorString = `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    context.fillStyle = colorString;
+    context.lineWidth = 1;
+    context.rect(
+      startPos.x, startPos.y, pos.x - startPos.x, pos.y - startPos.y);
+    context.fill();
+  }, [startPos, drawImageOnCanvas]);
+
+  // const drawRectangle = (
+  //   startingPos: ImageCoordinates,
+  //   currPos: ImageCoordinates,
+  //   color: Color) => {
+
+  // }
+
   const startPaint = useCallback(
     (e: MouseEvent) => {
       const mousePosition = getMousePos(e);
       if (!mousePosition) return;
       setMousePos(mousePosition);
       const imageCoord = getImageCoord(mousePosition);
+      if (!canvasRef.current) return;
+      const context = canvasRef.current.getContext('2d');
+      if (!context) return;
       // if (!imageCoord) return;
       switch (settings.currentTool) {
         case Tool.PENCIL:
@@ -236,6 +265,14 @@ export default function EditorCanvas({
             palette[selectedPaletteIndex]
           );
           break;
+        case Tool.SQUARE:
+          if (!imageCoord) return;
+          const startingPos = {
+            x: imagePosition.x + imageCoord.x * scale,
+            y: imagePosition.y + imageCoord.y * scale
+          }
+          setStartPos(startingPos);
+          setIsPainting(true);
         case Tool.PAN:
           setIsPainting(true);
           break;
@@ -243,6 +280,7 @@ export default function EditorCanvas({
     },
     [
       settings.currentTool,
+      scale,
       bucketFill,
       fillPixel,
       getImageCoord,
@@ -256,7 +294,6 @@ export default function EditorCanvas({
       const newMousePos = getMousePos(e);
       if (!newMousePos) return;
       const imageCoord = getImageCoord(newMousePos);
-      // if (!imageCoord) return;
       switch (settings.currentTool) {
         case Tool.PENCIL:
           if (isPainting) {
@@ -264,7 +301,20 @@ export default function EditorCanvas({
               imageCoord,
               palette[selectedPaletteIndex]
             );
+            setMousePos(newMousePos);
           }
+          break;
+        case Tool.SQUARE:
+          if (isPainting) {
+            if (!imageCoord) return;
+            const endingPos = {
+              x: imagePosition.x + imageCoord.x * scale,
+              y: imagePosition.y + imageCoord.y * scale
+            }
+            rectangle(endingPos);
+          }
+          break;
+        case Tool.ELLIPSE:
           break;
         case Tool.PAN:
           if (isPainting && mousePos) {
@@ -273,26 +323,30 @@ export default function EditorCanvas({
               y: imagePosition.y + (newMousePos.y - mousePos.y)
             };
             setImagePosition(newImagePosition);
+            setMousePos(newMousePos);
           }
           break;
       }
-      setMousePos(newMousePos);
     },
     [
       isPainting,
       fillPixel,
+      rectangle,
       getImageCoord,
       palette,
       selectedPaletteIndex,
       imagePosition,
       mousePos,
-      settings.currentTool
+      settings.currentTool,
+      scale
     ]
   );
 
   const stopPaint = useCallback(() => {
     setMousePos(undefined);
     setIsPainting(false);
+    if (settings.currentTool === Tool.SQUARE) {
+    }
   }, []);
 
   useEffect(() => {
@@ -339,6 +393,8 @@ const generateEditorCanvasProps = (tool: Tool): string => {
       return base + "pencil";
     case Tool.BUCKET:
       return base + "bucket";
+    case Tool.SQUARE:
+      return base + "square";
     case Tool.PAN:
       return base + "pan";
   }
