@@ -1,6 +1,16 @@
 # VOCC: a Game Boy Advance Image Editor/Converter
 
-**Authors**: Logan Bussell, Bennett Hillier, Rosie Blair, Jacob Lambert, John Beckner
+VOCC is a web-based image editor focused on Game Boy Advance Development.
+
+## Usage
+
+Visit the [website](loganbussell.com/vocc) to use the application.
+
+### Installation / Offline use
+
+If you are using a modern web browser that supports progressive web applications (PWAs), then when you visit the website you should see a button that says "Install" in the title bar. Clicking this button installs the application locally and you can use it offline. Tested on Chrome, Chromium, and Brave.
+
+If you're using a different browser that supports service workers, offline use should still work but you won't be able to install the application.
 
 ## Setting up the development environment
 
@@ -68,3 +78,5 @@ git push -u origin [branch name]
 
 4. Publish your changes  
    To push your changes to your fork, use `git push`. From there, you can create a pull request to this repository to get your changes reviewed and potentially merged.
+
+**Authors**: Logan Bussell, Bennett Hillier, Rosie Blair, Jacob Lambert, John Beckner
