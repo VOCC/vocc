@@ -119,7 +119,7 @@ function App(): JSX.Element {
 
   const handleRedo = useCallback(() => {
     console.log("trying to redo");
-    if (image && undoPointer < undoStack.length) {
+    if (image && undoPointer + 1 < undoStack.length) {
       image.updateFromStore(JSON.parse(undoStack[undoPointer + 1]));
       setUndoPointer(undoPointer + 1);
     }
