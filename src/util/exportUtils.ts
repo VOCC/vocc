@@ -1,4 +1,4 @@
-import { ImageInterface, Color, Dimensions, Mode } from "./interfaces";
+import { ImageInterface, Color, Dimensions, Mode } from "./types";
 import { PALETTE_LENGTH } from "./consts";
 import Palette from "../models/Palette";
 

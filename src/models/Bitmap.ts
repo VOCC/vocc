@@ -4,7 +4,7 @@ import {
   ImageInterface,
   ImageCoordinates,
   ImageDataStore
-} from "../util/interfaces";
+} from "../util/types";
 import ImageCanvas from "./ImageCanvas";
 import * as Loader from "../util/fileLoadUtils";
 

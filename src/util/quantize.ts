@@ -1,6 +1,6 @@
 import Bitmap4 from "../models/Bitmap4";
 import Palette from "../models/Palette";
-import { Color } from "./interfaces";
+import { Color } from "./types";
 import Bitmap from "../models/Bitmap";
 
 const BLACK: Color = new Color(0, 0, 0, 1);

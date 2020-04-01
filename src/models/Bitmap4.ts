@@ -3,7 +3,7 @@ import {
   Dimensions,
   ImageCoordinates,
   ImageDataStore
-} from "../util/interfaces";
+} from "../util/types";
 import {
   generateHeaderString,
   generateCSourceFileString

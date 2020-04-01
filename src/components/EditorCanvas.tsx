@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useLayoutEffect
 } from "react";
-import { EditorSettings, ImageCoordinates, Color } from "../util/interfaces";
+import { EditorSettings, ImageCoordinates, Color } from "../util/types";
 import Bitmap from "../models/Bitmap";
 import Palette from "../models/Palette";
 import { Tool } from "../util/consts";

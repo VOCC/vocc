@@ -11,7 +11,7 @@ import {
   EditorSettings,
   Mode,
   ImageDataStore
-} from "../util/interfaces";
+} from "../util/types";
 import { quantize } from "../util/quantize";
 import Bitmap from "../models/Bitmap";
 import Bitmap3 from "../models/Bitmap3";

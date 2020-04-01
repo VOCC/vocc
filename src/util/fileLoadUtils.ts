@@ -1,4 +1,4 @@
-import { Dimensions, ImageCoordinates, Color } from "./interfaces";
+import { Dimensions, ImageCoordinates, Color } from "./types";
 import Bitmap from "../models/Bitmap";
 import Bitmap3 from "../models/Bitmap3";
 import Palette from "../models/Palette";

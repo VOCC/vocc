@@ -1,4 +1,4 @@
-import { Color } from "../util/interfaces";
+import { Color } from "../util/types";
 import { PALETTE_SIZE, PALETTE_LENGTH } from "../util/consts";
 import { createHiddenCanvas } from "../util/fileLoadUtils";
 import { PixelGrid } from "./ImageCanvas";

@@ -1,5 +1,5 @@
 import Palette from "../models/Palette";
-import { Color } from "./interfaces";
+import { Color } from "./types";
 
 const DEFAULT_PALETTE: Palette = [
   new Color(0, 0, 0, 1),

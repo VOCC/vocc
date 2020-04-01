@@ -1,5 +1,5 @@
 import React from "react";
-import { EditorSettings } from "../util/interfaces";
+import { EditorSettings } from "../util/types";
 import {
   faBorderAll,
   faPen,
