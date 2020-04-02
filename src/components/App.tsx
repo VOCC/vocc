@@ -26,7 +26,6 @@ import ToolsPanel from "./ToolsPanel";
 import NewImageModal from "./modals/NewImageModal";
 import useModal from "./hooks/useModal";
 import ImportPaletteModal from "./modals/ImportPaletteModal";
-import { combinePals } from "../util/combinePals";
 
 function scaleReducer(state: number, e: WheelEvent) {
   const direction = e.deltaY < 0 ? -1 : 1;
@@ -76,9 +75,9 @@ function App(): JSX.Element {
       case "Image":
         handleImageLoad(element.files[0]);
         break;
-      case "Palette":
-        handlePaletteLoad(element.files[0]);
-        break;
+      // case "Palette":
+      //   handlePaletteLoad(element.files[0]);
+      //   break;
     }
   };
 
@@ -117,26 +116,22 @@ function App(): JSX.Element {
 
   const handleClearLocalStorage = () => window.localStorage.clear();
 
-  const handlePaletteLoad = async (palFile: File | null) => {
-    if (palFile) {
-      console.log("Loading palette from file...");
-      let newPalette = await loadNewPalette(palFile);
-      if (newPalette) {
-        if (image instanceof Bitmap4) {
-          image.updatePalette(newPalette);
-        }
-        handlePaletteChange(newPalette);
-      }
-    }
-  };
+  // const handlePaletteLoad = async (palFile: File | null) => {
+  //   if (palFile) {
+  //     console.log("Loading palette from file...");
+  //     let newPalette = await loadNewPalette(palFile);
+  //     if (newPalette) {
+  //       if (image instanceof Bitmap4) {
+  //         image.updatePalette(newPalette);
+  //       }
+  //       handlePaletteChange(newPalette);
+  //     }
+  //   }
+  // };
 
   const handlePaletteImport = (
     pal: Palette,
-    startRow: number,
-    numRows: number,
   ) => {
-    combinePals(palette, pal, startRow, numRows);
-
     if (image instanceof Bitmap4) {
       image.updatePalette(pal);
     }
@@ -423,6 +418,7 @@ function App(): JSX.Element {
             isShowing={isPaletteModalShowing}
             hide={togglePaletteModal}
             onAccept={handlePaletteImport}
+            oldPal={palette}
           ></ImportPaletteModal>
         </Dropdown>
         <Dropdown label="Export">
