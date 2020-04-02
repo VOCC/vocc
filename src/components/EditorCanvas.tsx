@@ -302,6 +302,10 @@ export default function EditorCanvas({
           setStartPos(startingPos);
           setIsPainting(true);
           break;
+        case Tool.ELLIPSE:
+          if (!imageCoord) return;
+          setStartPos(imageCoord);
+          setIsPainting(true);
         case Tool.PAN:
           setIsPainting(true);
           break;
@@ -352,6 +356,11 @@ export default function EditorCanvas({
           }
           break;
         case Tool.ELLIPSE:
+          if (isPainting) {
+            if (!imageCoord) return;
+            const endingPos = imageCoord;
+            setEndingPos(endingPos);
+          }
           break;
         case Tool.PAN:
           if (isPainting && mousePos) {
@@ -402,6 +411,33 @@ export default function EditorCanvas({
       }
       drawImageOnCanvas();
     }
+
+    if (settings.currentTool === Tool.ELLIPSE) {
+      console.log("drawing ellipse");
+      if (!endingPos) return;
+      let center = startPos;
+      let a = Math.abs(endingPos.x - center.x);
+      let b = Math.abs(endingPos.y - center.y);
+      let s = {x: center.x - a, y: center.y - b};
+      let e = {x: center.x + a, y: center.y + b};
+      // console.log(center,a,b,s,e);
+      for (let i = s.y; i <= e.y; i++) {
+        for (let j = s.x; j <= e.x; j++) {
+          let point = {x: j, y: i};
+          console.log(point);
+          // solve for equation of ellipse to check if inside or on ellipse
+          let l = Math.pow(point.x - center.x, 2) / Math.pow(a, 2);
+          let r = Math.pow(point.y - center.y, 2) / Math.pow(b, 2);
+          console.log(l + r);
+          let isInside: boolean = l + r <= 1;
+          if (isInside) {
+            image.setPixelColor(point, palette[selectedPaletteIndex]);
+          }
+        }
+      }
+      drawImageOnCanvas();
+    }
+    setEndingPos(undefined);
   }, [settings.currentTool, startPos, endingPos, drawImageOnCanvas, image,
       palette, selectedPaletteIndex]);
 
