@@ -44,7 +44,7 @@ export default class Bitmap4 extends Bitmap {
     this.imageCanvas.redrawImage(this);
   }
 
-  public getHeaderData(): string {
+  public get headerData(): string {
     return generateHeaderString(
       {
         fileName: this.fileName,
@@ -55,7 +55,7 @@ export default class Bitmap4 extends Bitmap {
     );
   }
 
-  public getCSourceData(): string {
+  public get cSourceData(): string {
     return generateCSourceFileString(this, 4, this.palette);
   }
 
@@ -91,7 +91,7 @@ export default class Bitmap4 extends Bitmap {
     this.imageCanvas.redrawImage(this);
   }
 
-  public getImageDataStore(): ImageDataStore {
+  public get imageDataStore(): ImageDataStore {
     return {
       imageData: this.data.slice(),
       dimensions: this.dimensions,

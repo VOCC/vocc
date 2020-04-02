@@ -21,12 +21,12 @@ export default class ImageCanvas {
     this.drawImageToHiddenCanvas(image);
   }
 
-  public getImageCanvasElement(): HTMLCanvasElement {
+  public get imageCanvasElement(): HTMLCanvasElement {
     return this.hiddenCanvas;
   }
 
-  public getPixelGridCanvasElement(): HTMLCanvasElement {
-    return this.pixelGrid.getCanvasElement();
+  public get pixelGridCanvasElement(): HTMLCanvasElement {
+    return this.pixelGrid.canvasElement;
   }
 
   public updatePixel(pos: ImageCoordinates, color: Color): void {
@@ -89,7 +89,7 @@ export class PixelGrid {
     this.drawGrid();
   }
 
-  public getCanvasElement(): HTMLCanvasElement {
+  public get canvasElement(): HTMLCanvasElement {
     return this.hiddenCanvas;
   }
 

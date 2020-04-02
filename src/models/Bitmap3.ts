@@ -35,7 +35,7 @@ class Bitmap3 extends Bitmap {
     this.imageCanvas.redrawImage(this);
   }
 
-  public getImageDataStore(): ImageDataStore {
+  public get imageDataStore(): ImageDataStore {
     return {
       fileName: this.fileName,
       dimensions: this.dimensions,
@@ -43,11 +43,11 @@ class Bitmap3 extends Bitmap {
     };
   }
 
-  public getCSourceData(): string {
+  public get cSourceData(): string {
     return generateCSourceFileString(this, 3);
   }
 
-  public getHeaderData(): string {
+  public get headerData(): string {
     return generateHeaderString(
       { fileName: this.fileName, imageDimensions: this.dimensions },
       3

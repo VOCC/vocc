@@ -27,7 +27,7 @@ export function generateCSourceFileString(
 }
 
 function generateMode3CSourceFileString(image: ImageInterface): string {
-  const { fileName, dimensions, imageData } = image.getImageDataStore();
+  const { fileName, dimensions, imageData } = image.imageDataStore;
 
   const variableName = fileName.slice(0, fileName.lastIndexOf("."));
   const bitmapLength = dimensions.height * dimensions.width;
@@ -68,7 +68,7 @@ function generateMode4CSourceFileString(
     return generateMode3CSourceFileString(image);
   }
 
-  const { fileName, dimensions, imageData } = image.getImageDataStore();
+  const { fileName, dimensions, imageData } = image.imageDataStore;
 
   // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
   // into a short

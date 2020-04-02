@@ -92,7 +92,7 @@ function App(): JSX.Element {
   };
 
   const handleImageChange = (newImage: Bitmap) => {
-    const store = JSON.stringify(newImage.getImageDataStore());
+    const store = JSON.stringify(newImage.imageDataStore);
     window.localStorage.setItem(STORAGE.imageData, store);
     pushUndoStack(store);
     setImage(newImage);
@@ -289,11 +289,11 @@ function App(): JSX.Element {
         }
         //.c file
         fileType = ".c";
-        let cBlob = new Blob([image.getCSourceData()]);
+        let cBlob = new Blob([image.cSourceData]);
         saveAs(cBlob, fileName + fileType);
         //.h file
         fileType = ".h";
-        let hBlob = new Blob([image.getHeaderData()]);
+        let hBlob = new Blob([image.headerData]);
         saveAs(hBlob, fileName + fileType);
         return;
       case "PAL":

@@ -39,8 +39,8 @@ export enum EditorMode {
 
 export interface Drawable {
   dimensions: Dimensions;
-  getImageCanvasElement: () => HTMLCanvasElement;
-  getPixelGridCanvasElement: () => HTMLCanvasElement;
+  imageCanvasElement: HTMLCanvasElement;
+  pixelGridCanvasElement: HTMLCanvasElement;
 }
 
 /**
@@ -51,10 +51,10 @@ export interface Drawable {
  */
 export interface Exportable {
   fileName: string;
-  getImageDataStore: () => ImageDataStore;
+  imageDataStore: ImageDataStore;
+  headerData: string;
+  cSourceData: string;
   getImageFileBlob: () => Promise<Blob | null>;
-  getHeaderData: () => string;
-  getCSourceData: () => string;
   getPixelColorAt: (pos: ImageCoordinates) => Color;
 }
 

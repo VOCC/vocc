@@ -51,7 +51,7 @@ function PaletteDisplay({
     const context = canvasRef.current.getContext("2d");
     if (!context) return;
     context.drawImage(
-      pixelGrid.getCanvasElement(),
+      pixelGrid.canvasElement,
       0,
       0,
       PALETTE_CANVAS_SIZE.width * window.devicePixelRatio,

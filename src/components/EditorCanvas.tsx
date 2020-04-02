@@ -58,7 +58,7 @@ export default function EditorCanvas({
     context.clearRect(0, 0, canvas.width, canvas.height);
     // Draw the image at the correct position and scale
     context.drawImage(
-      image.getImageCanvasElement(),
+      image.imageCanvasElement,
       imagePosition.x,
       imagePosition.y,
       image.dimensions.width * scale,
@@ -67,7 +67,7 @@ export default function EditorCanvas({
     // Draw the grid (if we need to)
     if (settings.grid && scale >= PIXELGRID_ZOOM_LIMIT) {
       context.drawImage(
-        image.getPixelGridCanvasElement(),
+        image.pixelGridCanvasElement,
         imagePosition.x,
         imagePosition.y,
         image.dimensions.width * scale,
