@@ -46,17 +46,12 @@ export default function EditorCanvas({
     x: 0,
     y: 0
   });
-  ///////////////////// Rectangle Tool
-  // const osc = document.createElement('canvas');
-  // osc.width = image.dimensions.width;
-  // osc.height = image.dimensions.height;
   // const [offScreenCanvas, setOffScreenCanvas] = useState<HTMLCanvasElement>(
   //   osc);  
-
   const [endingPos, setEndingPos] = useState<
     ImageCoordinates | undefined
     >(undefined);
-  /////////////////////
+  ///////////////////////////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -420,7 +415,6 @@ export default function EditorCanvas({
       let b = Math.abs(endingPos.y - center.y);
       let s = {x: center.x - a, y: center.y - b};
       let e = {x: center.x + a, y: center.y + b};
-      // console.log(center,a,b,s,e);
       for (let i = s.y; i <= e.y; i++) {
         for (let j = s.x; j <= e.x; j++) {
           let point = {x: j, y: i};
