@@ -46,6 +46,16 @@ export default function EditorCanvas({
     x: 0,
     y: 0
   });
+  ///////////////////// Rectangle Tool
+  // const osc = document.createElement('canvas');
+  // osc.width = image.dimensions.width;
+  // osc.height = image.dimensions.height;
+  // const [offScreenCanvas, setOffScreenCanvas] = useState<HTMLCanvasElement>(
+  //   osc);  
+
+  const [endingPos, setEndingPos] = useState<
+    ImageCoordinates | undefined
+    >(undefined);
   /////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
@@ -163,8 +173,23 @@ export default function EditorCanvas({
         || y < 0 || y > image.dimensions.height) return undefined;
       return { x, y };
     },
-    [scale, imagePosition]
+    [scale, imagePosition, image.dimensions]
   );
+
+  // const atNewPixel = useCallback((newPos: ImageCoordinates): boolean => {
+  //   if (!mousePos) return false;
+  //   const prevImgCoord = getImageCoord(mousePos); 
+  //   if (!prevImgCoord) return false;
+  //   const prevPixel = {
+  //     x: imagePosition.x + prevImgCoord.x * scale,
+  //     y: imagePosition.y + prevImgCoord.y * scale
+  //   }
+    
+  //   if (prevPixel.x === newPos.x && prevPixel.y === newPos.y) {
+  //     return false;
+  //   }
+  //   return true;
+  // }, [mousePos, getImageCoord, imagePosition, scale]);
 
   const fillPixel = useCallback(
     (pos: ImageCoordinates | undefined, color: Color): void => {
@@ -222,20 +247,21 @@ export default function EditorCanvas({
     [image, drawImageOnCanvas]
   );
 
-  const rectangle = useCallback((pos: ImageCoordinates | undefined): void => {
-    if (!pos) return;
-    if (!canvasRef.current) return;
-    const context = canvasRef.current.getContext('2d');
-    if (!context) return;
-    drawImageOnCanvas();
-    const color = palette[selectedPaletteIndex];
-    const colorString = `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    context.fillStyle = colorString;
-    context.lineWidth = 1;
-    context.rect(
-      startPos.x, startPos.y, pos.x - startPos.x, pos.y - startPos.y);
-    context.fill();
-  }, [startPos, drawImageOnCanvas]);
+  // const rectangle = useCallback((): void => {
+  //   if (!endingPos) return;
+  //   if (!canvasRef.current) return;
+  //   const context = canvasRef.current.getContext('2d');
+  //   if (!context) return;
+  //   // drawImageOnCanvas();
+  //   const color = palette[selectedPaletteIndex];
+  //   const colorString = `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+  //   context.fillStyle = colorString;
+  //   context.lineWidth = 1;
+  //   context.rect(
+  //     startPos.x, startPos.y, 
+  //     endingPos.x - startPos.x, endingPos.y - startPos.y);
+  //   context.fill();
+  // }, [startPos, endingPos, palette, selectedPaletteIndex]);
 
   // const drawRectangle = (
   //   startingPos: ImageCoordinates,
@@ -267,12 +293,15 @@ export default function EditorCanvas({
           break;
         case Tool.SQUARE:
           if (!imageCoord) return;
-          const startingPos = {
-            x: imagePosition.x + imageCoord.x * scale,
-            y: imagePosition.y + imageCoord.y * scale
-          }
+          // setOffScreenCanvas(canvasRef.current);
+          // const startingPos = {
+          //   x: imagePosition.x + imageCoord.x * scale,
+          //   y: imagePosition.y + imageCoord.y * scale
+          // }
+          const startingPos = imageCoord;
           setStartPos(startingPos);
           setIsPainting(true);
+          break;
         case Tool.PAN:
           setIsPainting(true);
           break;
@@ -280,7 +309,6 @@ export default function EditorCanvas({
     },
     [
       settings.currentTool,
-      scale,
       bucketFill,
       fillPixel,
       getImageCoord,
@@ -307,11 +335,20 @@ export default function EditorCanvas({
         case Tool.SQUARE:
           if (isPainting) {
             if (!imageCoord) return;
-            const endingPos = {
-              x: imagePosition.x + imageCoord.x * scale,
-              y: imagePosition.y + imageCoord.y * scale
-            }
-            rectangle(endingPos);
+            // if (!canvasRef.current) return;
+            // const ctx = canvasRef.current.getContext('2d');
+            // if (!ctx) return;
+            // const endingPos = {
+            //   x: imagePosition.x + imageCoord.x * scale,
+            //   y: imagePosition.y + imageCoord.y * scale
+            // }
+            const endingPos = imageCoord;
+            setEndingPos(endingPos);
+
+            // if (atNewPixel(endingPos)) {
+            //   // drawImageOnCanvas();
+            //   rectangle();
+            // }
           }
           break;
         case Tool.ELLIPSE:
@@ -331,14 +368,12 @@ export default function EditorCanvas({
     [
       isPainting,
       fillPixel,
-      rectangle,
       getImageCoord,
       palette,
       selectedPaletteIndex,
       imagePosition,
       mousePos,
-      settings.currentTool,
-      scale
+      settings.currentTool
     ]
   );
 
@@ -346,8 +381,29 @@ export default function EditorCanvas({
     setMousePos(undefined);
     setIsPainting(false);
     if (settings.currentTool === Tool.SQUARE) {
+      if (!endingPos) return;
+      let s = startPos;
+      let e = endingPos;
+      if (e.x < s.x) {
+        let temp = s.x;
+        s = {x: e.x, y: s.y};
+        e = {x: temp, y: e.y};
+      }
+      if (e.y < s.y) {
+        let temp = s.y;
+        s = {x: s.x, y: e.y};
+        e = {x: e.x, y: temp};
+      }
+      for (let i = s.y; i <= e.y; i++) {
+        for (let j = s.x; j <= e.x; j++) {
+          let pos: ImageCoordinates = {x: j, y: i};
+          image.setPixelColor(pos, palette[selectedPaletteIndex]);
+        }
+      }
+      drawImageOnCanvas();
     }
-  }, []);
+  }, [settings.currentTool, startPos, endingPos, drawImageOnCanvas, image,
+      palette, selectedPaletteIndex]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
