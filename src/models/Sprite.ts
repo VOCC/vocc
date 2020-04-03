@@ -7,6 +7,7 @@ import {
 } from "../util/types";
 import ImageCanvas from "./ImageCanvas";
 import Palette from "./Palette";
+import Color from "./Color";
 
 interface ISprite extends Drawable {
   dimensions: SpriteDimensions; // In pixels
@@ -66,6 +67,39 @@ export default class Sprite implements ISprite, Drawable {
 
   public get dimensions() {
     return this._dimensions;
+  }
+
+  // returns array of 8x8 pixel times
+  public get tiles() {
+    let tileArr: Color[][][] = [];
+
+    let tileStartRow = 0;
+    let tileStartCol = 0;
+    let tile: Color[][] = [];
+
+    //get the number of tiles needed to represent this sprite
+    // # pixels in image / # pixles in sprite
+    let numberTiles = 
+      (this.dimensions.height * this.dimensions.width) / (8*8)
+
+    while (tileArr.length < numberTiles) 
+    {
+      for (let i = tileStartRow; i % 8 != 0 && i != tileStartRow; i++) {
+        for (let j = tileStartCol; j % 8 != 0 && j != tileStartCol; j++) {
+          let pos: ImageCoordinates = {
+            x: i,
+            y: j
+          }
+          tile[i - tileStartRow][j - tileStartCol] = this.getPixelColorAt(pos);
+        }
+      }
+      tileArr.push(tile);
+
+      (tileStartCol + 8 >= this.dimensions.width) ? tileStartCol = 0 : tileStartCol += 8;
+      (tileStartRow + 8 >= this.dimensions.height) ? tileStartRow = 0 : tileStartCol += 8;
+    }
+
+    return tileArr;
   }
 
   public set dimensions(newDimensions: SpriteDimensions) {
