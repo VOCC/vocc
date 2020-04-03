@@ -5,22 +5,25 @@ import React, {
   useRef,
   useState
 } from "react";
-import Bitmap from "../models/Bitmap";
 import Color from "../models/Color";
 import Palette from "../models/Palette";
 import { Tool } from "../util/consts";
-import { EditorSettings, ImageCoordinates } from "../util/types";
+import {
+  ImageInterface,
+  EditorSettings,
+  ImageCoordinates
+} from "../util/types";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
 
 interface EditorCanvasProps {
-  image: Bitmap;
+  image: ImageInterface;
   palette: Palette;
   selectedPaletteIndex: number;
   settings: EditorSettings;
   scale: number;
-  onChangeImage: (newImage: Bitmap) => void;
+  onChangeImage: (newImage: ImageInterface) => void;
   onMouseWheel: (e: WheelEvent) => void;
 }
 

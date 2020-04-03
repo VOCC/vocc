@@ -1,10 +1,10 @@
 import { saveAs } from "file-saver";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
-import Bitmap from "../models/Bitmap";
 import Bitmap3 from "../models/Bitmap3";
 import Bitmap4 from "../models/Bitmap4";
 import Color from "../models/Color";
 import Palette from "../models/Palette";
+import Spritesheet from "../models/Spritesheet";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
 import { exportImage, exportPalette } from "../util/exportUtils";
@@ -14,8 +14,11 @@ import {
   Dimensions,
   EditorMode,
   EditorSettings,
+  ImageCoordinates,
   ImageDataStore,
-  Mode
+  ImageInterface,
+  Mode,
+  SpriteDimensions
 } from "../util/types";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
@@ -24,6 +27,7 @@ import EditorCanvas from "./EditorCanvas";
 import useModal from "./hooks/useModal";
 import NewImageModal from "./modals/NewImageModal";
 import PalettePanel from "./PalettePanel";
+import SpritePanel from "./SpritePanel";
 import ToolsPanel from "./ToolsPanel";
 
 function scaleReducer(state: number, e: WheelEvent) {
@@ -36,7 +40,7 @@ function scaleReducer(state: number, e: WheelEvent) {
 }
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<Bitmap>();
+  const [image, setImage] = useState<ImageInterface>();
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
@@ -91,11 +95,21 @@ function App(): JSX.Element {
     }
   };
 
-  const handleImageChange = (newImage: Bitmap) => {
+  const handleImageChange = (newImage: ImageInterface) => {
     const store = JSON.stringify(newImage.imageDataStore);
     window.localStorage.setItem(STORAGE.imageData, store);
     pushUndoStack(store);
     setImage(newImage);
+  };
+
+  const handleAddSprite = (
+    position: ImageCoordinates,
+    dimensions: SpriteDimensions,
+    paletteRow = 0
+  ) => {
+    let spritesheet = image as Spritesheet;
+    spritesheet.addSprite(position, dimensions);
+    console.log("Adding sprite");
   };
 
   const pushUndoStack = (imageDataStoreString: string) => {
@@ -192,7 +206,7 @@ function App(): JSX.Element {
    * @param imageMode The image mode to edit in. Can be any of the GBA Modes,
    * although only 0, 3, and 4 are supported.
    */
-  const handleNewBitmap = (
+  const handleNewImage = (
     editorMode: EditorMode,
     imageMode: Mode,
     fileName: string,
@@ -214,24 +228,29 @@ function App(): JSX.Element {
             handleSettingsChange(editorSettings);
             handleImageChange(new Bitmap3(fileName, dimensions));
             handlePaletteChange(palette);
-            break;
+            return;
           case 4: // Set up the editor for working on a mode 4 paletted bitmap
             editorSettings.editorMode = EditorMode.Bitmap;
             editorSettings.imageMode = 4;
             handleSettingsChange(editorSettings);
             handleImageChange(new Bitmap4(fileName, palette, dimensions));
             handlePaletteChange(palette);
-            break;
+            return;
           default:
             alert("Unsupported image mode!");
-            break;
+            return;
         }
-        break;
       case EditorMode.Spritesheet:
+        editorSettings.editorMode = EditorMode.Spritesheet;
+        editorSettings.imageMode = 0;
+        handleSettingsChange(editorSettings);
+        handleImageChange(new Spritesheet("untitled", palette));
+        handlePaletteChange(palette);
+        return;
       case EditorMode.Background:
       default:
         alert("Unsupported editing mode!");
-        break;
+        return;
     }
   };
 
@@ -422,19 +441,22 @@ function App(): JSX.Element {
           <NewImageModal
             isShowing={isMode3BitmapModalShowing}
             hide={toggleMode3BitmpModal}
-            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 3)}
+            onAccept={handleNewImage.bind(null, EditorMode.Bitmap, 3)}
           ></NewImageModal>
           <button onClick={toggleMode4BitmpModal}>Mode 4</button>
           <NewImageModal
             isShowing={isMode4BitmapModalShowing}
             hide={toggleMode4BitmpModal}
-            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 4)}
+            onAccept={handleNewImage.bind(null, EditorMode.Bitmap, 4)}
           ></NewImageModal>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Spritesheet</div>
           <button
             onClick={() =>
-              alert("Spritesheet editing not currently supported.")
+              handleNewImage(EditorMode.Spritesheet, 0, "untitled", {
+                height: 256,
+                width: 256
+              })
             }
           >
             4 bpp
@@ -560,6 +582,12 @@ function App(): JSX.Element {
             settings={editorSettings}
             onSettingsChange={handleSettingsChange}
           />
+          {editorSettings.editorMode === EditorMode.Spritesheet ? (
+            <SpritePanel
+              onAddSprite={handleAddSprite}
+              sprites={(image as Spritesheet).sprites}
+            />
+          ) : null}
         </div>
       </div>
     </div>

@@ -41,6 +41,7 @@ export interface Drawable {
   dimensions: Dimensions;
   imageCanvasElement: HTMLCanvasElement;
   pixelGridCanvasElement: HTMLCanvasElement;
+  getPixelColorAt: (pos: ImageCoordinates) => Color;
 }
 
 /**

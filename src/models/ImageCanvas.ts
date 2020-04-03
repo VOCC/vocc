@@ -1,6 +1,6 @@
 import Color from "../models/Color";
 import { createHiddenCanvas } from "../util/fileLoadUtils";
-import { Dimensions, ImageCoordinates, ImageInterface } from "../util/types";
+import { Dimensions, ImageCoordinates, Drawable } from "../util/types";
 
 export default class ImageCanvas {
   public dimensions: Dimensions;
@@ -10,7 +10,7 @@ export default class ImageCanvas {
   private context: CanvasRenderingContext2D | null;
   private pixelGrid: PixelGrid;
 
-  public constructor(image: ImageInterface) {
+  public constructor(image: Drawable) {
     console.log("Creating new internal ImageCanvas.");
 
     this.dimensions = image.dimensions;
@@ -34,7 +34,7 @@ export default class ImageCanvas {
   }
 
   public updateRegion(
-    image: ImageInterface,
+    image: Drawable,
     x: number,
     y: number,
     dx: number,
@@ -47,18 +47,17 @@ export default class ImageCanvas {
     // }
   }
 
-  public redrawImage(image: ImageInterface): void {
+  public redrawImage(image: Drawable): void {
     this.drawImageToHiddenCanvas(image);
   }
 
-  private drawPixel(pos: ImageCoordinates, color: Color): void {
+  private drawPixel({ x, y }: ImageCoordinates, color: Color): void {
     if (!this.context) return;
-    let colorString = `rgba(${color.r}, ${color.g}, ${color.b}, 1)`;
-    this.context.fillStyle = colorString;
-    this.context.fillRect(pos.x, pos.y, 1, 1);
+    this.context.fillStyle = color.toString();
+    this.context.fillRect(x, y, 1, 1);
   }
 
-  private drawImageToHiddenCanvas(image: ImageInterface) {
+  private drawImageToHiddenCanvas(image: Drawable) {
     for (let x = 0; x < image.dimensions.width; x++) {
       for (let y = 0; y < image.dimensions.height; y++) {
         this.drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
