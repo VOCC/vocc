@@ -50,6 +50,9 @@ function App(): JSX.Element {
     editorMode: EditorMode.Bitmap
   });
 
+  const [, updateState] = React.useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+
   /**
    * The undo stack will hold stringified ImageDataStore objects ONLY. They will
    * be decoded on undo.
@@ -109,6 +112,7 @@ function App(): JSX.Element {
   ) => {
     let spritesheet = image as Spritesheet;
     spritesheet.addSprite(position, dimensions);
+    forceUpdate();
     console.log("Adding sprite");
   };
 

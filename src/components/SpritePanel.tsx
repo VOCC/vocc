@@ -15,7 +15,7 @@ export default function SpritePanel({
   onAddSprite
 }: SpritePanelProps) {
   const renderSprite = (sprite: Sprite) => (
-    <div>
+    <div key={sprite.position.x * sprite.position.y}>
       <strong>Sprite</strong>
       <br />
       Position: {sprite.position.x}, {sprite.position.y} <br />
