@@ -3,23 +3,12 @@ import Bitmap4 from "../models/Bitmap4";
 import Color from "../models/Color";
 import Palette from "../models/Palette";
 
-//sprite testing
-import Sprite from "../models/Sprite";
-
 const BLACK: Color = new Color(0, 0, 0, 1);
 
 export function quantize(
   image: Bitmap,
   depth: number
 ): { sprite: Bitmap4; palette: Palette } {
-
-  // testing sprite getTIles
-  let paletteTest: Color[] = new Array(256);
-  let test: Sprite = new Sprite({x: 0,y: 0}, { height: 64, width: 64 } ,paletteTest, 0);
-  console.log("Test Tiles, empty tiles: " + test.dimensions.height + "x" + test.dimensions.width);
-  console.log(test.tiles);
-  console.log("End tile test")
-  //
 
   let centroids: number[][];
   let imageArr = imageToArr(image);

@@ -75,7 +75,6 @@ export default class Sprite implements ISprite, Drawable {
 
     let tileStartRow = 0;
     let tileStartCol = 0;
-    let tile: Color[][] = [];
 
     //get the number of tiles needed to represent this sprite
     // # pixels in image / # pixles in sprite
@@ -84,19 +83,20 @@ export default class Sprite implements ISprite, Drawable {
 
     while (tileArr.length < numberTiles) 
     {
-      for (let i = tileStartRow; i % 8 != 0 && i != tileStartRow; i++) {
-        for (let j = tileStartCol; j % 8 != 0 && j != tileStartCol; j++) {
-          let pos: ImageCoordinates = {
-            x: i,
-            y: j
-          }
-          tile[i - tileStartRow][j - tileStartCol] = this.getPixelColorAt(pos);
+
+      let tile: Color[][] = [];
+      for(let i = 0; i < 8; i++) {
+        tile[i] = [];
+      }
+
+      for (let i = tileStartRow; i === tileStartRow || i % 8 !== 0; i++) {
+        for (let j = tileStartCol; j === tileStartCol || j % 8 !== 0; j++) {
+          tile[i - tileStartRow][j - tileStartCol] = this.getPixelColorAt({x: i, y: j})
         }
       }
-      tileArr.push(tile);
-
+      (tileStartRow + 8 >= this.dimensions.height) ? tileStartRow = 0 : tileStartRow += 8;
       (tileStartCol + 8 >= this.dimensions.width) ? tileStartCol = 0 : tileStartCol += 8;
-      (tileStartRow + 8 >= this.dimensions.height) ? tileStartRow = 0 : tileStartCol += 8;
+      tileArr.push(tile);
     }
 
     return tileArr;
