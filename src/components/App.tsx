@@ -3,8 +3,8 @@ import React, { useCallback, useEffect, useReducer, useState } from "react";
 import Bitmap3 from "../models/Bitmap3";
 import Bitmap4 from "../models/Bitmap4";
 import Color from "../models/Color";
-import Palette from "../models/Palette";
-import Spritesheet from "../models/Spritesheet";
+import Palette, { paletteIndexToCol } from "../models/Palette";
+import Spritesheet4 from "../models/Spritesheet4";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
 import { exportImage, exportPalette } from "../util/exportUtils";
@@ -110,7 +110,7 @@ function App(): JSX.Element {
     dimensions: SpriteDimensions,
     paletteRow = 0
   ) => {
-    let spritesheet = image as Spritesheet;
+    let spritesheet = image as Spritesheet4;
     spritesheet.addSprite(position, dimensions);
     forceUpdate();
     console.log("Adding sprite");
@@ -172,7 +172,7 @@ function App(): JSX.Element {
       console.log("Loading palette from file...");
       let newPalette = await loadNewPalette(palFile);
       if (newPalette) {
-        if (image instanceof Bitmap4) {
+        if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
           image.updatePalette(newPalette);
         }
         handlePaletteChange(newPalette);
@@ -248,7 +248,13 @@ function App(): JSX.Element {
         editorSettings.editorMode = EditorMode.Spritesheet;
         editorSettings.imageMode = 0;
         handleSettingsChange(editorSettings);
-        handleImageChange(new Spritesheet("untitled", palette));
+        handleImageChange(
+          new Spritesheet4(
+            "untitled",
+            palette,
+            paletteIndexToCol(selectedColorIndex)
+          )
+        );
         handlePaletteChange(palette);
         return;
       case EditorMode.Background:
@@ -276,7 +282,7 @@ function App(): JSX.Element {
 
   const handleChangeSelectedColor = (newIndex: number) => {
     setSelectedColorIndex(newIndex);
-    if (image instanceof Bitmap4) {
+    if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
       image.setPaletteIndex(newIndex);
     }
   };
@@ -284,7 +290,7 @@ function App(): JSX.Element {
   const handleColorChange = (newColor: Color): void => {
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
-    if (image instanceof Bitmap4) {
+    if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
       image.updatePalette(newPalette);
     }
     handlePaletteChange(newPalette);
@@ -589,7 +595,7 @@ function App(): JSX.Element {
           {editorSettings.editorMode === EditorMode.Spritesheet ? (
             <SpritePanel
               onAddSprite={handleAddSprite}
-              sprites={(image as Spritesheet).sprites}
+              sprites={(image as Spritesheet4).sprites}
             />
           ) : null}
         </div>

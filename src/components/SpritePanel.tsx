@@ -25,7 +25,6 @@ export default function SpritePanel({
   const renderSpriteList = (sprites: Sprite[]) =>
     sprites.map((s, i) => renderSprite(s, i));
 
-  console.log("rendering panel");
   return (
     <div className="spritepanel-container">
       <div>Sprites</div>

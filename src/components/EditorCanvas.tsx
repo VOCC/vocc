@@ -13,9 +13,12 @@ import {
   EditorSettings,
   ImageCoordinates
 } from "../util/types";
+import Sprite from "../models/Sprite";
+import Spritesheet4 from "../models/Spritesheet4";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
+const TILEGRID_ZOOM_LIMIT = 4;
 
 interface EditorCanvasProps {
   image: ImageInterface;
@@ -71,6 +74,21 @@ export default function EditorCanvas({
     if (settings.grid && scale >= PIXELGRID_ZOOM_LIMIT) {
       context.drawImage(
         image.pixelGridCanvasElement,
+        imagePosition.x,
+        imagePosition.y,
+        image.dimensions.width * scale,
+        image.dimensions.height * scale
+      );
+    }
+    // Always draw tile grid on spritesheets
+    // TODO: Add option for this
+    if (
+      settings.grid &&
+      image instanceof Spritesheet4 &&
+      scale >= TILEGRID_ZOOM_LIMIT
+    ) {
+      context.drawImage(
+        (image as Spritesheet4).tileGridCanvasElement,
         imagePosition.x,
         imagePosition.y,
         image.dimensions.width * scale,

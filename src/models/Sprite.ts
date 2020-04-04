@@ -12,6 +12,7 @@ import Color from "./Color";
 interface ISprite extends Drawable {
   dimensions: SpriteDimensions; // In pixels
   position: ImageCoordinates; // In tiles
+  palette: Palette;
   paletteRow: number;
 }
 
@@ -34,10 +35,15 @@ export default class Sprite implements ISprite, Drawable {
     this._palette = palette;
     this._paletteRow = paletteRow;
     this._data = new Uint8ClampedArray(dimensions.height * dimensions.width);
-    this._data.fill(randomPaletteCol());
     this._imageCanvas = new ImageCanvas(this);
   }
 
+  /**
+   * Sets the pixel color to the given palette column color (row is not
+   * applicable), then updates internal image canvas.
+   * @param pos the position on the sprite to draw the color, in pixels
+   * @param col column of the palette to draw the color of
+   */
   public setPixelColorAt(pos: ImageCoordinates, col: number) {
     if (pos.x >= this._dimensions.width || pos.y >= this._dimensions.height) {
       console.error("Sprite: tried to set pixel color outside image bounds.");
@@ -54,7 +60,12 @@ export default class Sprite implements ISprite, Drawable {
       );
       return;
     }
+    console.log("set pixel color on sprite");
     this._data[offset(this._dimensions, pos)] = col;
+    this._imageCanvas.updatePixel(
+      pos,
+      this._palette[offset(PALETTE_SIZE, { x: col, y: this._paletteRow })]
+    );
   }
 
   public getPixelColorAt(pos: ImageCoordinates) {
@@ -62,10 +73,12 @@ export default class Sprite implements ISprite, Drawable {
     return this._palette[offset(PALETTE_SIZE, { x: col, y: this._paletteRow })];
   }
 
+  /** Position of sprite, in tiles */
   public get position() {
     return this._position;
   }
 
+  /** Dimensions of the sprite, in pixels */
   public get dimensions() {
     return this._dimensions;
   }
@@ -135,6 +148,11 @@ export default class Sprite implements ISprite, Drawable {
 
   public get pixelGridCanvasElement() {
     return this._imageCanvas.pixelGridCanvasElement;
+  }
+
+  public set palette(newPalette: Palette) {
+    this._palette = newPalette;
+    this._imageCanvas.redrawImage(this);
   }
 }
 
