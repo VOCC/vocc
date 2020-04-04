@@ -14,25 +14,23 @@ export default function SpritePanel({
   sprites,
   onAddSprite
 }: SpritePanelProps) {
-  const renderSprite = (sprite: Sprite) => (
-    <div key={sprite.position.x * sprite.position.y}>
-      <strong>Sprite</strong>
-      <br />
-      Position: {sprite.position.x}, {sprite.position.y} <br />
-      Dimensions: {sprite.dimensions.width}, {sprite.dimensions.height} <br />
-      Palette Row: {sprite.paletteRow.toString()} <br />
+  const renderSprite = (sprite: Sprite, i: number) => (
+    <div key={i}>
+      <strong>Sprite {i}: </strong>
+      p:({sprite.position.x}, {sprite.position.y}), d:({sprite.dimensions.width}
+      , {sprite.dimensions.height}), r:{sprite.paletteRow.toString()} <br />
     </div>
   );
 
   const renderSpriteList = (sprites: Sprite[]) =>
-    sprites.map(s => renderSprite(s));
+    sprites.map((s, i) => renderSprite(s, i));
 
   console.log("rendering panel");
   return (
     <div className="spritepanel-container">
       <div>Sprites</div>
       <NewSpriteForm onAddSprite={onAddSprite}></NewSpriteForm>
-      {sprites.map(s => renderSprite(s))}
+      {renderSpriteList(sprites)}
     </div>
   );
 }

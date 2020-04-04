@@ -34,6 +34,7 @@ export default class Sprite implements ISprite, Drawable {
     this._palette = palette;
     this._paletteRow = paletteRow;
     this._data = new Uint8ClampedArray(dimensions.height * dimensions.width);
+    this._data.fill(randomPaletteCol());
     this._imageCanvas = new ImageCanvas(this);
   }
 
@@ -78,24 +79,29 @@ export default class Sprite implements ISprite, Drawable {
 
     //get the number of tiles needed to represent this sprite
     // # pixels in image / # pixles in sprite
-    let numberTiles = 
-      (this.dimensions.height * this.dimensions.width) / (8*8)
+    let numberTiles =
+      (this.dimensions.height * this.dimensions.width) / (8 * 8);
 
-    while (tileArr.length < numberTiles) 
-    {
-
+    while (tileArr.length < numberTiles) {
       let tile: Color[][] = [];
-      for(let i = 0; i < 8; i++) {
+      for (let i = 0; i < 8; i++) {
         tile[i] = [];
       }
 
       for (let i = tileStartRow; i === tileStartRow || i % 8 !== 0; i++) {
         for (let j = tileStartCol; j === tileStartCol || j % 8 !== 0; j++) {
-          tile[i - tileStartRow][j - tileStartCol] = this.getPixelColorAt({x: i, y: j})
+          tile[i - tileStartRow][j - tileStartCol] = this.getPixelColorAt({
+            x: i,
+            y: j
+          });
         }
       }
-      (tileStartRow + 8 >= this.dimensions.height) ? tileStartRow = 0 : tileStartRow += 8;
-      (tileStartCol + 8 >= this.dimensions.width) ? tileStartCol = 0 : tileStartCol += 8;
+      tileStartRow + 8 >= this.dimensions.height
+        ? (tileStartRow = 0)
+        : (tileStartRow += 8);
+      tileStartCol + 8 >= this.dimensions.width
+        ? (tileStartCol = 0)
+        : (tileStartCol += 8);
       tileArr.push(tile);
     }
 
@@ -134,4 +140,10 @@ export default class Sprite implements ISprite, Drawable {
 
 function offset({ width }: Dimensions, { x, y }: ImageCoordinates) {
   return width * y + x;
+}
+
+function randomPaletteCol(): number {
+  const col = Math.floor(Math.random() * 16);
+  console.log("Random palette index from 0 to 15", col);
+  return col;
 }
