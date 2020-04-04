@@ -11,6 +11,9 @@ import { PixelGrid } from "./ImageCanvas";
 import Palette, { paletteIndexToCol } from "./Palette";
 import Sprite from "./Sprite";
 
+const ALERT_INVALID_SPRITE = () =>
+  alert("There's already a sprite at that location!");
+
 /**
  * Size of a 4bpp spritesheet in pixels
  */
@@ -69,19 +72,33 @@ export default class Spritesheet4 implements ImageInterface {
   public addSprite({ x, y }: ImageCoordinates, dimensions: SpriteDimensions) {
     const newSprite = new Sprite({ x, y }, dimensions, this._palette, 0);
     const newSpriteIndex = this._sprites.length;
+
+    for (let r = y; r < y + dimensions.height / TILE_SIZE.height; r++) {
+      for (let c = x; c < x + dimensions.width / TILE_SIZE.width; c++) {
+        if (this._spriteMap[r][c] != null) {
+          // There's already a sprite at the location we'd be putting this one,
+          // or it overlaps, so the new sprite is invalid.
+          ALERT_INVALID_SPRITE();
+          return;
+        }
+      }
+    }
+
     this._sprites[newSpriteIndex] = newSprite;
+
     for (let r = y; r < y + dimensions.height / 8; r++) {
       for (let c = x; c < x + dimensions.width / 8; c++) {
         this._spriteMap[r][c] = newSprite;
       }
     }
+
     this.drawToHiddenCanvas();
     addSpriteBoxToTileGridCanvas(
       { x, y },
       dimensions,
       this._tileGridHiddenCanvas
     );
-    console.log("Added sprite. Spritemap:", this._spriteMap);
+    console.log("Added sprite of size", dimensions, "at", { x, y });
   }
 
   // TODO: Implement
@@ -101,7 +118,7 @@ export default class Spritesheet4 implements ImageInterface {
 
   private getTileIndexFromCoordinates(p: ImageCoordinates): ImageCoordinates {
     const tileX = Math.floor(p.x / 8);
-    const tileY = Math.floor(p.x / 8);
+    const tileY = Math.floor(p.y / 8);
     return { x: tileX, y: tileY };
   } // TODO: Implement
 
@@ -294,6 +311,7 @@ function spritesheetCoordsToSpriteCoords(
     x: stp.x * TILE_SIZE.width,
     y: stp.y * TILE_SIZE.height
   };
+  // console.log("in:", ssc, ssd, spp, spd);
 
   if (ssc.y >= ssd.height || ssc.x >= ssd.width) {
     console.warn("Trying to translate spritesheet coordinates out of range!");
@@ -307,6 +325,8 @@ function spritesheetCoordsToSpriteCoords(
   if (pixelPos.x >= spd.width || pixelPos.y >= spd.height) {
     console.warn("Translated sprite coordinates out of sprite range!");
   }
+
+  // console.log("out", pixelPos);
 
   return pixelPos;
 }

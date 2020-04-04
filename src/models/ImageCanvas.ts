@@ -58,13 +58,11 @@ export default class ImageCanvas {
   }
 
   private drawImageToHiddenCanvas(image: Drawable) {
-    console.log(image);
     for (let x = 0; x < image.dimensions.width; x++) {
       for (let y = 0; y < image.dimensions.height; y++) {
         this.drawPixel({ x, y }, image.getPixelColorAt({ x, y }));
       }
     }
-    console.log("done");
   }
 }
 

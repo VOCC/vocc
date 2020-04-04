@@ -5,9 +5,9 @@ import {
   ImageCoordinates,
   SpriteDimensions
 } from "../util/types";
+import Color from "./Color";
 import ImageCanvas from "./ImageCanvas";
 import Palette from "./Palette";
-import Color from "./Color";
 
 interface ISprite extends Drawable {
   dimensions: SpriteDimensions; // In pixels
@@ -158,10 +158,4 @@ export default class Sprite implements ISprite, Drawable {
 
 function offset({ width }: Dimensions, { x, y }: ImageCoordinates) {
   return width * y + x;
-}
-
-function randomPaletteCol(): number {
-  const col = Math.floor(Math.random() * 16);
-  console.log("Random palette index from 0 to 15", col);
-  return col;
 }

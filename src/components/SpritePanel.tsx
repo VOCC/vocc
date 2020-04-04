@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { SpriteDimensions, ImageCoordinates } from "../util/types";
 import Sprite from "../models/Sprite";
+import { ImageCoordinates, SpriteDimensions } from "../util/types";
 
 interface SpritePanelProps {
   onAddSprite: (
@@ -14,22 +14,29 @@ export default function SpritePanel({
   sprites,
   onAddSprite
 }: SpritePanelProps) {
-  const renderSprite = (sprite: Sprite, i: number) => (
-    <div key={i}>
-      <strong>Sprite {i}: </strong>
-      p:({sprite.position.x}, {sprite.position.y}), d:({sprite.dimensions.width}
-      , {sprite.dimensions.height}), r:{sprite.paletteRow.toString()} <br />
-    </div>
-  );
-
   const renderSpriteList = (sprites: Sprite[]) =>
-    sprites.map((s, i) => renderSprite(s, i));
+    sprites.map((s, i) => <SpriteListItem sprite={s} i={i} />);
 
   return (
     <div className="spritepanel-container">
       <div>Sprites</div>
       <NewSpriteForm onAddSprite={onAddSprite}></NewSpriteForm>
       {renderSpriteList(sprites)}
+    </div>
+  );
+}
+
+interface SpriteListItemProps {
+  sprite: Sprite;
+  i: number;
+}
+
+function SpriteListItem({ sprite, i }: SpriteListItemProps) {
+  return (
+    <div key={i}>
+      <strong>Sprite {i}: </strong>
+      p:({sprite.position.x}, {sprite.position.y}), d:({sprite.dimensions.width}
+      , {sprite.dimensions.height}), r:{sprite.paletteRow.toString()}
     </div>
   );
 }

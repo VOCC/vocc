@@ -7,14 +7,13 @@ import React, {
 } from "react";
 import Color from "../models/Color";
 import Palette from "../models/Palette";
+import Spritesheet4 from "../models/Spritesheet4";
 import { Tool } from "../util/consts";
 import {
-  ImageInterface,
   EditorSettings,
-  ImageCoordinates
+  ImageCoordinates,
+  ImageInterface
 } from "../util/types";
-import Sprite from "../models/Sprite";
-import Spritesheet4 from "../models/Spritesheet4";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
