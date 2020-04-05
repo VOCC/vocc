@@ -17,13 +17,12 @@
   font-size: 10pt;
   background-color: $dark-nav;
   .title {
-    padding: 0.1rem 1.75rem 0rem 0.5rem;
+    padding: 0.1rem 2rem 0.15rem 0.25rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    letter-spacing: 4px;
+    font-family: 'Open Sans', sans-serif;
     font-size: 16pt;
-    font-style: italic;
-    font-weight: 800;
+    font-weight: 600;
     color: $dark-text;
   }
 }

@@ -42,7 +42,7 @@ export default function PalettePanel({
       <div className="panel-header">Properties</div>
       <div className="settings-container">
         <div>
-          Mode: &nbsp; {settings.mode}
+          Mode: &nbsp; {settings.editorMode}
           <br/>
           Type: &nbsp; {settings.editorMode.toString()}
         </div>
@@ -55,11 +55,11 @@ const MIN_COLOR_VAL = "0";
 const MAX_COLOR_VAL = "31";
 
 const color256to32 = (color: Color): Color => {
-    const r = Math.ceil((color.r + 1) / 8) - 1;
-    const g = Math.ceil((color.g + 1) / 8) - 1;
-    const b = Math.ceil((color.b + 1) / 8) - 1;
+  const r = Math.ceil((color.r + 1) / 8) - 1;
+  const g = Math.ceil((color.g + 1) / 8) - 1;
+  const b = Math.ceil((color.b + 1) / 8) - 1;
 
-    return new Color(r, g, b, 1);
+  return new Color(r, g, b, 1);
 };
 
 const color32to256 = (color: Color): Color => {
