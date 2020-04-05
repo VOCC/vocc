@@ -8,6 +8,7 @@ interface SpritePanelProps {
     dimensions: SpriteDimensions
   ) => void;
   onRemoveSprite: (i: number) => void;
+  onUpdatePaletteRow: () => void;
   sprites: Sprite[];
 }
 
@@ -15,13 +16,19 @@ export default function SpritePanel({
   sprites,
   onAddSprite,
   onRemoveSprite,
+  onUpdatePaletteRow,
 }: SpritePanelProps) {
+  const handleChangePaletteRow = (s: Sprite, n: number) => {
+    s.paletteRow = n;
+    onUpdatePaletteRow();
+  };
   const renderSpriteList = (sprites: Sprite[]) =>
     sprites.map((s, i) => (
       <SpriteListItem
         sprite={s}
         i={i}
         onRemoveSprite={onRemoveSprite.bind(null, i)}
+        onChangePaletteRow={handleChangePaletteRow.bind(null, s)}
       />
     ));
 
@@ -38,15 +45,37 @@ interface SpriteListItemProps {
   sprite: Sprite;
   i: number;
   onRemoveSprite: () => void;
+  onChangePaletteRow: (newPaletteRow: number) => void;
 }
 
-function SpriteListItem({ sprite, i, onRemoveSprite }: SpriteListItemProps) {
+function SpriteListItem({
+  sprite,
+  i,
+  onRemoveSprite,
+  onChangePaletteRow,
+}: SpriteListItemProps) {
+  const [paletteRow, setPaletteRow] = useState<number>(sprite.paletteRow);
+  const handleChangePaletteRow = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.value) return;
+    const newRow = parseInt(e.target.value);
+    if (newRow >= 0 && newRow <= 15) {
+      setPaletteRow(newRow);
+      onChangePaletteRow(newRow);
+    }
+  };
   return (
     <div key={i}>
       <strong>Sprite {i}: </strong>
       p:({sprite.position.x}, {sprite.position.y}), d:({sprite.dimensions.width}
-      , {sprite.dimensions.height}), r:{sprite.paletteRow.toString()}
-      <button onClick={onRemoveSprite}>X</button>
+      , {sprite.dimensions.height})<button onClick={onRemoveSprite}>X</button>
+      <label>Row</label>
+      <input
+        type="number"
+        min={0}
+        max={15}
+        value={paletteRow}
+        onChange={handleChangePaletteRow}
+      ></input>
     </div>
   );
 }

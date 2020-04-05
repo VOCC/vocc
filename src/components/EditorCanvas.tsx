@@ -3,7 +3,7 @@ import React, {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState
+  useState,
 } from "react";
 import Color from "../models/Color";
 import Palette from "../models/Palette";
@@ -12,7 +12,7 @@ import { Tool } from "../util/consts";
 import {
   EditorSettings,
   ImageCoordinates,
-  ImageInterface
+  ImageInterface,
 } from "../util/types";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
@@ -36,7 +36,7 @@ export default function EditorCanvas({
   settings,
   scale,
   onChangeImage,
-  onMouseWheel
+  onMouseWheel,
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasSize, setCanvasSize] = useState<number[]>([0, 0]);
@@ -48,7 +48,7 @@ export default function EditorCanvas({
   );
   const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
     x: 0,
-    y: 0
+    y: 0,
   });
   /////////////////////
 
@@ -104,7 +104,7 @@ export default function EditorCanvas({
       if (canvasRef.current) {
         setCanvasSize([
           canvasRef.current.clientWidth,
-          canvasRef.current.clientHeight
+          canvasRef.current.clientHeight,
         ]);
       }
     };
@@ -170,7 +170,7 @@ export default function EditorCanvas({
       const scaleY = canvas.height / rect.height;
       return {
         x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
+        y: (e.clientY - rect.top) * scaleY,
       };
     }
     return undefined;
@@ -233,8 +233,8 @@ export default function EditorCanvas({
         }
         ///
         edges
-          .filter(n => !explored.includes(n))
-          .forEach(n => {
+          .filter((n) => !explored.includes(n))
+          .forEach((n) => {
             explored.push(n);
             if (image.getPixelColorAt(n).isEqual(color)) {
               queue.push(n);
@@ -274,7 +274,7 @@ export default function EditorCanvas({
       fillPixel,
       getImageCoord,
       palette,
-      selectedPaletteIndex
+      selectedPaletteIndex,
     ]
   );
 
@@ -294,7 +294,7 @@ export default function EditorCanvas({
           if (isPainting && mousePos) {
             const newImagePosition = {
               x: imagePosition.x + (newMousePos.x - mousePos.x),
-              y: imagePosition.y + (newMousePos.y - mousePos.y)
+              y: imagePosition.y + (newMousePos.y - mousePos.y),
             };
             setImagePosition(newImagePosition);
           }
@@ -310,7 +310,7 @@ export default function EditorCanvas({
       selectedPaletteIndex,
       imagePosition,
       mousePos,
-      settings.currentTool
+      settings.currentTool,
     ]
   );
 

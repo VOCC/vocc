@@ -70,7 +70,9 @@ export default class Spritesheet4 implements ImageInterface {
   }
 
   public addSprite({ x, y }: ImageCoordinates, dimensions: SpriteDimensions) {
-    const newSprite = new Sprite({ x, y }, dimensions, this._palette, 0);
+    const newSprite = new Sprite({ x, y }, dimensions, this._palette, 0, () =>
+      this.drawToHiddenCanvas()
+    );
     const newSpriteIndex = this._sprites.length;
 
     for (let r = y; r < y + dimensions.height / TILE_SIZE.height; r++) {

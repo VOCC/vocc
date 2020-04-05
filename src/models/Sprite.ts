@@ -3,7 +3,7 @@ import {
   Dimensions,
   Drawable,
   ImageCoordinates,
-  SpriteDimensions
+  SpriteDimensions,
 } from "../util/types";
 import Color from "./Color";
 import ImageCanvas from "./ImageCanvas";
@@ -23,12 +23,14 @@ export default class Sprite implements ISprite, Drawable {
   private _palette: Palette;
   private _paletteRow: number;
   private _imageCanvas: ImageCanvas;
+  private _redrawSpritesheet: () => void;
 
   constructor(
     position: ImageCoordinates,
     dimensions: SpriteDimensions,
     palette: Palette,
-    paletteRow: number
+    paletteRow: number,
+    redrawSpritesheet: () => void
   ) {
     this._dimensions = dimensions;
     this._position = position;
@@ -36,6 +38,7 @@ export default class Sprite implements ISprite, Drawable {
     this._paletteRow = paletteRow;
     this._data = new Uint8ClampedArray(dimensions.height * dimensions.width);
     this._imageCanvas = new ImageCanvas(this);
+    this._redrawSpritesheet = redrawSpritesheet;
   }
 
   /**
@@ -105,7 +108,7 @@ export default class Sprite implements ISprite, Drawable {
         for (let j = tileStartCol; j === tileStartCol || j % 8 !== 0; j++) {
           tile[i - tileStartRow][j - tileStartCol] = this.getPixelColorAt({
             x: i,
-            y: j
+            y: j,
           });
         }
       }
@@ -137,9 +140,11 @@ export default class Sprite implements ISprite, Drawable {
         "Sprite: tried to set palette row outside bounds: ",
         newPaletteRow
       );
-    } else {
-      this._paletteRow = newPaletteRow;
+      return;
     }
+    this._paletteRow = newPaletteRow;
+    this._imageCanvas.redrawImage(this);
+    this._redrawSpritesheet();
   }
 
   public get imageCanvasElement() {

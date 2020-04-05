@@ -603,6 +603,7 @@ function App(): JSX.Element {
             <SpritePanel
               onAddSprite={handleAddSprite}
               onRemoveSprite={(i) => handleRemoveSprite(image, i)}
+              onUpdatePaletteRow={forceUpdate}
               sprites={(image as Spritesheet4).sprites}
             />
           ) : null}
