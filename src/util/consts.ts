@@ -1,4 +1,4 @@
-import { Dimensions, Color } from "./interfaces";
+import { Dimensions, Color, EditorMode, EditorSettings } from "./interfaces";
 
 export const COLORS = {
   black: new Color(0, 0, 0, 1),
@@ -20,3 +20,18 @@ export enum Tool {
   DROPPER,
   LAYER
 }
+
+export const STORAGE = {
+  image: "image",
+  imageData: "imageData",
+  palette: "palette",
+  imageMode: "imageMode",
+  imageType: "imageType"
+};
+
+export const DEFAULT_SETTINGS: EditorSettings = {
+  grid: true,
+  currentTool: Tool.PENCIL,
+  imageMode: 3,
+  editorMode: EditorMode.Bitmap
+};

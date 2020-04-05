@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
-import Palette, * as PaletteUtils from "./objects/Palette";
-import { PixelGrid } from "./objects/ImageCanvas";
+import Palette, * as PaletteUtils from "../models/Palette";
+import { PixelGrid } from "../models/ImageCanvas";
 
 interface IPaletteDisplay {
   palette: Palette;
@@ -157,12 +157,7 @@ function PaletteDisplay({
     drawPalette();
     drawGrid();
     drawSelectedColorHighlight(selectedColorIndex);
-  }, [
-    selectedColorIndex,
-    drawPalette,
-    drawGrid,
-    drawSelectedColorHighlight
-  ]);
+  }, [selectedColorIndex, drawPalette, drawGrid, drawSelectedColorHighlight]);
 
   return (
     <canvas ref={canvasRef} onClick={handleClick} className="palette-canvas" />

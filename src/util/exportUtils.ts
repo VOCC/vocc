@@ -1,6 +1,6 @@
 import { ImageInterface, Color, Dimensions, Mode } from "./interfaces";
 import { PALETTE_LENGTH } from "./consts";
-import Palette from "../components/objects/Palette";
+import Palette from "../models/Palette";
 
 /*
   getGBAImageString
@@ -26,12 +26,13 @@ export function generateCSourceFileString(
 }
 
 function generateMode3CSourceFileString(image: ImageInterface): string {
-  const variableName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
-  const bitmapLength = image.dimensions.height * image.dimensions.width;
+  const { fileName, dimensions, imageData } = image.getImageDataStore();
+
+  const variableName = fileName.slice(0, fileName.lastIndexOf("."));
+  const bitmapLength = dimensions.height * dimensions.width;
   const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${bitmapLength /
     2}]__attribute__((aligned(4)))=\n{\n\t`;
 
-  const imageData = image.getImageData();
   let imageDataHexString = ``;
 
   let pixelCount = 0;
@@ -66,14 +67,15 @@ function generateMode4CSourceFileString(
     return generateMode3CSourceFileString(image);
   }
 
+  const { fileName, dimensions, imageData } = image.getImageDataStore();
+
   // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
   // into a short
-  const variableName = image.fileName.slice(0, image.fileName.lastIndexOf("."));
-  const bitmapLength = image.dimensions.height * image.dimensions.width;
+  const variableName = fileName.slice(0, fileName.lastIndexOf("."));
+  const bitmapLength = dimensions.height * dimensions.width;
   const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${bitmapLength /
     2}]__attribute__((aligned(4)))=\n{\n`;
 
-  const imageData = image.getImageData();
   let imageDataHexString = "";
   for (let i = 0; i < imageData.length; i += 2) {
     imageDataHexString += paletteIndicesToHex(imageData[i], imageData[i + 1]);

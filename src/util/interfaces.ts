@@ -21,8 +21,12 @@ export class Color {
       return false;
     }
     const that: Color = other as Color;
-    return (this.r === that.r && this.g === that.g
-      && this.b === that.b && this.a === that.a);
+    return (
+      this.r === that.r &&
+      this.g === that.g &&
+      this.b === that.b &&
+      this.a === that.a
+    );
   }
 }
 
@@ -37,7 +41,7 @@ export interface Dimensions {
   width: number;
 }
 
-export type Mode = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7; 
+export type Mode = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export enum EditorMode {
   Bitmap = "Bitmap",
@@ -59,7 +63,7 @@ export interface Drawable {
  */
 export interface Exportable {
   fileName: string;
-  getImageData: () => Uint8ClampedArray;
+  getImageDataStore: () => ImageDataStore;
   getImageFileBlob: () => Promise<Blob | null>;
   getHeaderData: () => string;
   getCSourceData: () => string;
@@ -70,16 +74,30 @@ export interface Modifiable {
   setPixelColor: (pos: ImageCoordinates, color: Color) => void;
 }
 
-export interface ImageInterface extends Drawable, Exportable, Modifiable {}
+export interface Undoable {
+  updateFromStore: (store: ImageDataStore) => void;
+}
+
+export interface ImageInterface
+  extends Drawable,
+    Exportable,
+    Modifiable,
+    Undoable {}
 
 export interface EditorSettings {
   grid: boolean;
   currentTool: Tool;
-  mode: Mode;
+  imageMode: Mode;
   editorMode: EditorMode;
 }
 
 export interface ImageCoordinates {
   x: number;
   y: number;
+}
+
+export interface ImageDataStore {
+  fileName: string;
+  dimensions: Dimensions;
+  imageData: Uint8ClampedArray | number[];
 }

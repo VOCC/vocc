@@ -1,8 +1,8 @@
 import React from "react";
-import Palette from "./objects/Palette";
+import Palette from "../models/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
-import { Color, EditorSettings } from "../lib/interfaces";
+import { Color, EditorSettings } from "../util/interfaces";
 
 interface PalettePanelProps {
   palette: Palette;

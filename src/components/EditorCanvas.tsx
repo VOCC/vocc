@@ -5,10 +5,10 @@ import React, {
   useCallback,
   useLayoutEffect
 } from "react";
-import { EditorSettings, ImageCoordinates, Color } from "../lib/interfaces";
-import Bitmap from "./objects/Bitmap";
-import Palette from "./objects/Palette";
-import { Tool } from "../lib/consts";
+import { EditorSettings, ImageCoordinates, Color } from "../util/interfaces";
+import Bitmap from "../models/Bitmap";
+import Palette from "../models/Palette";
+import { Tool } from "../util/consts";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
@@ -19,6 +19,7 @@ interface EditorCanvasProps {
   selectedPaletteIndex: number;
   settings: EditorSettings;
   scale: number;
+  onChangeImage: (newImage: Bitmap) => void;
   onMouseWheel: (e: WheelEvent) => void;
 }
 
@@ -28,6 +29,7 @@ export default function EditorCanvas({
   selectedPaletteIndex,
   settings,
   scale,
+  onChangeImage,
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -129,11 +131,13 @@ export default function EditorCanvas({
    * Draw the image whenever the image, imageCanvas, context, scale, or editor
    * settings change.
    */
-  useLayoutEffect(() => drawImageOnCanvas(), [
-    drawImageOnCanvas,
-    palette,
-    canvasSize
-  ]);
+  useLayoutEffect(() => drawImageOnCanvas());
+  // [
+  //   image,
+  //   palette,
+  //   canvasSize,
+  //   drawImageOnCanvas,
+  // ]);
 
   /////////////////////////////////////////////////////////////////////////////
   // Drawing Tool
@@ -146,7 +150,7 @@ export default function EditorCanvas({
       return {
         x: (e.clientX - rect.left) * scaleX,
         y: (e.clientY - rect.top) * scaleY
-      }
+      };
     }
     return undefined;
   };
@@ -155,11 +159,16 @@ export default function EditorCanvas({
     (mousePos: ImageCoordinates): ImageCoordinates | undefined => {
       const x = Math.floor((mousePos.x - imagePosition.x) / scale);
       const y = Math.floor((mousePos.y - imagePosition.y) / scale);
-      if (x < 0 || x > image.dimensions.width
-        || y < 0 || y > image.dimensions.height) return undefined;
+      if (
+        x < 0 ||
+        x > image.dimensions.width ||
+        y < 0 ||
+        y > image.dimensions.height
+      )
+        return undefined;
       return { x, y };
     },
-    [scale, imagePosition]
+    [scale, imagePosition, image.dimensions]
   );
 
   const fillPixel = useCallback(
@@ -231,10 +240,7 @@ export default function EditorCanvas({
           fillPixel(imageCoord, palette[selectedPaletteIndex]);
           break;
         case Tool.BUCKET:
-          bucketFill(
-            imageCoord,
-            palette[selectedPaletteIndex]
-          );
+          bucketFill(imageCoord, palette[selectedPaletteIndex]);
           break;
         case Tool.PAN:
           setIsPainting(true);
@@ -260,10 +266,7 @@ export default function EditorCanvas({
       switch (settings.currentTool) {
         case Tool.PENCIL:
           if (isPainting) {
-            fillPixel(
-              imageCoord,
-              palette[selectedPaletteIndex]
-            );
+            fillPixel(imageCoord, palette[selectedPaletteIndex]);
           }
           break;
         case Tool.PAN:
@@ -293,6 +296,12 @@ export default function EditorCanvas({
   const stopPaint = useCallback(() => {
     setMousePos(undefined);
     setIsPainting(false);
+    onChangeImage(image);
+  }, [image, onChangeImage]);
+
+  const mouseLeave = useCallback(() => {
+    setMousePos(undefined);
+    setIsPainting(false);
   }, []);
 
   useEffect(() => {
@@ -315,12 +324,12 @@ export default function EditorCanvas({
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     canvas.addEventListener("mouseup", stopPaint);
-    canvas.addEventListener("mouseleave", stopPaint);
+    canvas.addEventListener("mouseleave", mouseLeave);
     return () => {
       canvas.removeEventListener("mouseup", stopPaint);
-      canvas.removeEventListener("mouseleave", stopPaint);
+      canvas.removeEventListener("mouseleave", mouseLeave);
     };
-  }, [stopPaint]);
+  }, [stopPaint, mouseLeave]);
 
   /////////////////////////////////////////////////////////////////////////////
 

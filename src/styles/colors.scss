@@ -29,7 +29,6 @@ $yellow: rgb(255, 204, 0);
 // Dark layout colors
 
 $dark-bg: #252426;
-$dark-border: $gray;
 $dark-nav: #3c3c3c;
 $dark-nav-active: #505050;
 $dark-sidebar: #515151;
@@ -39,8 +38,14 @@ $dark-active2: #858585;
 $dark-inactive: #777777;
 $dark-inactive2: #666666;
 
+$dark-border: #5e5e61d8;
+// $dark-button: #616161;
+$dark-button: #636262;
+$dark-modal: #363636;
+$dark-modal-input: #00000070;
+
 $dark-text: white;
-$dark-text-secondary: rgb(219, 202, 123);
+$dark-text-secondary: #b9b9b9;
 
 $dark-title: #e45eff;
 $dark-subtitle: #e0e0e0;
