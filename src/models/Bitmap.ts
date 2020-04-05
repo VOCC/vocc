@@ -2,13 +2,14 @@ import {
   Color,
   Dimensions,
   ImageInterface,
-  ImageCoordinates
-} from "../../lib/interfaces";
+  ImageCoordinates,
+  ImageDataStore
+} from "../util/interfaces";
 import ImageCanvas from "./ImageCanvas";
-import * as Loader from "../../lib/fileLoadUtils";
+import * as Loader from "../util/fileLoadUtils";
 
 export default abstract class Bitmap implements ImageInterface {
-  public  fileName: string;
+  public fileName: string;
   public dimensions: Dimensions;
 
   protected imageData: Uint8ClampedArray;
@@ -39,8 +40,22 @@ export default abstract class Bitmap implements ImageInterface {
     return this.imageCanvas.getPixelGridCanvasElement();
   }
 
-  public getImageData(): Uint8ClampedArray {
-    return this.imageData;
+  // public getRawImageData(): Uint8ClampedArray {
+  //   return this.imageData;
+  // }
+
+  public getImageDataStore(): ImageDataStore {
+    return {
+      fileName: this.fileName,
+      dimensions: this.dimensions,
+      imageData: this.imageData.slice()
+    };
+  }
+
+  public updateFromStore(store: ImageDataStore): void {
+    this.dimensions = store.dimensions;
+    this.fileName = store.fileName;
+    this.imageData = store.imageData as Uint8ClampedArray;
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {
@@ -61,8 +76,5 @@ export default abstract class Bitmap implements ImageInterface {
   public abstract getCSourceData(): string;
   public abstract getHeaderData(): string;
   public abstract getPixelColorAt(pos: ImageCoordinates): Color;
-  public abstract setPixelColor(
-    pos: ImageCoordinates,
-    color: Color
-  ): void;
+  public abstract setPixelColor(pos: ImageCoordinates, color: Color): void;
 }

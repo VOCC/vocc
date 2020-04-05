@@ -4,7 +4,10 @@ interface DropdownProps {
   label: string;
 }
 
-export default function Dropdown({ label, children }: PropsWithChildren<DropdownProps>) {
+export default function Dropdown({
+  label,
+  children
+}: PropsWithChildren<DropdownProps>) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -15,10 +18,10 @@ export default function Dropdown({ label, children }: PropsWithChildren<Dropdown
       <div
         id="myDropdown"
         className={open ? "dd-content dd-show" : "dd-content"}
+        onClick={() => setOpen(false)}
       >
         {children}
       </div>
     </div>
   );
 }
-

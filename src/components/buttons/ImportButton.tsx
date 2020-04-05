@@ -4,58 +4,28 @@ type ImportFile = File | null;
 
 interface IProps {
   buttonLabel: string;
-  onFileChange: (imageFile: ImportFile) => void;
+  onFileInputChange: (
+    element: HTMLInputElement | null,
+    event: React.FormEvent<HTMLInputElement>
+  ) => void;
 }
 
-interface IFile {
-  fileName: string;
-  hasLoadedFile: boolean;
-}
-
-function ImportButton({ onFileChange, buttonLabel }: IProps): JSX.Element {
+function ImportButton({ onFileInputChange, buttonLabel }: IProps): JSX.Element {
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLInputElement>): void => {
-    e.preventDefault();
-    if (fileInput.current) {
-      if (fileInput.current.files) {
-        onFileChange(fileInput.current.files[0]);
-      }
-    }
-  };
-
-  // const renderLoaded = (fileTitle: string): JSX.Element => (
-  //   <div>
-  //     <button className="button import-button">
-  //     <label>
-  //       Import
-  //       <input
-  //         type="file"
-  //         accept=".png, .jpg, .jpeg, .bmp, .pal"
-  //         ref={fileInput}
-  //         onChange={handleSubmit}
-  //       />
-  //     </label>
-  //   </button>
-  //     Loaded <em>{fileTitle}</em>
-  //   </div>
-  // );
-
-  const render = (): JSX.Element => (
-    <button className="button import-button">
+  return (
+    <>
       <label>
         {buttonLabel}
         <input
           type="file"
           accept=".png, .jpg, .jpeg, .bmp, .pal"
           ref={fileInput}
-          onChange={handleSubmit}
+          onChange={e => onFileInputChange(fileInput.current, e)}
         />
       </label>
-    </button>
+    </>
   );
-
-  return render();
 }
 
 export default ImportButton;

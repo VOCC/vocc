@@ -1,8 +1,8 @@
 import React from "react";
-import Palette from "./objects/Palette";
+import Palette from "../models/Palette";
 import PaletteDisplay from "./PaletteDisplay";
 import QuantizeButton from "./buttons/QuantizeButton";
-import { Color } from "../lib/interfaces";
+import { Color, EditorSettings } from "../util/interfaces";
 
 interface PalettePanelProps {
   palette: Palette;
@@ -11,6 +11,8 @@ interface PalettePanelProps {
   onChangeSelectedColorIndex: (newIndex: number) => void;
   onChangeColor: (newColor: Color) => void;
   handleQuantize: (newColorDepth: number) => void;
+  settings: EditorSettings;
+  onSettingsChange: (newSettings: EditorSettings) => void;
 }
 
 export default function PalettePanel({
@@ -18,11 +20,13 @@ export default function PalettePanel({
   selectedColorIndex,
   onChangeSelectedColorIndex,
   onChangeColor,
-  handleQuantize
+  handleQuantize,
+  settings,
+  onSettingsChange
 }: PalettePanelProps): JSX.Element {
   return (
     <div>
-      <div className="panel-label">Color Palette</div>
+      <div className="panel-header-top">Palette</div>
       <div className="palette-container">
         <PaletteDisplay
           palette={palette}
@@ -35,6 +39,14 @@ export default function PalettePanel({
         onChangeColor={onChangeColor}
       ></ColorInput>
       <QuantizeButton handleQuantize={handleQuantize} />
+      <div className="panel-header">Properties</div>
+      <div className="settings-container">
+        <div>
+          Mode: &nbsp; {settings.editorMode}
+          <br/>
+          Type: &nbsp; {settings.editorMode.toString()}
+        </div>
+      </div>
     </div>
   );
 }
@@ -43,11 +55,11 @@ const MIN_COLOR_VAL = "0";
 const MAX_COLOR_VAL = "31";
 
 const color256to32 = (color: Color): Color => {
-    const r = Math.ceil((color.r + 1) / 8) - 1;
-    const g = Math.ceil((color.g + 1) / 8) - 1;
-    const b = Math.ceil((color.b + 1) / 8) - 1;
+  const r = Math.ceil((color.r + 1) / 8) - 1;
+  const g = Math.ceil((color.g + 1) / 8) - 1;
+  const b = Math.ceil((color.b + 1) / 8) - 1;
 
-    return new Color(r, g, b, 1);
+  return new Color(r, g, b, 1);
 };
 
 const color32to256 = (color: Color): Color => {
@@ -101,37 +113,34 @@ function ColorInput({
   };
 
   return (
-    <div>
-      <div>
-        <label>R</label>
+    <div className="rgb-container">
+        <label className="rgb-label">R</label>
         <input
+          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
           value={color32.r}
           onChange={e => handleRChange(parseInt(e.target.value))}
         ></input>
-      </div>
-      <div>
-        <label>G</label>
+        <label className="rgb-label">G</label>
         <input
+          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
           value={color32.g}
           onChange={e => handleGChange(parseInt(e.target.value))}
         ></input>
-      </div>
-      <div>
-        <label>B</label>
+        <label className="rgb-label">B</label>
         <input
+          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
           value={color32.b}
           onChange={e => handleBChange(parseInt(e.target.value))}
         ></input>
-      </div>
     </div>
   );
 }
