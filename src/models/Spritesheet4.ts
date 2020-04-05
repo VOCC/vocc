@@ -96,6 +96,7 @@ export default class Spritesheet4 implements ImageInterface {
     addSpriteBoxToTileGridCanvas(
       { x, y },
       dimensions,
+      newSpriteIndex,
       this._tileGridHiddenCanvas
     );
     console.log("Added sprite of size", dimensions, "at", { x, y });
@@ -279,6 +280,7 @@ function createTileGridHiddenCanvas(tileDimensions: Dimensions) {
 function addSpriteBoxToTileGridCanvas(
   spritePos: ImageCoordinates,
   spriteDim: Dimensions,
+  spriteNum: number,
   canvas: HTMLCanvasElement
 ) {
   const ctx = canvas.getContext("2d");
@@ -291,6 +293,13 @@ function addSpriteBoxToTileGridCanvas(
     spriteDim.width * TILEGRID_RATIO,
     spriteDim.height * TILEGRID_RATIO
   );
+  ctx.fillStyle = "white"
+  ctx.font = "12px monospace";
+  ctx.fillText(
+    spriteNum.toString(),
+    spritePos.x * ratio + 2,
+    spritePos.y * ratio + 12,
+  )
 }
 
 /**
