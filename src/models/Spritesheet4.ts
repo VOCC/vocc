@@ -4,7 +4,7 @@ import {
   ImageCoordinates,
   ImageDataStore,
   ImageInterface,
-  SpriteDimensions
+  SpriteDimensions,
 } from "../util/types";
 import Color from "./Color";
 import { PixelGrid } from "./ImageCanvas";
@@ -102,6 +102,25 @@ export default class Spritesheet4 implements ImageInterface {
     console.log("Added sprite of size", dimensions, "at", { x, y });
   }
 
+  public removeSprite(index: number) {
+    const sprite = this._sprites[index];
+    const { x, y } = sprite.position;
+    // Clear out spritemap
+    for (let r = y; r < y + sprite.dimensions.height / TILE_SIZE.height; r++) {
+      for (let c = x; c < x + sprite.dimensions.width / TILE_SIZE.width; c++) {
+        this._spriteMap[r][c] = null;
+      }
+    }
+    // Remove from sprite array
+    this._sprites.splice(index, 1);
+    this.drawToHiddenCanvas();
+    redrawTileGridCanvas(
+      this._tileGridHiddenCanvas,
+      this._sprites,
+      this._tileDimensions
+    );
+  }
+
   // TODO: Implement
   public getPixelColorAt(pos: ImageCoordinates): Color {
     return new Color(0, 0, 0);
@@ -127,7 +146,7 @@ export default class Spritesheet4 implements ImageInterface {
     this._palette = newPalette;
     // for each sprite, set the new palette
     // the sprites take care of redrawing themselves
-    this._sprites.map(s => (s.palette = newPalette));
+    this._sprites.map((s) => (s.palette = newPalette));
     this.drawToHiddenCanvas();
   }
 
@@ -175,7 +194,7 @@ export default class Spritesheet4 implements ImageInterface {
 
     this.fillBlack();
 
-    this.sprites.forEach(sprite => {
+    this.sprites.forEach((sprite) => {
       ctx.drawImage(
         sprite.imageCanvasElement,
         8 * sprite.position.x,
@@ -215,14 +234,14 @@ export default class Spritesheet4 implements ImageInterface {
     const tempData: ImageDataStore = {
       fileName: this.fileName,
       dimensions: this.dimensions,
-      imageData: []
+      imageData: [],
     };
     return tempData;
   }
 
   public async getImageFileBlob(): Promise<Blob | null> {
-    return new Promise(resolve => {
-      this.imageCanvasElement.toBlob(blob => resolve(blob));
+    return new Promise((resolve) => {
+      this.imageCanvasElement.toBlob((blob) => resolve(blob));
     });
   }
 
@@ -238,24 +257,32 @@ export default class Spritesheet4 implements ImageInterface {
 }
 
 function createTileGridHiddenCanvas(tileDimensions: Dimensions) {
+  // height vs. width doesn't matter, since tiles /should/ be square...
+  const ratio = TILEGRID_RATIO * TILE_SIZE.height;
+  const hiddenCanvas = createHiddenCanvas({
+    height: ratio * tileDimensions.height,
+    width: ratio * tileDimensions.width,
+  });
+  drawTilesOnCanvas(hiddenCanvas, tileDimensions);
+  return hiddenCanvas;
+}
+
+function drawTilesOnCanvas(
+  canvas: HTMLCanvasElement,
+  tileDimensions: Dimensions
+) {
   const error = () =>
     console.error(
       "Spritesheet: Failed to get context for tile grid canvas.",
       "Cannot draw tile grid."
     );
 
-  // height vs. width doesn't matter, since tiles /should/ be square...
   const ratio = TILEGRID_RATIO * TILE_SIZE.height;
 
-  const hiddenCanvas = createHiddenCanvas({
-    height: ratio * tileDimensions.height,
-    width: ratio * tileDimensions.width
-  });
-
-  const ctx = hiddenCanvas.getContext("2d");
+  const ctx = canvas.getContext("2d");
   if (!ctx) {
     error();
-    return hiddenCanvas;
+    return canvas;
   }
 
   ctx.globalAlpha = 1;
@@ -273,8 +300,20 @@ function createTileGridHiddenCanvas(tileDimensions: Dimensions) {
   }
 
   ctx.stroke();
+}
 
-  return hiddenCanvas;
+function redrawTileGridCanvas(
+  canvas: HTMLCanvasElement,
+  sprites: Sprite[],
+  tileDimensions: Dimensions
+) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawTilesOnCanvas(canvas, tileDimensions);
+  sprites.map((s, i) =>
+    addSpriteBoxToTileGridCanvas(s.position, s.dimensions, i, canvas)
+  );
 }
 
 function addSpriteBoxToTileGridCanvas(
@@ -293,13 +332,13 @@ function addSpriteBoxToTileGridCanvas(
     spriteDim.width * TILEGRID_RATIO,
     spriteDim.height * TILEGRID_RATIO
   );
-  ctx.fillStyle = "white"
+  ctx.fillStyle = "white";
   ctx.font = "12px monospace";
   ctx.fillText(
     spriteNum.toString(),
     spritePos.x * ratio + 2,
-    spritePos.y * ratio + 12,
-  )
+    spritePos.y * ratio + 12
+  );
 }
 
 /**
@@ -318,7 +357,7 @@ function spritesheetCoordsToSpriteCoords(
 ): ImageCoordinates {
   const spp: ImageCoordinates = {
     x: stp.x * TILE_SIZE.width,
-    y: stp.y * TILE_SIZE.height
+    y: stp.y * TILE_SIZE.height,
   };
   // console.log("in:", ssc, ssd, spp, spd);
 
@@ -328,7 +367,7 @@ function spritesheetCoordsToSpriteCoords(
 
   const pixelPos: ImageCoordinates = {
     x: ssc.x - spp.x,
-    y: ssc.y - spp.y
+    y: ssc.y - spp.y,
   };
 
   if (pixelPos.x >= spd.width || pixelPos.y >= spd.height) {

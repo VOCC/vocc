@@ -7,15 +7,23 @@ interface SpritePanelProps {
     position: ImageCoordinates,
     dimensions: SpriteDimensions
   ) => void;
+  onRemoveSprite: (i: number) => void;
   sprites: Sprite[];
 }
 
 export default function SpritePanel({
   sprites,
-  onAddSprite
+  onAddSprite,
+  onRemoveSprite,
 }: SpritePanelProps) {
   const renderSpriteList = (sprites: Sprite[]) =>
-    sprites.map((s, i) => <SpriteListItem sprite={s} i={i} />);
+    sprites.map((s, i) => (
+      <SpriteListItem
+        sprite={s}
+        i={i}
+        onRemoveSprite={onRemoveSprite.bind(null, i)}
+      />
+    ));
 
   return (
     <div className="spritepanel-container">
@@ -29,14 +37,16 @@ export default function SpritePanel({
 interface SpriteListItemProps {
   sprite: Sprite;
   i: number;
+  onRemoveSprite: () => void;
 }
 
-function SpriteListItem({ sprite, i }: SpriteListItemProps) {
+function SpriteListItem({ sprite, i, onRemoveSprite }: SpriteListItemProps) {
   return (
     <div key={i}>
       <strong>Sprite {i}: </strong>
       p:({sprite.position.x}, {sprite.position.y}), d:({sprite.dimensions.width}
       , {sprite.dimensions.height}), r:{sprite.paletteRow.toString()}
+      <button onClick={onRemoveSprite}>X</button>
     </div>
   );
 }
@@ -52,7 +62,7 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
   // In terms of PIXELS
   const [dimensions, setDimensions] = useState<SpriteDimensions>({
     height: 8,
-    width: 8
+    width: 8,
   });
   // In terms of TILES
   const [position, setPosition] = useState<ImageCoordinates>({ x: 0, y: 0 });
@@ -62,28 +72,28 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
   ) => {
     setDimensions({
       height: parseInt(e.target.value),
-      width: dimensions.width
+      width: dimensions.width,
     } as SpriteDimensions);
   };
 
   const handleSpriteWidthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDimensions({
       width: parseInt(e.target.value),
-      height: dimensions.height
+      height: dimensions.height,
     } as SpriteDimensions);
   };
 
   const handlePosXChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPosition({
       x: parseInt(e.target.value),
-      y: position.y
+      y: position.y,
     });
   };
 
   const handlePosYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPosition({
       y: parseInt(e.target.value),
-      x: position.x
+      x: position.x,
     });
   };
 

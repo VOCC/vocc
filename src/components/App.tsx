@@ -18,7 +18,7 @@ import {
   ImageDataStore,
   ImageInterface,
   Mode,
-  SpriteDimensions
+  SpriteDimensions,
 } from "../util/types";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
@@ -47,7 +47,7 @@ function App(): JSX.Element {
     grid: true,
     currentTool: Tool.PENCIL,
     imageMode: 3,
-    editorMode: EditorMode.Bitmap
+    editorMode: EditorMode.Bitmap,
   });
 
   const [, updateState] = React.useState();
@@ -62,15 +62,15 @@ function App(): JSX.Element {
 
   const {
     isShowing: isMode3BitmapModalShowing,
-    toggle: toggleMode3BitmpModal
+    toggle: toggleMode3BitmpModal,
   } = useModal();
   const {
     isShowing: isMode4BitmapModalShowing,
-    toggle: toggleMode4BitmpModal
+    toggle: toggleMode4BitmpModal,
   } = useModal();
 
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
-  const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
+  const handleMouseWheelEvent = useCallback((e) => scaleDispatch(e), []);
 
   const handleFileInputChange = (
     type: "Image" | "Palette",
@@ -114,6 +114,13 @@ function App(): JSX.Element {
     spritesheet.addSprite(position, dimensions);
     forceUpdate();
     console.log("Adding sprite");
+  };
+
+  const handleRemoveSprite = (image: ImageInterface | undefined, i: number) => {
+    if (image && image instanceof Spritesheet4) {
+      (image as Spritesheet4).removeSprite(i);
+    }
+    forceUpdate();
   };
 
   const pushUndoStack = (imageDataStoreString: string) => {
@@ -195,7 +202,7 @@ function App(): JSX.Element {
         grid: editorSettings.grid,
         currentTool: newTool,
         imageMode: editorSettings.imageMode,
-        editorMode: editorSettings.editorMode
+        editorMode: editorSettings.editorMode,
       });
     },
     [editorSettings]
@@ -465,7 +472,7 @@ function App(): JSX.Element {
             onClick={() =>
               handleNewImage(EditorMode.Spritesheet, 0, "untitled", {
                 height: 256,
-                width: 256
+                width: 256,
               })
             }
           >
@@ -595,6 +602,7 @@ function App(): JSX.Element {
           {editorSettings.editorMode === EditorMode.Spritesheet ? (
             <SpritePanel
               onAddSprite={handleAddSprite}
+              onRemoveSprite={(i) => handleRemoveSprite(image, i)}
               sprites={(image as Spritesheet4).sprites}
             />
           ) : null}
