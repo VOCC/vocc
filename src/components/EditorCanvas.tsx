@@ -131,11 +131,13 @@ export default function EditorCanvas({
    * Draw the image whenever the image, imageCanvas, context, scale, or editor
    * settings change.
    */
-  useLayoutEffect(() => drawImageOnCanvas(), [
-    drawImageOnCanvas,
-    palette,
-    canvasSize
-  ]);
+  useLayoutEffect(() => drawImageOnCanvas());
+  // [
+  //   image,
+  //   palette,
+  //   canvasSize,
+  //   drawImageOnCanvas,
+  // ]);
 
   /////////////////////////////////////////////////////////////////////////////
   // Drawing Tool
@@ -297,6 +299,11 @@ export default function EditorCanvas({
     onChangeImage(image);
   }, [image, onChangeImage]);
 
+  const mouseLeave = useCallback(() => {
+    setMousePos(undefined);
+    setIsPainting(false);
+  }, []);
+
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -317,12 +324,12 @@ export default function EditorCanvas({
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     canvas.addEventListener("mouseup", stopPaint);
-    canvas.addEventListener("mouseleave", stopPaint);
+    canvas.addEventListener("mouseleave", mouseLeave);
     return () => {
       canvas.removeEventListener("mouseup", stopPaint);
-      canvas.removeEventListener("mouseleave", stopPaint);
+      canvas.removeEventListener("mouseleave", mouseLeave);
     };
-  }, [stopPaint]);
+  }, [stopPaint, mouseLeave]);
 
   /////////////////////////////////////////////////////////////////////////////
 

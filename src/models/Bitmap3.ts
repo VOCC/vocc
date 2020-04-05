@@ -30,7 +30,21 @@ class Bitmap3 extends Bitmap {
     dimensions,
     fileName
   }: ImageDataStore): Bitmap3 {
-    return new Bitmap3(fileName, dimensions, imageData as Uint8ClampedArray);
+    return new Bitmap3(fileName, dimensions, Uint8ClampedArray.from(imageData));
+  }
+
+  public updateFromStore({ imageData }: ImageDataStore) {
+    console.log(imageData as Uint8ClampedArray);
+    this.imageData = imageData as Uint8ClampedArray;
+    this.imageCanvas.redrawImage(this);
+  }
+
+  public getImageDataStore(): ImageDataStore {
+    return {
+      fileName: this.fileName,
+      dimensions: this.dimensions,
+      imageData: Array.from(this.imageData)
+    };
   }
 
   public getCSourceData(): string {
