@@ -3,7 +3,7 @@ import React, {
   useRef,
   useState,
   useCallback,
-  useLayoutEffect
+  useLayoutEffect,
 } from "react";
 import { EditorSettings, ImageCoordinates, Color } from "../util/interfaces";
 import Bitmap from "../models/Bitmap";
@@ -30,7 +30,7 @@ export default function EditorCanvas({
   settings,
   scale,
   onChangeImage,
-  onMouseWheel
+  onMouseWheel,
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasSize, setCanvasSize] = useState<number[]>([0, 0]);
@@ -42,15 +42,15 @@ export default function EditorCanvas({
   );
   const [startPos, setStartPos] = useState<ImageCoordinates>({
     x: 0,
-    y: 0
+    y: 0,
   });
   const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
     x: 0,
-    y: 0
-  }); 
-  const [endingPos, setEndingPos] = useState<
-    ImageCoordinates | undefined
-    >(undefined);
+    y: 0,
+  });
+  const [endingPos, setEndingPos] = useState<ImageCoordinates | undefined>(
+    undefined
+  );
   ///////////////////////////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
@@ -90,7 +90,7 @@ export default function EditorCanvas({
       if (canvasRef.current) {
         setCanvasSize([
           canvasRef.current.clientWidth,
-          canvasRef.current.clientHeight
+          canvasRef.current.clientHeight,
         ]);
       }
     };
@@ -150,7 +150,7 @@ export default function EditorCanvas({
       const scaleY = canvas.height / rect.height;
       return {
         x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
+        y: (e.clientY - rect.top) * scaleY,
       };
     }
     return undefined;
@@ -174,13 +174,13 @@ export default function EditorCanvas({
 
   // const atNewPixel = useCallback((newPos: ImageCoordinates): boolean => {
   //   if (!mousePos) return false;
-  //   const prevImgCoord = getImageCoord(mousePos); 
+  //   const prevImgCoord = getImageCoord(mousePos);
   //   if (!prevImgCoord) return false;
   //   const prevPixel = {
   //     x: imagePosition.x + prevImgCoord.x * scale,
   //     y: imagePosition.y + prevImgCoord.y * scale
   //   }
-    
+
   //   if (prevPixel.x === newPos.x && prevPixel.y === newPos.y) {
   //     return false;
   //   }
@@ -228,8 +228,8 @@ export default function EditorCanvas({
         }
         ///
         edges
-          .filter(n => !explored.includes(n))
-          .forEach(n => {
+          .filter((n) => !explored.includes(n))
+          .forEach((n) => {
             explored.push(n);
             if (image.getPixelColorAt(n).isEqual(color)) {
               queue.push(n);
@@ -254,7 +254,7 @@ export default function EditorCanvas({
   //   context.fillStyle = colorString;
   //   context.lineWidth = 1;
   //   context.rect(
-  //     startPos.x, startPos.y, 
+  //     startPos.x, startPos.y,
   //     endingPos.x - startPos.x, endingPos.y - startPos.y);
   //   context.fill();
   // }, [startPos, endingPos, palette, selectedPaletteIndex]);
@@ -266,7 +266,7 @@ export default function EditorCanvas({
       setMousePos(mousePosition);
       const imageCoord = getImageCoord(mousePosition);
       if (!canvasRef.current) return;
-      const context = canvasRef.current.getContext('2d');
+      const context = canvasRef.current.getContext("2d");
       if (!context) return;
       // if (!imageCoord) return;
       switch (settings.currentTool) {
@@ -298,7 +298,7 @@ export default function EditorCanvas({
       fillPixel,
       getImageCoord,
       palette,
-      selectedPaletteIndex
+      selectedPaletteIndex,
     ]
   );
 
@@ -310,10 +310,7 @@ export default function EditorCanvas({
       switch (settings.currentTool) {
         case Tool.PENCIL:
           if (isPainting) {
-            fillPixel(
-              imageCoord,
-              palette[selectedPaletteIndex]
-            );
+            fillPixel(imageCoord, palette[selectedPaletteIndex]);
             setMousePos(newMousePos);
           }
           break;
@@ -335,7 +332,7 @@ export default function EditorCanvas({
           if (isPainting && mousePos) {
             const newImagePosition = {
               x: imagePosition.x + (newMousePos.x - mousePos.x),
-              y: imagePosition.y + (newMousePos.y - mousePos.y)
+              y: imagePosition.y + (newMousePos.y - mousePos.y),
             };
             setImagePosition(newImagePosition);
             setMousePos(newMousePos);
@@ -351,7 +348,7 @@ export default function EditorCanvas({
       selectedPaletteIndex,
       imagePosition,
       mousePos,
-      settings.currentTool
+      settings.currentTool,
     ]
   );
 
@@ -364,17 +361,17 @@ export default function EditorCanvas({
       let e = endingPos;
       if (e.x < s.x) {
         let temp = s.x;
-        s = {x: e.x, y: s.y};
-        e = {x: temp, y: e.y};
+        s = { x: e.x, y: s.y };
+        e = { x: temp, y: e.y };
       }
       if (e.y < s.y) {
         let temp = s.y;
-        s = {x: s.x, y: e.y};
-        e = {x: e.x, y: temp};
+        s = { x: s.x, y: e.y };
+        e = { x: e.x, y: temp };
       }
       for (let i = s.y; i <= e.y; i++) {
         for (let j = s.x; j <= e.x; j++) {
-          let pos: ImageCoordinates = {x: j, y: i};
+          let pos: ImageCoordinates = { x: j, y: i };
           image.setPixelColor(pos, palette[selectedPaletteIndex]);
         }
       }
@@ -387,11 +384,11 @@ export default function EditorCanvas({
       let center = startPos;
       let a = Math.abs(endingPos.x - center.x);
       let b = Math.abs(endingPos.y - center.y);
-      let s = {x: center.x - a, y: center.y - b};
-      let e = {x: center.x + a, y: center.y + b};
+      let s = { x: center.x - a, y: center.y - b };
+      let e = { x: center.x + a, y: center.y + b };
       for (let i = s.y; i <= e.y; i++) {
         for (let j = s.x; j <= e.x; j++) {
-          let point = {x: j, y: i};
+          let point = { x: j, y: i };
           console.log(point);
           // solve for equation of ellipse to check if inside or on ellipse
           let l = Math.pow(point.x - center.x, 2) / Math.pow(a, 2);
@@ -406,8 +403,17 @@ export default function EditorCanvas({
       drawImageOnCanvas();
     }
     setEndingPos(undefined);
-  }, [settings.currentTool, startPos, endingPos, drawImageOnCanvas, image,
-      palette, selectedPaletteIndex]);
+    onChangeImage(image);
+  }, [
+    settings.currentTool,
+    startPos,
+    endingPos,
+    drawImageOnCanvas,
+    image,
+    palette,
+    selectedPaletteIndex,
+    onChangeImage,
+  ]);
 
   const mouseLeave = useCallback(() => {
     setMousePos(undefined);
