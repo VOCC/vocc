@@ -125,22 +125,50 @@ input[type="file"] {
 }
 
 .quantize-button {
+  // @extend .button;
+  // margin-top: 1rem;
+  // border: none;
+  // padding-top: 3px;
+  // padding-left: 12px;
+  // padding-right: 12px;
+  // text-align: center;
+  // font-weight: 500;
+  // background-color: $dark-sidebar2;
   @extend .button;
-  margin-top: 1rem;
   border: none;
-  padding-top: 3px;
-  padding-left: 12px;
-  padding-right: 12px;
+  padding: 2px 1rem 0 1rem;
+  min-height: 32px;
+  max-height: 32px;
   text-align: center;
+  line-height: 0;
+  letter-spacing: 0.5px;
   font-weight: 500;
-  background-color: $dark-sidebar2;
+  background-color: $dark-modal;
 }
 
 .quantize-input {
+  // margin-left: 0.75rem;
+  // border-radius: 4px;
+  // width: 64px;
+  // box-sizing: border-box;
   margin-left: 0.75rem;
   border-radius: 4px;
-  width: 64px;
+  min-height: 32px;
+  max-height: 32px;
+  max-width: 54px;
   box-sizing: border-box;
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.sprite-button {
+  @extend .quantize-button;
+  margin: 0.25rem auto 0.5rem auto;
+  padding: 0.75rem;
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: 0.5px;
+  font-size: 10pt;
+  background-color: $dark-button;
 }
 
 @mixin track() {

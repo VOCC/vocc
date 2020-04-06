@@ -33,10 +33,12 @@ export default function SpritePanel({
     ));
 
   return (
-    <div className="spritepanel-container">
-      <div>Sprites</div>
-      <NewSpriteForm onAddSprite={onAddSprite}></NewSpriteForm>
-      {renderSpriteList(sprites)}
+    <div>
+      <div className="spritepanel-header">Sprites</div>
+      <div className="spritepanel-container">
+        <NewSpriteForm onAddSprite={onAddSprite}></NewSpriteForm>
+        {renderSpriteList(sprites)}
+      </div>
     </div>
   );
 }
@@ -133,53 +135,64 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="sprite-height">Height</label>
-      <select
-        id="sprite-height"
-        name="sprite-height"
-        value={dimensions.height}
-        onChange={handleSpriteHeightChange}
-      >
-        <option value={8}>8</option>
-        <option value={16}>16</option>
-        <option value={32}>32</option>
-        <option value={64}>64</option>
-      </select>
-      <label htmlFor="sprite-width">Width</label>
-      <select
-        id="sprite-width"
-        name="sprite-width"
-        value={dimensions.width}
-        onChange={handleSpriteWidthChange}
-      >
-        <option value={8}>8</option>
-        <option value={16}>16</option>
-        <option value={32}>32</option>
-        <option value={64}>64</option>
-      </select>
-      <br />
-      <label htmlFor="sprite-pos-x">Pos X</label>
-      <input
-        id="sprite-pos-x"
-        name="sprite-pos-x"
-        type="number"
-        min={0}
-        max={31}
-        value={position.x}
-        onChange={handlePosXChange}
-      ></input>
-      <label htmlFor="sprite-pos-y">Pos Y</label>
-      <input
-        id="sprite-pos-y"
-        name="sprite-pos-y"
-        type="number"
-        min={0}
-        max={31}
-        value={position.y}
-        onChange={handlePosYChange}
-      ></input>
-      <br />
-      <button>Add Sprite</button>
+      <div className="spritepanel-label">Dimensions</div>
+      <div className="sprite-input-container">
+        <label htmlFor="sprite-height" className="spritepanel-label-num">Height: </label>
+        <select
+          className="sprite-select"
+          id="sprite-height"
+          name="sprite-height"
+          value={dimensions.height}
+          onChange={handleSpriteHeightChange}
+        >
+          <option value={8}>8</option>
+          <option value={16}>16</option>
+          <option value={32}>32</option>
+          <option value={64}>64</option>
+        </select>
+        <br />
+        <label htmlFor="sprite-width" className="spritepanel-label-num">Width: </label>
+        <select
+          className="sprite-select"
+          id="sprite-width"
+          name="sprite-width"
+          value={dimensions.width}
+          onChange={handleSpriteWidthChange}
+        >
+          <option value={8}>8</option>
+          <option value={16}>16</option>
+          <option value={32}>32</option>
+          <option value={64}>64</option>
+        </select>
+      </div>
+      {/* <br /> */}
+      <div className="spritepanel-label">Position</div>
+      <div className="sprite-input-container">
+        <label htmlFor="sprite-pos-x" className="spritepanel-label-pos">X: </label>
+        <input
+          className="sprite-input"
+          id="sprite-pos-x"
+          name="sprite-pos-x"
+          type="number"
+          min={0}
+          max={31}
+          value={position.x}
+          onChange={handlePosXChange}
+        ></input>
+        <label htmlFor="sprite-pos-y" className="spritepanel-label-pos">Y: </label>
+        <input
+          className="sprite-input"
+          id="sprite-pos-y"
+          name="sprite-pos-y"
+          type="number"
+          min={0}
+          max={31}
+          value={position.y}
+          onChange={handlePosYChange}
+        ></input>
+      </div>
+      {/* <br /> */}
+      <button className="sprite-button">Add Sprite</button>
     </form>
   );
 }
