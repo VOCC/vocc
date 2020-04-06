@@ -195,6 +195,16 @@ export function generateMode4HeaderString({
   return headerString;
 }
 
+export const PALETTE_HEADER = (varName: string, palLength = PALETTE_LENGTH) =>
+  `#define ${varName}PalLen ${palLength * 2}\n`
+    + `extern const unsigned short ${varName}Palette[${palLength}];\n\n`;
+
+export const SS_TILES_HEADER = (varName: string, ssDimensions = {height:256,width:256}) => {
+  const len = ssDimensions.height * ssDimensions.width;
+  return `#define ${varName}TilesLen ${len / 2}\n`
+    + `extern const unsigned short ${varName}Tiles[${len / 4}];\n\n`;
+}
+
 function paletteIndicesToHex(index1: number, index2: number): string {
   if (index1 > 255 || index2 > 255) {
     console.error(

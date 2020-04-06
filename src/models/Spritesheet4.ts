@@ -1,4 +1,5 @@
 import { createHiddenCanvas } from "../util/fileLoadUtils";
+import { PALETTE_HEADER, SS_TILES_HEADER } from "../util/exportUtils";
 import {
   Dimensions,
   ImageCoordinates,
@@ -247,39 +248,30 @@ export default class Spritesheet4 implements ImageInterface {
     });
   }
 
-  // TODO: Implement
-  // size = (height * width) / bpp (4 bpp)
-  public get tilesHeaderData(): string {
-    const size = (this.dimensions.height * this.dimensions.width) / 4
-    const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
-    const imageDefinitionString = `const unsigned short [${name}] __attribute__((aligned(4)))=\n{\n\t`;
-    return "const unsigned short " + name + "[" + size + "]" + "__attribute__((aligned(4)))";
-  }
-
-  //TODO: impliment
-  // same as image data export for mode 3
-  public get tileData(): String {
-    return "";
-  }
-
-  // size = (height * width) / 64 (tile size: 8x8 = 64)
-  public get mapHeaderData(): string {
-    const size = (this.dimensions.height * this.dimensions.width) / 64
-    const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
-    const imageDefinitionString = `const unsigned short [${name}] __attribute__((aligned(4)))=\n{\n\t`;
-    return "const unsigned short " + name + "[" + size + "]" + "__attribute__((aligned(4)))";
-  }
-
-  //TODO: impliment
-  public get mapData(): String {
-    return "";
-  }
-
-  // TODO: Implement
   // The correct order should be:
   // tileHeader, tileData, mapHeader, mapData, paletteHeader, paletteData
+  public get headerData(): string {
+    return SS_TILES_HEADER(this.fileName) + PALETTE_HEADER(this.fileName)
+  }
+
+  // TODO: Implement
+  // size = (height * width) / bpp (4 bpp)
+  // private get tilesHeader(): string {
+  //   const size = (this.dimensions.height * this.dimensions.width) / 4
+  //   const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
+  //   const imageDefinitionString = `const unsigned short [${name}] __attribute__((aligned(4)))=\n{\n\t`;
+  //   return "const unsigned short " + name + "[" + size + "]" + "__attribute__((aligned(4)))";
+  // }
+
+  // //TODO: impliment
+  // // same as image data export for mode 3
+  // private get tileData(): String {
+  //   return "";
+  // }
+
+  // TODO: Implement
   public get cSourceData(): string {
-    return "";
+    return "lol sorry not done yet";
   }
 }
 
