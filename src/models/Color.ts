@@ -1,4 +1,4 @@
-export default class Color {
+class Color {
   public r: number;
   public g: number;
   public b: number;
@@ -16,23 +16,6 @@ export default class Color {
   }
 
   public toHexString(): string {
-    // // convert to 16-bit binary format: 0bbbbbgggggrrrrr
-    // let binary_value = "0";
-    // bgr.forEach(element => {
-    //   element = Math.floor((element * 32) / 256);
-    //   let elementString = element.toString(2); // convert to binary
-    //   while (elementString.length < 5) {
-    //     elementString = "0" + elementString;
-    //   }
-    //   binary_value += elementString;
-    // });
-    // // convert to hex
-    // let hex_value = parseInt(binary_value, 2).toString(16);
-    // while (hex_value.length < 4) {
-    //   hex_value = "0" + hex_value;
-    // }
-    // hex_value = hex_value.toUpperCase();
-    // return "0x" + hex_value;
     return "";
   }
 
@@ -59,3 +42,5 @@ export default class Color {
     );
   }
 }
+
+export default Color;
