@@ -4,6 +4,7 @@ import {
   Drawable,
   ImageCoordinates,
   SpriteDimensions,
+  SpriteDataStore,
 } from "../util/types";
 import Color from "./Color";
 import ImageCanvas from "./ImageCanvas";
@@ -41,6 +42,34 @@ export default class Sprite implements ISprite, Drawable {
     this._redrawSpritesheet = redrawSpritesheet;
   }
 
+  public static fromDataStore(
+    { position, dimensions, paletteRow, data }: SpriteDataStore,
+    palette: Palette,
+    redrawSpritesheet: () => void
+  ): Sprite {
+    const sprite = new Sprite(
+      position,
+      dimensions,
+      palette,
+      paletteRow,
+      redrawSpritesheet
+    );
+    sprite.dangerouslySetData(data);
+    return sprite;
+  }
+
+  public updateFromDataStore({
+    position,
+    dimensions,
+    paletteRow,
+    data,
+  }: SpriteDataStore) {
+    this._position = position;
+    this._dimensions = dimensions;
+    this._paletteRow = paletteRow;
+    this._data = data;
+  }
+
   /**
    * Sets the pixel color to the given palette column color (row is not
    * applicable), then updates internal image canvas.
@@ -75,6 +104,13 @@ export default class Sprite implements ISprite, Drawable {
     const col = this._data[offset(this._dimensions, pos)];
     return this._palette[offset(PALETTE_SIZE, { x: col, y: this._paletteRow })];
   }
+
+  public dangerouslySetData(data: Uint8ClampedArray) {
+    this._data = data;
+    this._imageCanvas.redrawImage(this);
+  }
+
+  // Getters and setters
 
   /** Position of sprite, in tiles */
   public get position() {
@@ -158,6 +194,15 @@ export default class Sprite implements ISprite, Drawable {
   public set palette(newPalette: Palette) {
     this._palette = newPalette;
     this._imageCanvas.redrawImage(this);
+  }
+
+  public get spriteDataStore(): SpriteDataStore {
+    return {
+      position: this._position,
+      dimensions: this._dimensions,
+      paletteRow: this._paletteRow,
+      data: this._data,
+    };
   }
 }
 

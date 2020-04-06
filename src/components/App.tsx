@@ -19,6 +19,7 @@ import {
   ImageInterface,
   Mode,
   SpriteDimensions,
+  SpritesheetDataStore,
 } from "../util/types";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
@@ -99,7 +100,12 @@ function App(): JSX.Element {
   };
 
   const handleImageChange = (newImage: ImageInterface) => {
-    const store = JSON.stringify(newImage.imageDataStore);
+    let store: string;
+    if (newImage instanceof Spritesheet4) {
+      store = JSON.stringify(newImage.spritesheetDataStore);
+    } else {
+      store = JSON.stringify(newImage.imageDataStore);
+    }
     window.localStorage.setItem(STORAGE.imageData, store);
     pushUndoStack(store);
     setImage(newImage);
@@ -112,6 +118,7 @@ function App(): JSX.Element {
   ) => {
     let spritesheet = image as Spritesheet4;
     spritesheet.addSprite(position, dimensions);
+    handleImageChange(spritesheet);
     forceUpdate();
     console.log("Adding sprite");
   };
@@ -416,12 +423,33 @@ function App(): JSX.Element {
         return;
       }
 
-      const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
       const parsedImageMode: Mode = parseInt(loadedImageMode) as Mode;
       const parsedImageType: EditorMode = loadedImageType as EditorMode;
 
       switch (parsedImageMode) {
+        case 0:
+          if (!loadedPalette) {
+            alertBadFormatting();
+            return;
+          } else {
+            const parsedPalette = JSON.parse(loadedPalette) as Palette;
+            const parsedImage = JSON.parse(loadedImage) as SpritesheetDataStore;
+            setImage(
+              Spritesheet4.fromDataStore(
+                parsedImage,
+                palette,
+                paletteIndexToCol(selectedColorIndex)
+              )
+            );
+            setPalette(parsedPalette);
+            let newEditorSettings = DEFAULT_SETTINGS;
+            newEditorSettings.imageMode = parsedImageMode;
+            newEditorSettings.editorMode = parsedImageType;
+            setEditorSettings(newEditorSettings);
+          }
+          break;
         case 3:
+          const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
           setImage(Bitmap3.fromDataStore(parsedImage));
           let newEditorSettings = DEFAULT_SETTINGS;
           newEditorSettings.imageMode = parsedImageMode;
@@ -433,6 +461,7 @@ function App(): JSX.Element {
             alertBadFormatting();
             return;
           } else {
+            const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
             const parsedPalette = JSON.parse(loadedPalette) as Palette;
             setImage(Bitmap4.fromDataStore(parsedImage, parsedPalette));
             setPalette(parsedPalette);
@@ -446,6 +475,8 @@ function App(): JSX.Element {
           alertBadFormatting();
       }
     }
+    // BIG HACK
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
