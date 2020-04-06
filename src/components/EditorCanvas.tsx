@@ -20,6 +20,7 @@ interface EditorCanvasProps {
   settings: EditorSettings;
   scale: number;
   onChangeImage: (newImage: Bitmap) => void;
+  onChangeColor: (newColor: Color) => void;
   onMouseWheel: (e: WheelEvent) => void;
 }
 
@@ -30,6 +31,7 @@ export default function EditorCanvas({
   settings,
   scale,
   onChangeImage,
+  onChangeColor,
   onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -290,6 +292,11 @@ export default function EditorCanvas({
         case Tool.PAN:
           setIsPainting(true);
           break;
+        case Tool.DROPPER:
+          if (!imageCoord) return;
+          const color = image.getPixelColorAt(imageCoord);
+          onChangeColor(color);
+          break;
       }
     },
     [
@@ -460,8 +467,12 @@ const generateEditorCanvasProps = (tool: Tool): string => {
       return base + "bucket";
     case Tool.SQUARE:
       return base + "square";
+    case Tool.ELLIPSE:
+      return base + "ellipse";
     case Tool.PAN:
       return base + "pan";
+    case Tool.DROPPER:
+      return base + "dropper";
   }
   return base;
 };
