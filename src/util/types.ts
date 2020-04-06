@@ -34,7 +34,7 @@ export type Mode = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export enum EditorMode {
   Bitmap = "Bitmap",
   Spritesheet = "Spritesheet",
-  Background = "Background"
+  Background = "Background",
 }
 
 export interface Drawable {
@@ -89,4 +89,18 @@ export interface ImageDataStore {
   fileName: string;
   dimensions: Dimensions;
   imageData: Uint8ClampedArray | number[];
+}
+
+export interface SpritesheetDataStore {
+  fileName: string;
+  dimensions: Dimensions;
+  sprites: string[];
+  bpp: number;
+}
+
+export interface SpriteDataStore {
+  position: ImageCoordinates;
+  dimensions: SpriteDimensions;
+  paletteRow: number;
+  data: Uint8ClampedArray;
 }

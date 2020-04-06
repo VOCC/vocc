@@ -8,12 +8,36 @@
   width: 192px;
 }
 
-.panel-label {
-  padding-top: 0.75rem;
-  padding-bottom: 0.5rem;
-  text-align: center;
-  letter-spacing: 0.5px;
-  font-weight: 900;
+.rgb-container {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  border-radius: 4px;
+  display: block;
+  width: 100%;
   font-size: 9pt;
-  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.rgb-label {
+  text-align: center;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 9pt;
+  font-weight: 600;
+  color: $dark-text;
+}
+
+.settings-container {
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  display: block;
+  width: fit-content;
+  text-align: left;
+  line-height: 18pt;
+  letter-spacing: 0px;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 9pt;
+  font-weight: 500;
+  background-color: $dark-nav;
 }

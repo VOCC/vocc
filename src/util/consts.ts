@@ -18,7 +18,8 @@ export enum Tool {
   ELLIPSE,
   ZOOM,
   PAN,
-  DROPPER
+  DROPPER,
+  LAYER
 }
 
 export const STORAGE = {

@@ -1,10 +1,13 @@
 import { createHiddenCanvas } from "../util/fileLoadUtils";
+import { PALETTE_HEADER, SS_TILES_HEADER } from "../util/exportUtils";
 import {
   Dimensions,
   ImageCoordinates,
   ImageDataStore,
   ImageInterface,
   SpriteDimensions,
+  SpritesheetDataStore,
+  SpriteDataStore,
 } from "../util/types";
 import Color from "./Color";
 import { PixelGrid } from "./ImageCanvas";
@@ -69,30 +72,52 @@ export default class Spritesheet4 implements ImageInterface {
     this._sprites = [];
   }
 
+  public static fromDataStore(
+    { fileName, sprites }: SpritesheetDataStore,
+    palette: Palette,
+    paletteCol: number
+  ) {
+    let ss = new Spritesheet4(fileName, palette, paletteCol);
+    ss.dangerouslySetSprites(ss.decodeSprites(sprites));
+    return ss;
+  }
+
+  /** Decodes sprites from their string format and creates Sprite objects out
+   * of them. Also tries to add them to the spritemap without checking to make
+   * sure they're valid :( */
+  public decodeSprites(sprites: string[]): Sprite[] {
+    let decodedSprites = sprites.map((s) =>
+      Sprite.fromDataStore(
+        JSON.parse(s) as SpriteDataStore,
+        this._palette,
+        () => this.drawToHiddenCanvas()
+      )
+    );
+    decodedSprites.forEach((s) => this.addToSpriteMap(s));
+    return decodedSprites;
+  }
+
+  public dangerouslySetSprites(sprites: Sprite[]) {
+    this._sprites = sprites;
+    redrawTileGridCanvas(
+      this._tileGridHiddenCanvas,
+      sprites,
+      this._tileDimensions
+    );
+    this.drawToHiddenCanvas();
+  }
+
   public addSprite({ x, y }: ImageCoordinates, dimensions: SpriteDimensions) {
     const newSprite = new Sprite({ x, y }, dimensions, this._palette, 0, () =>
       this.drawToHiddenCanvas()
     );
+
+    if (!this.addToSpriteMap(newSprite)) {
+      return; // failed since there was another sprite in the way
+    }
+
     const newSpriteIndex = this._sprites.length;
-
-    for (let r = y; r < y + dimensions.height / TILE_SIZE.height; r++) {
-      for (let c = x; c < x + dimensions.width / TILE_SIZE.width; c++) {
-        if (this._spriteMap[r][c] != null) {
-          // There's already a sprite at the location we'd be putting this one,
-          // or it overlaps, so the new sprite is invalid.
-          ALERT_INVALID_SPRITE();
-          return;
-        }
-      }
-    }
-
     this._sprites[newSpriteIndex] = newSprite;
-
-    for (let r = y; r < y + dimensions.height / 8; r++) {
-      for (let c = x; c < x + dimensions.width / 8; c++) {
-        this._spriteMap[r][c] = newSprite;
-      }
-    }
 
     this.drawToHiddenCanvas();
     addSpriteBoxToTileGridCanvas(
@@ -102,6 +127,30 @@ export default class Spritesheet4 implements ImageInterface {
       this._tileGridHiddenCanvas
     );
     console.log("Added sprite of size", dimensions, "at", { x, y });
+  }
+
+  public addToSpriteMap(sprite: Sprite): boolean {
+    let { x, y } = sprite.position; // tiles
+    let { height, width } = sprite.dimensions; // pixels
+
+    for (let r = y; r < y + height / TILE_SIZE.height; r++) {
+      for (let c = x; c < x + width / TILE_SIZE.width; c++) {
+        if (this._spriteMap[r][c] != null) {
+          // There's already a sprite at the location we'd be putting this one,
+          // or it overlaps, so the new sprite is invalid.
+          ALERT_INVALID_SPRITE();
+          return false;
+        }
+      }
+    }
+
+    for (let r = y; r < y + height / 8; r++) {
+      for (let c = x; c < x + width / 8; c++) {
+        this._spriteMap[r][c] = sprite;
+      }
+    }
+
+    return true;
   }
 
   public removeSprite(index: number) {
@@ -241,20 +290,46 @@ export default class Spritesheet4 implements ImageInterface {
     return tempData;
   }
 
+  public get spritesheetDataStore(): SpritesheetDataStore {
+    let temp = {
+      fileName: this.fileName,
+      dimensions: this._pixelDimensions,
+      sprites: this._sprites.map((s) => JSON.stringify(s.spriteDataStore)),
+      bpp: 4,
+    };
+    return temp;
+  }
+
   public async getImageFileBlob(): Promise<Blob | null> {
     return new Promise((resolve) => {
       this.imageCanvasElement.toBlob((blob) => resolve(blob));
     });
   }
 
-  // TODO: Implement
+  // The correct order should be:
+  // tileHeader, tileData, mapHeader, mapData, paletteHeader, paletteData
   public get headerData(): string {
-    return "";
+    return SS_TILES_HEADER(this.fileName) + PALETTE_HEADER(this.fileName);
   }
 
   // TODO: Implement
+  // size = (height * width) / bpp (4 bpp)
+  // private get tilesHeader(): string {
+  //   const size = (this.dimensions.height * this.dimensions.width) / 4
+  //   const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
+  //   const imageDefinitionString = `const unsigned short [${name}] __attribute__((aligned(4)))=\n{\n\t`;
+  //   return "const unsigned short " + name + "[" + size + "]" + "__attribute__((aligned(4)))";
+  // }
+
+  // //TODO: impliment
+  // // same as image data export for mode 3
+  // private get tileData(): String {
+  //   return "";
+  // }
+
+  // TODO: Implement
   public get cSourceData(): string {
-    return "";
+    return "lol sorry not done yet";
   }
 }
 

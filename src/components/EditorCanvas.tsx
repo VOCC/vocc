@@ -46,11 +46,18 @@ export default function EditorCanvas({
   const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(
     undefined
   );
+  const [startPos, setStartPos] = useState<ImageCoordinates>({
+    x: 0,
+    y: 0,
+  });
   const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
     x: 0,
     y: 0,
   });
-  /////////////////////
+  const [endingPos, setEndingPos] = useState<ImageCoordinates | undefined>(
+    undefined
+  );
+  ///////////////////////////////////////////
 
   const drawImageOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -153,12 +160,6 @@ export default function EditorCanvas({
    * settings change.
    */
   useLayoutEffect(() => drawImageOnCanvas());
-  // [
-  //   image,
-  //   palette,
-  //   canvasSize,
-  //   drawImageOnCanvas,
-  // ]);
 
   /////////////////////////////////////////////////////////////////////////////
   // Drawing Tool
@@ -191,6 +192,21 @@ export default function EditorCanvas({
     },
     [scale, imagePosition, image.dimensions]
   );
+
+  // const atNewPixel = useCallback((newPos: ImageCoordinates): boolean => {
+  //   if (!mousePos) return false;
+  //   const prevImgCoord = getImageCoord(mousePos);
+  //   if (!prevImgCoord) return false;
+  //   const prevPixel = {
+  //     x: imagePosition.x + prevImgCoord.x * scale,
+  //     y: imagePosition.y + prevImgCoord.y * scale
+  //   }
+
+  //   if (prevPixel.x === newPos.x && prevPixel.y === newPos.y) {
+  //     return false;
+  //   }
+  //   return true;
+  // }, [mousePos, getImageCoord, imagePosition, scale]);
 
   const fillPixel = useCallback(
     (pos: ImageCoordinates | undefined, color: Color): void => {
@@ -248,12 +264,31 @@ export default function EditorCanvas({
     [image, drawImageOnCanvas]
   );
 
+  // const rectangle = useCallback((): void => {
+  //   if (!endingPos) return;
+  //   if (!canvasRef.current) return;
+  //   const context = canvasRef.current.getContext('2d');
+  //   if (!context) return;
+  //   // drawImageOnCanvas();
+  //   const color = palette[selectedPaletteIndex];
+  //   const colorString = `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+  //   context.fillStyle = colorString;
+  //   context.lineWidth = 1;
+  //   context.rect(
+  //     startPos.x, startPos.y,
+  //     endingPos.x - startPos.x, endingPos.y - startPos.y);
+  //   context.fill();
+  // }, [startPos, endingPos, palette, selectedPaletteIndex]);
+
   const startPaint = useCallback(
     (e: MouseEvent) => {
       const mousePosition = getMousePos(e);
       if (!mousePosition) return;
       setMousePos(mousePosition);
       const imageCoord = getImageCoord(mousePosition);
+      if (!canvasRef.current) return;
+      const context = canvasRef.current.getContext("2d");
+      if (!context) return;
       // if (!imageCoord) return;
       switch (settings.currentTool) {
         case Tool.PENCIL:
@@ -263,6 +298,16 @@ export default function EditorCanvas({
         case Tool.BUCKET:
           bucketFill(imageCoord, palette[selectedPaletteIndex]);
           break;
+        case Tool.SQUARE:
+          if (!imageCoord) return;
+          const startingPos = imageCoord;
+          setStartPos(startingPos);
+          setIsPainting(true);
+          break;
+        case Tool.ELLIPSE:
+          if (!imageCoord) return;
+          setStartPos(imageCoord);
+          setIsPainting(true);
         case Tool.PAN:
           setIsPainting(true);
           break;
@@ -283,11 +328,25 @@ export default function EditorCanvas({
       const newMousePos = getMousePos(e);
       if (!newMousePos) return;
       const imageCoord = getImageCoord(newMousePos);
-      // if (!imageCoord) return;
       switch (settings.currentTool) {
         case Tool.PENCIL:
           if (isPainting) {
             fillPixel(imageCoord, palette[selectedPaletteIndex]);
+            setMousePos(newMousePos);
+          }
+          break;
+        case Tool.SQUARE:
+          if (isPainting) {
+            if (!imageCoord) return;
+            const endingPos = imageCoord;
+            setEndingPos(endingPos);
+          }
+          break;
+        case Tool.ELLIPSE:
+          if (isPainting) {
+            if (!imageCoord) return;
+            const endingPos = imageCoord;
+            setEndingPos(endingPos);
           }
           break;
         case Tool.PAN:
@@ -297,10 +356,10 @@ export default function EditorCanvas({
               y: imagePosition.y + (newMousePos.y - mousePos.y),
             };
             setImagePosition(newImagePosition);
+            setMousePos(newMousePos);
           }
           break;
       }
-      setMousePos(newMousePos);
     },
     [
       isPainting,
@@ -317,8 +376,65 @@ export default function EditorCanvas({
   const stopPaint = useCallback(() => {
     setMousePos(undefined);
     setIsPainting(false);
+    if (settings.currentTool === Tool.SQUARE) {
+      if (!endingPos) return;
+      let s = startPos;
+      let e = endingPos;
+      if (e.x < s.x) {
+        let temp = s.x;
+        s = { x: e.x, y: s.y };
+        e = { x: temp, y: e.y };
+      }
+      if (e.y < s.y) {
+        let temp = s.y;
+        s = { x: s.x, y: e.y };
+        e = { x: e.x, y: temp };
+      }
+      for (let i = s.y; i <= e.y; i++) {
+        for (let j = s.x; j <= e.x; j++) {
+          let pos: ImageCoordinates = { x: j, y: i };
+          image.setPixelColor(pos, palette[selectedPaletteIndex]);
+        }
+      }
+      drawImageOnCanvas();
+    }
+
+    if (settings.currentTool === Tool.ELLIPSE) {
+      console.log("drawing ellipse");
+      if (!endingPos) return;
+      let center = startPos;
+      let a = Math.abs(endingPos.x - center.x);
+      let b = Math.abs(endingPos.y - center.y);
+      let s = { x: center.x - a, y: center.y - b };
+      let e = { x: center.x + a, y: center.y + b };
+      for (let i = s.y; i <= e.y; i++) {
+        for (let j = s.x; j <= e.x; j++) {
+          let point = { x: j, y: i };
+          console.log(point);
+          // solve for equation of ellipse to check if inside or on ellipse
+          let l = Math.pow(point.x - center.x, 2) / Math.pow(a, 2);
+          let r = Math.pow(point.y - center.y, 2) / Math.pow(b, 2);
+          console.log(l + r);
+          let isInside: boolean = l + r <= 1;
+          if (isInside) {
+            image.setPixelColor(point, palette[selectedPaletteIndex]);
+          }
+        }
+      }
+      drawImageOnCanvas();
+    }
+    setEndingPos(undefined);
     onChangeImage(image);
-  }, [image, onChangeImage]);
+  }, [
+    settings.currentTool,
+    startPos,
+    endingPos,
+    drawImageOnCanvas,
+    image,
+    palette,
+    selectedPaletteIndex,
+    onChangeImage,
+  ]);
 
   const mouseLeave = useCallback(() => {
     setMousePos(undefined);
@@ -369,6 +485,8 @@ const generateEditorCanvasProps = (tool: Tool): string => {
       return base + "pencil";
     case Tool.BUCKET:
       return base + "bucket";
+    case Tool.SQUARE:
+      return base + "square";
     case Tool.PAN:
       return base + "pan";
   }
