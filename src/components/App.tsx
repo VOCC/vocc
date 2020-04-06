@@ -140,6 +140,9 @@ function App(): JSX.Element {
   const handleUndo = useCallback(() => {
     console.log("trying to undo");
     if (image && undoPointer >= 1) {
+      if (image instanceof Spritesheet4) {
+      } else {
+      }
       const newStoreString = undoStack[undoPointer - 1];
       const newStore = JSON.parse(newStoreString);
       window.localStorage.setItem(STORAGE.imageData, newStoreString);
@@ -433,15 +436,16 @@ function App(): JSX.Element {
             return;
           } else {
             const parsedPalette = JSON.parse(loadedPalette) as Palette;
+            console.log(parsedPalette);
             const parsedImage = JSON.parse(loadedImage) as SpritesheetDataStore;
+            setPalette(parsedPalette);
             setImage(
               Spritesheet4.fromDataStore(
                 parsedImage,
-                palette,
+                parsedPalette,
                 paletteIndexToCol(selectedColorIndex)
               )
             );
-            setPalette(parsedPalette);
             let newEditorSettings = DEFAULT_SETTINGS;
             newEditorSettings.imageMode = parsedImageMode;
             newEditorSettings.editorMode = parsedImageType;
