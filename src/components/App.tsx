@@ -623,6 +623,7 @@ function App(): JSX.Element {
               selectedPaletteIndex={selectedColorIndex}
               scale={scale}
               onChangeImage={handleImageChange}
+              onChangeColor={handleColorChange}
               onMouseWheel={handleMouseWheelEvent}
             />
           ) : (

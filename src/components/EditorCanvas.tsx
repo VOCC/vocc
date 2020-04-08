@@ -26,6 +26,7 @@ interface EditorCanvasProps {
   settings: EditorSettings;
   scale: number;
   onChangeImage: (newImage: ImageInterface) => void;
+  onChangeColor: (newColor: Color) => void;
   onMouseWheel: (e: WheelEvent) => void;
 }
 
@@ -36,7 +37,8 @@ export default function EditorCanvas({
   settings,
   scale,
   onChangeImage,
-  onMouseWheel,
+  onChangeColor,
+  onMouseWheel
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasSize, setCanvasSize] = useState<number[]>([0, 0]);
@@ -308,12 +310,20 @@ export default function EditorCanvas({
           if (!imageCoord) return;
           setStartPos(imageCoord);
           setIsPainting(true);
+          break;
         case Tool.PAN:
           setIsPainting(true);
+          break;
+        case Tool.DROPPER:
+          if (!imageCoord) return;
+          const color = image.getPixelColorAt(imageCoord);
+          onChangeColor(color);
           break;
       }
     },
     [
+      image,
+      onChangeColor,
       settings.currentTool,
       bucketFill,
       fillPixel,
@@ -402,11 +412,27 @@ export default function EditorCanvas({
     if (settings.currentTool === Tool.ELLIPSE) {
       console.log("drawing ellipse");
       if (!endingPos) return;
-      let center = startPos;
-      let a = Math.abs(endingPos.x - center.x);
-      let b = Math.abs(endingPos.y - center.y);
-      let s = { x: center.x - a, y: center.y - b };
-      let e = { x: center.x + a, y: center.y + b };
+      let s = startPos;
+      let e = endingPos;
+      if (e.x < s.x) {
+        let temp = s.x;
+        s = { x: e.x, y: s.y };
+        e = { x: temp, y: e.y };
+      }
+      if (e.y < s.y) {
+        let temp = s.y;
+        s = { x: s.x, y: e.y };
+        e = { x: e.x, y: temp };
+      }
+      let center = {
+        x: (s.x + e.x) / 2,
+        y: (s.y + e.y) / 2
+      };
+      // let center = startPos;
+      let a = Math.abs(e.x - center.x);
+      let b = Math.abs(e.y - center.y);
+      // let s = { x: center.x - a, y: center.y - b };
+      // let e = { x: center.x + a, y: center.y + b };
       for (let i = s.y; i <= e.y; i++) {
         for (let j = s.x; j <= e.x; j++) {
           let point = { x: j, y: i };
@@ -487,8 +513,12 @@ const generateEditorCanvasProps = (tool: Tool): string => {
       return base + "bucket";
     case Tool.SQUARE:
       return base + "square";
+    case Tool.ELLIPSE:
+      return base + "ellipse";
     case Tool.PAN:
       return base + "pan";
+    case Tool.DROPPER:
+      return base + "dropper";
   }
   return base;
 };
