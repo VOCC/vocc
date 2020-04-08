@@ -69,9 +69,9 @@ export interface Undoable {
 
 export interface ImageInterface
   extends Drawable,
-    Exportable,
-    Modifiable,
-    Undoable {}
+  Exportable,
+  Modifiable,
+  Undoable { }
 
 export interface EditorSettings {
   grid: boolean;

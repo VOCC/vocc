@@ -132,10 +132,10 @@ export function generateMode3HeaderString({
   const bitmapLengthDefinition = `#define ${variableName.toUpperCase()}_LENGTH ${bitmapLength}\n`;
   const imageHeightDefinition = `#define ${variableName.toUpperCase()}_HEIGHT ${
     imageDimensions.height
-  }\n`;
+    }\n`;
   const imageWidthDefinition = `#define ${variableName.toUpperCase()}_WIDTH ${
     imageDimensions.width
-  }\n`;
+    }\n`;
   const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${bitmapLength}];\n\n`;
 
   const headerString =
@@ -172,10 +172,10 @@ export function generateMode4HeaderString({
   const bitmapLengthDefinition = `#define ${variableName.toUpperCase()}_SIZE ${bitmapLength}\n`;
   const imageHeightDefinition = `#define ${variableName.toUpperCase()}_HEIGHT ${
     imageDimensions.height
-  }\n`;
+    }\n`;
   const imageWidthDefinition = `#define ${variableName.toUpperCase()}_WIDTH ${
     imageDimensions.width
-  }\n`;
+    }\n`;
   const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${bitmapLength /
     2}];\n\n`;
 
@@ -197,9 +197,9 @@ export function generateMode4HeaderString({
 
 export const PALETTE_HEADER = (varName: string, palLength = PALETTE_LENGTH) =>
   `#define ${varName}PalLen ${palLength * 2}\n`
-    + `extern const unsigned short ${varName}Palette[${palLength}];\n\n`;
+  + `extern const unsigned short ${varName}Palette[${palLength}];\n\n`;
 
-export const SS_TILES_HEADER = (varName: string, ssDimensions = {height:256,width:256}) => {
+export const SS_TILES_HEADER = (varName: string, ssDimensions = { height: 256, width: 256 }) => {
   const len = ssDimensions.height * ssDimensions.width;
   return `#define ${varName}TilesLen ${len / 2}\n`
     + `extern const unsigned short ${varName}Tiles[${len / 4}];\n\n`;

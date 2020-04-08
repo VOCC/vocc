@@ -44,7 +44,7 @@ export default function PalettePanel({
       <div className="settings-container">
         <div>
           Mode: &nbsp; {settings.editorMode}
-          <br/>
+          <br />
           Type: &nbsp; {settings.editorMode.toString()}
         </div>
       </div>
@@ -115,33 +115,33 @@ function ColorInput({
 
   return (
     <div className="rgb-container">
-        <label className="rgb-label">R</label>
-        <input
-          className="rgb-input"
-          type="number"
-          max={MAX_COLOR_VAL}
-          min={MIN_COLOR_VAL}
-          value={color32.r}
-          onChange={e => handleRChange(parseInt(e.target.value))}
-        ></input>
-        <label className="rgb-label">G</label>
-        <input
-          className="rgb-input"
-          type="number"
-          max={MAX_COLOR_VAL}
-          min={MIN_COLOR_VAL}
-          value={color32.g}
-          onChange={e => handleGChange(parseInt(e.target.value))}
-        ></input>
-        <label className="rgb-label">B</label>
-        <input
-          className="rgb-input"
-          type="number"
-          max={MAX_COLOR_VAL}
-          min={MIN_COLOR_VAL}
-          value={color32.b}
-          onChange={e => handleBChange(parseInt(e.target.value))}
-        ></input>
+      <label className="rgb-label">R</label>
+      <input
+        className="rgb-input"
+        type="number"
+        max={MAX_COLOR_VAL}
+        min={MIN_COLOR_VAL}
+        value={color32.r}
+        onChange={e => handleRChange(parseInt(e.target.value))}
+      ></input>
+      <label className="rgb-label">G</label>
+      <input
+        className="rgb-input"
+        type="number"
+        max={MAX_COLOR_VAL}
+        min={MIN_COLOR_VAL}
+        value={color32.g}
+        onChange={e => handleGChange(parseInt(e.target.value))}
+      ></input>
+      <label className="rgb-label">B</label>
+      <input
+        className="rgb-input"
+        type="number"
+        max={MAX_COLOR_VAL}
+        min={MIN_COLOR_VAL}
+        value={color32.b}
+        onChange={e => handleBChange(parseInt(e.target.value))}
+      ></input>
     </div>
   );
 }

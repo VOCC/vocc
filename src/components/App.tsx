@@ -1,8 +1,8 @@
+import Color from "../models/Color";
 import { saveAs } from "file-saver";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import Bitmap3 from "../models/Bitmap3";
 import Bitmap4 from "../models/Bitmap4";
-import Color from "../models/Color";
 import Palette, { paletteIndexToCol } from "../models/Palette";
 import Spritesheet4 from "../models/Spritesheet4";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";

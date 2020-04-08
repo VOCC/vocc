@@ -60,7 +60,7 @@ export function quantize(
     clusters.push(newCluster);
   }
   // sort clusters from largest to smallest
-  clusters.sort(function(a, b) {
+  clusters.sort(function (a, b) {
     return b.length - a.length;
   });
 
@@ -200,9 +200,9 @@ function kmeans(
           Math.min(
             Math.max(
               centroids[clusterIterate][i] /
-                (Groups[clusterIterate].length <= 1
-                  ? 1
-                  : Groups[clusterIterate].length),
+              (Groups[clusterIterate].length <= 1
+                ? 1
+                : Groups[clusterIterate].length),
               0
             ),
             255
