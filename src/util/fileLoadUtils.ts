@@ -1,7 +1,8 @@
-import { Dimensions, ImageCoordinates, Color } from "./interfaces";
 import Bitmap from "../models/Bitmap";
 import Bitmap3 from "../models/Bitmap3";
+import Color from "../models/Color";
 import Palette from "../models/Palette";
+import { Dimensions, ImageCoordinates } from "./types";
 
 export const createHiddenCanvas = (d: Dimensions): HTMLCanvasElement => {
   let hiddenCanvas = document.createElement("canvas");

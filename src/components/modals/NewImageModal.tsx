@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { Dimensions } from "../../util/interfaces";
+import { Dimensions } from "../../util/types";
 
 const MIN_IMG_SIZE = 1;
 
@@ -35,7 +35,9 @@ const NewImageModal = ({ onAccept, isShowing, hide }: NewImageModalProps) =>
                 }}
               ></NewImageForm>
               <div className="modal-button-right">
-                <button onClick={hide} className="modal-button">Cancel</button>
+                <button onClick={hide} className="modal-button">
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
@@ -66,7 +68,9 @@ const NewImageForm = ({ onAccept }: NewImageFormProps) => {
   return (
     <form onSubmit={handleSubmit}>
       <div className="modal-input-text">
-        <label htmlFor="filename" className="modal-label">Name:</label>
+        <label htmlFor="filename" className="modal-label">
+          Name:
+        </label>
         <input
           id="filename"
           name="filename"
@@ -78,7 +82,9 @@ const NewImageForm = ({ onAccept }: NewImageFormProps) => {
       <br />
       <label className="modal-label">Image Size</label>
       <div className="modal-input-num">
-        <label htmlFor="height" className="modal-label-num">Height:</label>
+        <label htmlFor="height" className="modal-label-num">
+          Height:
+        </label>
         <input
           id="height"
           type="number"
@@ -88,7 +94,9 @@ const NewImageForm = ({ onAccept }: NewImageFormProps) => {
         />
         <label>&nbsp;px</label>
         <br />
-        <label htmlFor="width" className="modal-label-num">Width:</label>
+        <label htmlFor="width" className="modal-label-num">
+          Width:
+        </label>
         <input
           id="width"
           type="number"
@@ -100,7 +108,7 @@ const NewImageForm = ({ onAccept }: NewImageFormProps) => {
       </div>
       <br />
       <div className="modal-button-left">
-      <button className="modal-button">OK</button>
+        <button className="modal-button">OK</button>
       </div>
     </form>
   );

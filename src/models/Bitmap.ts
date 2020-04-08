@@ -1,12 +1,12 @@
-import {
-  Color,
-  Dimensions,
-  ImageInterface,
-  ImageCoordinates,
-  ImageDataStore
-} from "../util/interfaces";
-import ImageCanvas from "./ImageCanvas";
+import Color from "../models/Color";
 import * as Loader from "../util/fileLoadUtils";
+import {
+  Dimensions,
+  ImageCoordinates,
+  ImageDataStore,
+  ImageInterface
+} from "../util/types";
+import ImageCanvas from "./ImageCanvas";
 
 export default abstract class Bitmap implements ImageInterface {
   public fileName: string;
@@ -32,19 +32,15 @@ export default abstract class Bitmap implements ImageInterface {
     }
   }
 
-  public getImageCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getImageCanvasElement();
+  public get imageCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.imageCanvasElement;
   }
 
-  public getPixelGridCanvasElement(): HTMLCanvasElement {
-    return this.imageCanvas.getPixelGridCanvasElement();
+  public get pixelGridCanvasElement(): HTMLCanvasElement {
+    return this.imageCanvas.pixelGridCanvasElement;
   }
 
-  // public getRawImageData(): Uint8ClampedArray {
-  //   return this.imageData;
-  // }
-
-  public getImageDataStore(): ImageDataStore {
+  public get imageDataStore(): ImageDataStore {
     return {
       fileName: this.fileName,
       dimensions: this.dimensions,
@@ -60,7 +56,7 @@ export default abstract class Bitmap implements ImageInterface {
 
   public async getImageFileBlob(): Promise<Blob | null> {
     return new Promise(resolve => {
-      this.getImageCanvasElement().toBlob(blob => resolve(blob));
+      this.imageCanvasElement.toBlob(blob => resolve(blob));
     });
   }
 
@@ -73,8 +69,8 @@ export default abstract class Bitmap implements ImageInterface {
 
   /////////////////////////////////////// abstract classes
 
-  public abstract getCSourceData(): string;
-  public abstract getHeaderData(): string;
+  public abstract get cSourceData(): string;
+  public abstract get headerData(): string;
   public abstract getPixelColorAt(pos: ImageCoordinates): Color;
   public abstract setPixelColor(pos: ImageCoordinates, color: Color): void;
 }

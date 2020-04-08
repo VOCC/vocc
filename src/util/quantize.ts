@@ -1,7 +1,7 @@
-import Bitmap4 from "../models/Bitmap4";
-import Palette from "../models/Palette";
-import { Color } from "./interfaces";
 import Bitmap from "../models/Bitmap";
+import Bitmap4 from "../models/Bitmap4";
+import Color from "../models/Color";
+import Palette from "../models/Palette";
 
 const BLACK: Color = new Color(0, 0, 0, 1);
 
@@ -9,6 +9,7 @@ export function quantize(
   image: Bitmap,
   depth: number
 ): { sprite: Bitmap4; palette: Palette } {
+
   let centroids: number[][];
   let imageArr = imageToArr(image);
   let colors = depth;

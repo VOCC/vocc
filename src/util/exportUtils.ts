@@ -1,6 +1,7 @@
-import { ImageInterface, Color, Dimensions, Mode } from "./interfaces";
-import { PALETTE_LENGTH } from "./consts";
+import Color from "../models/Color";
 import Palette from "../models/Palette";
+import { PALETTE_LENGTH } from "./consts";
+import { Dimensions, ImageInterface, Mode } from "./types";
 
 /*
   getGBAImageString
@@ -26,7 +27,7 @@ export function generateCSourceFileString(
 }
 
 function generateMode3CSourceFileString(image: ImageInterface): string {
-  const { fileName, dimensions, imageData } = image.getImageDataStore();
+  const { fileName, dimensions, imageData } = image.imageDataStore;
 
   const variableName = fileName.slice(0, fileName.lastIndexOf("."));
   const bitmapLength = dimensions.height * dimensions.width;
@@ -67,7 +68,7 @@ function generateMode4CSourceFileString(
     return generateMode3CSourceFileString(image);
   }
 
-  const { fileName, dimensions, imageData } = image.getImageDataStore();
+  const { fileName, dimensions, imageData } = image.imageDataStore;
 
   // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
   // into a short
@@ -192,6 +193,16 @@ export function generateMode4HeaderString({
     paletteDefinitionString;
 
   return headerString;
+}
+
+export const PALETTE_HEADER = (varName: string, palLength = PALETTE_LENGTH) =>
+  `#define ${varName}PalLen ${palLength * 2}\n`
+    + `extern const unsigned short ${varName}Palette[${palLength}];\n\n`;
+
+export const SS_TILES_HEADER = (varName: string, ssDimensions = {height:256,width:256}) => {
+  const len = ssDimensions.height * ssDimensions.width;
+  return `#define ${varName}TilesLen ${len / 2}\n`
+    + `extern const unsigned short ${varName}Tiles[${len / 4}];\n\n`;
 }
 
 function paletteIndicesToHex(index1: number, index2: number): string {

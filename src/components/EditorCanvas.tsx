@@ -1,25 +1,31 @@
 import React, {
+  useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
-  useCallback,
-  useLayoutEffect,
 } from "react";
-import { EditorSettings, ImageCoordinates, Color } from "../util/interfaces";
-import Bitmap from "../models/Bitmap";
+import Color from "../models/Color";
 import Palette from "../models/Palette";
+import Spritesheet4 from "../models/Spritesheet4";
 import { Tool } from "../util/consts";
+import {
+  EditorSettings,
+  ImageCoordinates,
+  ImageInterface,
+} from "../util/types";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
+const TILEGRID_ZOOM_LIMIT = 4;
 
 interface EditorCanvasProps {
-  image: Bitmap;
+  image: ImageInterface;
   palette: Palette;
   selectedPaletteIndex: number;
   settings: EditorSettings;
   scale: number;
-  onChangeImage: (newImage: Bitmap) => void;
+  onChangeImage: (newImage: ImageInterface) => void;
   onChangeColor: (newColor: Color) => void;
   onMouseWheel: (e: WheelEvent) => void;
 }
@@ -66,7 +72,7 @@ export default function EditorCanvas({
     context.clearRect(0, 0, canvas.width, canvas.height);
     // Draw the image at the correct position and scale
     context.drawImage(
-      image.getImageCanvasElement(),
+      image.imageCanvasElement,
       imagePosition.x,
       imagePosition.y,
       image.dimensions.width * scale,
@@ -75,7 +81,22 @@ export default function EditorCanvas({
     // Draw the grid (if we need to)
     if (settings.grid && scale >= PIXELGRID_ZOOM_LIMIT) {
       context.drawImage(
-        image.getPixelGridCanvasElement(),
+        image.pixelGridCanvasElement,
+        imagePosition.x,
+        imagePosition.y,
+        image.dimensions.width * scale,
+        image.dimensions.height * scale
+      );
+    }
+    // Always draw tile grid on spritesheets
+    // TODO: Add option for this
+    if (
+      settings.grid &&
+      image instanceof Spritesheet4 &&
+      scale >= TILEGRID_ZOOM_LIMIT
+    ) {
+      context.drawImage(
+        (image as Spritesheet4).tileGridCanvasElement,
         imagePosition.x,
         imagePosition.y,
         image.dimensions.width * scale,
@@ -289,6 +310,7 @@ export default function EditorCanvas({
           if (!imageCoord) return;
           setStartPos(imageCoord);
           setIsPainting(true);
+          break;
         case Tool.PAN:
           setIsPainting(true);
           break;
@@ -300,6 +322,8 @@ export default function EditorCanvas({
       }
     },
     [
+      image,
+      onChangeColor,
       settings.currentTool,
       bucketFill,
       fillPixel,
@@ -400,8 +424,10 @@ export default function EditorCanvas({
         s = { x: s.x, y: e.y };
         e = { x: e.x, y: temp };
       }
-      let center = {x: (s.x + e.x) / 2,
-                    y: (s.y + e.y) / 2};
+      let center = {
+        x: (s.x + e.x) / 2,
+        y: (s.y + e.y) / 2
+      };
       // let center = startPos;
       let a = Math.abs(e.x - center.x);
       let b = Math.abs(e.y - center.y);
