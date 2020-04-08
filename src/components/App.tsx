@@ -204,7 +204,7 @@ function App(): JSX.Element {
     newStartRow: number,
     numRows: number,
     overwrite: boolean
-  ) => {};
+  ) => { };
 
   const handleToolChange = useCallback(
     (newTool: Tool) => {
@@ -429,21 +429,31 @@ function App(): JSX.Element {
       const parsedImageMode: Mode = parseInt(loadedImageMode) as Mode;
       const parsedImageType: EditorMode = loadedImageType as EditorMode;
 
+      const buildPalette = (paletteString: string): Palette => {
+        interface IColor {
+          r: number, g: number, b: number, a: number
+        }
+        // The following cast is definitely unsafe.
+        let parsedPalette = JSON.parse(paletteString) as IColor[]
+        let newPalette = parsedPalette.map((c) => new Color(c.r, c.g, c.b, c.a))
+        return newPalette;
+      }
+
       switch (parsedImageMode) {
         case 0:
           if (!loadedPalette) {
             alertBadFormatting();
             return;
           } else {
-            const parsedPalette = JSON.parse(loadedPalette) as Palette;
-            console.log(parsedPalette);
+            const newPalette = buildPalette(loadedPalette);
+            console.log(newPalette);
             const parsedImage = JSON.parse(loadedImage) as SpritesheetDataStore;
-            setPalette(parsedPalette);
+            setPalette(newPalette);
             setImage(
               Spritesheet4.fromDataStore(
                 parsedImage,
-                parsedPalette,
-                paletteIndexToCol(selectedColorIndex)
+                newPalette,
+                0
               )
             );
             let newEditorSettings = DEFAULT_SETTINGS;
@@ -466,9 +476,9 @@ function App(): JSX.Element {
             return;
           } else {
             const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
-            const parsedPalette = JSON.parse(loadedPalette) as Palette;
-            setImage(Bitmap4.fromDataStore(parsedImage, parsedPalette));
-            setPalette(parsedPalette);
+            const newPalette = buildPalette(loadedPalette);
+            setImage(Bitmap4.fromDataStore(parsedImage, newPalette));
+            setPalette(newPalette);
             let newEditorSettings = DEFAULT_SETTINGS;
             newEditorSettings.imageMode = parsedImageMode;
             newEditorSettings.editorMode = parsedImageType;
@@ -479,8 +489,6 @@ function App(): JSX.Element {
           alertBadFormatting();
       }
     }
-    // BIG HACK
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -618,10 +626,10 @@ function App(): JSX.Element {
               onMouseWheel={handleMouseWheelEvent}
             />
           ) : (
-            <div className="start-message">
-              <em>Import an image to get started</em>
-            </div>
-          )}
+              <div className="start-message">
+                <em>Import an image to get started</em>
+              </div>
+            )}
         </div>
         <div className="right-panel">
           <PalettePanel
