@@ -43,7 +43,7 @@ export default function PalettePanel({
       <div className="panel-header">Properties</div>
       <div className="settings-container">
         <div>
-          Mode: &nbsp; {settings.editorMode}
+          Mode: &nbsp; {settings.imageMode}
           <br />
           Type: &nbsp; {settings.editorMode.toString()}
         </div>
