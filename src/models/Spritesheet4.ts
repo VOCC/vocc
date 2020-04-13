@@ -41,6 +41,7 @@ const TILEGRID_RATIO = 8;
 export default class Spritesheet4 implements ImageInterface {
   public fileName: string;
 
+  private _backgroundColor: Color;
   private _palette: Palette;
   private _selectedPaletteCol: number;
   private _pixelDimensions: Dimensions = SS4_SIZE_PIXELS;
@@ -68,6 +69,7 @@ export default class Spritesheet4 implements ImageInterface {
     this._tileGridHiddenCanvas = createTileGridHiddenCanvas(
       this._tileDimensions
     );
+    this._backgroundColor = new Color(255, 0, 255, 1);
     this.fillBackground();
     this._sprites = [];
   }
@@ -172,12 +174,17 @@ export default class Spritesheet4 implements ImageInterface {
     );
   }
 
-  // TODO: Implement
+  /**
+   * Gets the specified color of the sprite on the spritesheet.
+   * @param pos position on image in pixels
+   * @returns the color of the sprite at the given position or the transparent 
+   * background color if there is no sprite at the given position.
+   */
   public getPixelColorAt(pos: ImageCoordinates): Color {
     const sprite = this.getSpriteFromCoordinates(pos);
     if (!sprite) {
       console.warn("Spritesheet: trying to get color but there's no sprite!");
-      return new Color(0, 0, 0);
+      return this._palette[0];
     }
     const pixelPosInSprite = spritesheetCoordsToSpriteCoords(
       pos,
@@ -186,7 +193,6 @@ export default class Spritesheet4 implements ImageInterface {
       sprite.dimensions
     );
     const color = sprite.getPixelColorAt(pixelPosInSprite);
-    // console.log(color);
     return color;
   }
 
@@ -248,7 +254,7 @@ export default class Spritesheet4 implements ImageInterface {
   private fillBackground() {
     const ctx = this._hiddenCanvas.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = new Color(255, 0, 255).toString();
+    ctx.fillStyle = this._backgroundColor.toString();
     ctx.fillRect(0, 0, this.dimensions.width, this.dimensions.height);
   }
 

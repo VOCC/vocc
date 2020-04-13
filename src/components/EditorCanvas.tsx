@@ -231,7 +231,6 @@ export default function EditorCanvas({
       const color = image.getPixelColorAt(pos);
       if (color.isEqual(newColor)) return;
       image.setPixelColor(pos, newColor);
-      // console.log(color);
       let queue = new Array<ImageCoordinates>(pos);
       let explored = new Array<ImageCoordinates>(pos);
       while (queue[0] !== undefined) {
