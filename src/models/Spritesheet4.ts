@@ -68,7 +68,7 @@ export default class Spritesheet4 implements ImageInterface {
     this._tileGridHiddenCanvas = createTileGridHiddenCanvas(
       this._tileDimensions
     );
-    this.fillBlack();
+    this.fillBackground();
     this._sprites = [];
   }
 
@@ -245,10 +245,10 @@ export default class Spritesheet4 implements ImageInterface {
     console.log(this._selectedPaletteCol);
   }
 
-  private fillBlack() {
+  private fillBackground() {
     const ctx = this._hiddenCanvas.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = new Color(0, 0, 0).toString();
+    ctx.fillStyle = new Color(255, 0, 255).toString();
     ctx.fillRect(0, 0, this.dimensions.width, this.dimensions.height);
   }
 
@@ -256,7 +256,7 @@ export default class Spritesheet4 implements ImageInterface {
     const ctx = this._hiddenCanvas.getContext("2d");
     if (!ctx) return;
 
-    this.fillBlack();
+    this.fillBackground();
 
     this.sprites.forEach((sprite) => {
       ctx.drawImage(

@@ -6,7 +6,7 @@ import Color from "../models/Color";
 import Palette, { paletteIndexToCol } from "../models/Palette";
 import Spritesheet4 from "../models/Spritesheet4";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
-import DEFAULT_PALETTE from "../util/defaultPalette";
+import { DEFAULT_PALETTE, SPRITESHEET_PALETTE } from "../util/defaultPalette";
 import { exportImage, exportPalette } from "../util/exportUtils";
 import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
 import { quantize } from "../util/quantize";
@@ -268,11 +268,11 @@ function App(): JSX.Element {
         handleImageChange(
           new Spritesheet4(
             "untitled",
-            palette,
+            SPRITESHEET_PALETTE,
             paletteIndexToCol(selectedColorIndex)
           )
         );
-        handlePaletteChange(palette);
+        handlePaletteChange(SPRITESHEET_PALETTE);
         return;
       case EditorMode.Background:
       default:
