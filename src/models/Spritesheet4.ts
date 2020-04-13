@@ -1,5 +1,5 @@
 import { createHiddenCanvas } from "../util/fileLoadUtils";
-import { PALETTE_HEADER, SS_TILES_HEADER } from "../util/exportUtils";
+import { PALETTE_HEADER, SS_TILES_HEADER, colorToHex, PaletteToGBA } from "../util/exportUtils";
 import {
   Dimensions,
   ImageCoordinates,
@@ -312,8 +312,8 @@ export default class Spritesheet4 implements ImageInterface {
     return SS_TILES_HEADER(this.fileName) + PALETTE_HEADER(this.fileName);
   }
 
-  // TODO: Implement
-  // size = (height * width) / bpp (4 bpp)
+  // // TODO: Implement
+  // // size = (height * width) / bpp (4 bpp)
   // private get tilesHeader(): string {
   //   const size = (this.dimensions.height * this.dimensions.width) / 4
   //   const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
@@ -321,15 +321,56 @@ export default class Spritesheet4 implements ImageInterface {
   //   return "const unsigned short " + name + "[" + size + "]" + "__attribute__((aligned(4)))";
   // }
 
-  // //TODO: impliment
-  // // same as image data export for mode 3
-  // private get tileData(): String {
-  //   return "";
-  // }
+  /**
+   * Get properly formatted c code cotaining an array of spritesheet tile data.
+   * Each index is the hex color value of the pixel.
+   * Iterates one 8x8 TILE at a time going left to right and then down...
+   * 
+   * ex. 32x32 spritesheet
+   * -------------------------
+   * | 0  | 1  | 2  |...| 32 |                   
+   * | 33 | 34 | 35 |...| 64 |
+   * | .                     |
+   * | .    .                |
+   * | .         .           |
+   * | 992| 993| 994|...|1024|
+   * -------------------------
+   */
+  private get tileData(): String {
+    const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
+    const size = (this.dimensions.height * this.dimensions.width) / 4;
+    let toReturn = "const unsigned short " + name + "Tiles[" + size + "] __attribute__((aligned(4)))=\n{\n\t";
+    for (let tileNum = 0; tileNum < SS4_SIZE_TILES.height * SS4_SIZE_TILES.width; tileNum++) {
+      for (let tileRow = 0; tileRow < 8; tileRow++) {
+        for (let tileCol = 0; tileCol < 8; tileCol++) {
+          const coords : ImageCoordinates = {
+            x: (tileCol + (tileNum * 8)) % SS4_SIZE_PIXELS.width, 
+            y: (tileRow + Math.floor(tileNum / SS4_SIZE_TILES.width) * 8)
+          };
+          toReturn += colorToHex(this.getPixelColorAt(coords)) + ",";
+          if (tileCol == 7) {
+            toReturn += "\n\t";
+          }
+        }
+      }
+      toReturn += "\n\t";
+    }
+    toReturn += "};";
+    return toReturn;
+  }
 
-  // TODO: Implement
+  private get mapData(): String {
+    return "";
+  }
+
+  /**
+   * Get 
+   */
   public get cSourceData(): string {
-    return "lol sorry not done yet";
+    return "//spritesheet export WIP \n" 
+    + this.tileData + "\n\n"
+    + this.mapData + "\n\n" 
+    + PaletteToGBA(this._palette);
   }
 }
 

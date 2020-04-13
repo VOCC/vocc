@@ -250,7 +250,7 @@ function pixelToHex(bgr: number[]): string {
   return "0x" + hex_value;
 }
 
-function colorToHex(color: Color): string {
+export function colorToHex(color: Color): string {
   let bgr = [color.b, color.g, color.r];
   return pixelToHex(bgr);
 }
@@ -291,7 +291,7 @@ export function paletteToHex(palette: Palette): string {
   adds a declaration for the palette array in C
   outputs string with the declaration and converted Palette colorArray
 */
-function PaletteToGBA(palette: Palette): string {
+export function PaletteToGBA(palette: Palette): string {
   const palArea = PALETTE_LENGTH;
   const colAlignment = 8; //these numbers can change depending depending on how we want to format
   const rowAlignment = 8; //
@@ -299,17 +299,17 @@ function PaletteToGBA(palette: Palette): string {
   let palC =
     "const unsigned short powPal[" +
     palArea +
-    "] __attribute__((aligned(4)))=\n{\n";
+    "] __attribute__((aligned(4)))=\n{\n\t";
 
   for (let i = 1; i <= palette.length; i++) {
     const element = palette[i - 1];
     palC += colorToHex(element) + ",";
 
     if (i % colAlignment === 0) {
-      palC += "\n";
+      palC += "\n\t";
     }
     if (i % (colAlignment * rowAlignment) === 0) {
-      palC += "\n";
+      palC += "\n\t";
     }
   }
 
