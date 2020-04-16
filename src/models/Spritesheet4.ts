@@ -172,9 +172,24 @@ export default class Spritesheet4 implements ImageInterface {
     );
   }
 
-  // TODO: Implement
+/**
+ * Get the COLOR at an index on the spritesheet
+ * @param pos ImageCoordinates of the pixel
+ * returns Color of the pixel
+ */
   public getPixelColorAt(pos: ImageCoordinates): Color {
-    return new Color(0, 0, 0);
+    const sprite = this.getSpriteFromCoordinates(pos);
+    if (!sprite) {
+      console.warn("Spritesheet: trying to get color but there's no sprite!");
+      return new Color (0,0,0);
+    }
+    const pixelCoords = spritesheetCoordsToSpriteCoords(
+      pos,
+      this._pixelDimensions,
+      sprite.position,
+      sprite.dimensions
+    );
+    return sprite.getPixelColorAt(pixelCoords);
   }
 
   /**
@@ -312,21 +327,12 @@ export default class Spritesheet4 implements ImageInterface {
     return SS_TILES_HEADER(this.fileName) + PALETTE_HEADER(this.fileName);
   }
 
-  // // TODO: Implement
-  // // size = (height * width) / bpp (4 bpp)
-  // private get tilesHeader(): string {
-  //   const size = (this.dimensions.height * this.dimensions.width) / 4
-  //   const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
-  //   const imageDefinitionString = `const unsigned short [${name}] __attribute__((aligned(4)))=\n{\n\t`;
-  //   return "const unsigned short " + name + "[" + size + "]" + "__attribute__((aligned(4)))";
-  // }
-
   /**
    * Get properly formatted c code cotaining an array of spritesheet tile data.
    * Each index is the hex color value of the pixel.
    * Iterates one 8x8 TILE at a time going left to right and then down...
    * 
-   * ex. 32x32 spritesheet
+   * ex. 32 tiles x 32 tiles spritesheet
    * -------------------------
    * | 0  | 1  | 2  |...| 32 |                   
    * | 33 | 34 | 35 |...| 64 |
@@ -341,6 +347,7 @@ export default class Spritesheet4 implements ImageInterface {
     const size = (this.dimensions.height * this.dimensions.width) / 4;
     let toReturn = "const unsigned short " + name + "Tiles[" + size + "] __attribute__((aligned(4)))=\n{\n\t";
     for (let tileNum = 0; tileNum < SS4_SIZE_TILES.height * SS4_SIZE_TILES.width; tileNum++) {
+      // we are considering 8x8 tiles
       for (let tileRow = 0; tileRow < 8; tileRow++) {
         for (let tileCol = 0; tileCol < 8; tileCol++) {
           const coords : ImageCoordinates = {
@@ -348,7 +355,7 @@ export default class Spritesheet4 implements ImageInterface {
             y: (tileRow + Math.floor(tileNum / SS4_SIZE_TILES.width) * 8)
           };
           toReturn += colorToHex(this.getPixelColorAt(coords)) + ",";
-          if (tileCol == 7) {
+          if (tileCol === 7) {
             toReturn += "\n\t";
           }
         }
@@ -359,17 +366,13 @@ export default class Spritesheet4 implements ImageInterface {
     return toReturn;
   }
 
-  private get mapData(): String {
-    return "";
-  }
-
   /**
-   * Get 
+   * Get the c source code for the current spritesheet.
+   * Contains the spritesheet data and palette.
    */
   public get cSourceData(): string {
-    return "//spritesheet export WIP \n" 
-    + this.tileData + "\n\n"
-    + this.mapData + "\n\n" 
+    return "//spritesheet export\n" 
+    + this.tileData + "\n\n" 
     + PaletteToGBA(this._palette);
   }
 }
