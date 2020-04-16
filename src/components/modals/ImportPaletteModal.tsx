@@ -79,10 +79,13 @@ const ImportPaletteForm = ({ onAccept, oldPal }: ImportPaletteFormProps) => {
 
   const handleNewStartRowChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setNewStartRow(parseInt(e.target.value));
-      
+  
   const handleNumRowsChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setNumRows(parseInt(e.target.value));
 
+  /**
+   * On submit, we combine the palettes and pass back the updated palette
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     combinePals(oldPal, pal, oldStartRow, newStartRow, numRows);
@@ -138,7 +141,16 @@ const ImportPaletteForm = ({ onAccept, oldPal }: ImportPaletteFormProps) => {
   );
 };
 
-
+/**
+ * Function for combining two palettes
+ * @param oldPal old Palette
+ * @param newPal new Palette
+ * @param oldStartRow start row of old Palette
+ * @param newStartRow start row of new Palette
+ * @param numRows number of rows to replace
+ * This function overwrites a given number of rows on 
+ * the old Palette with rows from the new Palette
+ */
 const combinePals = (
   oldPal: Palette, 
   newPal: Palette, 
