@@ -13,7 +13,9 @@ import {
   EditorSettings,
   ImageCoordinates,
   ImageInterface,
+  Dimensions,
 } from "../util/types";
+import { spritesheetCoordsToSpriteCoords } from "../models/Spritesheet4";
 
 // The pixel grid will not be visible when the scale is smaller than this value.
 const PIXELGRID_ZOOM_LIMIT = 8;
@@ -224,29 +226,30 @@ export default function EditorCanvas({
   );
 
   const bucketFill = useCallback(
-    (pos: ImageCoordinates | undefined, newColor: Color): void => {
+    (pos: ImageCoordinates | undefined, newColor: Color,
+      topLeft: ImageCoordinates, botRight: ImageCoordinates): void => {
       // BFS fill
       if (!pos) return;
       const color = image.getPixelColorAt(pos);
       if (color.isEqual(newColor)) return;
       image.setPixelColor(pos, newColor);
-      console.log(color);
+      // console.log(color);
       let queue = new Array<ImageCoordinates>(pos);
       let explored = new Array<ImageCoordinates>(pos);
       while (queue[0] !== undefined) {
         let curr = queue.shift() as ImageCoordinates;
         let edges = new Array<ImageCoordinates>(0);
         // add edges
-        if (curr.y > 0) {
+        if (curr.y > topLeft.y) {
           edges.push({ x: curr.x, y: curr.y - 1 });
         }
-        if (curr.y < image.dimensions.height - 1) {
+        if (curr.y < botRight.y - 1) {
           edges.push({ x: curr.x, y: curr.y + 1 });
         }
-        if (curr.x > 0) {
+        if (curr.x > topLeft.x) {
           edges.push({ x: curr.x - 1, y: curr.y });
         }
-        if (curr.x < image.dimensions.width - 1) {
+        if (curr.x < botRight.x - 1) {
           edges.push({ x: curr.x + 1, y: curr.y });
         }
         ///
@@ -288,6 +291,7 @@ export default function EditorCanvas({
       if (!mousePosition) return;
       setMousePos(mousePosition);
       const imageCoord = getImageCoord(mousePosition);
+      if (!imageCoord) return;
       if (!canvasRef.current) return;
       const context = canvasRef.current.getContext("2d");
       if (!context) return;
@@ -298,7 +302,23 @@ export default function EditorCanvas({
           fillPixel(imageCoord, palette[selectedPaletteIndex]);
           break;
         case Tool.BUCKET:
-          bucketFill(imageCoord, palette[selectedPaletteIndex]);
+          let topLeft = {x: 0, y: 0};
+          let dims = image.dimensions;
+          let botRight = {x: dims.width, y: dims.height};
+          if (image instanceof Spritesheet4) {
+            const sprite = image.getSpriteFromCoordinates(imageCoord);
+            if (!sprite) return;
+            dims = sprite.dimensions;
+            const spriteCoord = spritesheetCoordsToSpriteCoords(
+              imageCoord, image.dimensions, sprite.position,
+              sprite.dimensions);
+            topLeft = {x: imageCoord.x - spriteCoord.x,
+                       y: imageCoord.y - spriteCoord.y};
+            botRight = {x: topLeft.x + dims.width,
+                        y: topLeft.y + dims.height};
+          }
+          bucketFill(
+            imageCoord, palette[selectedPaletteIndex], topLeft, botRight);
           break;
         case Tool.SQUARE:
           if (!imageCoord) return;

@@ -174,14 +174,27 @@ export default class Spritesheet4 implements ImageInterface {
 
   // TODO: Implement
   public getPixelColorAt(pos: ImageCoordinates): Color {
-    return new Color(0, 0, 0);
+    const sprite = this.getSpriteFromCoordinates(pos);
+    if (!sprite) {
+      console.warn("Spritesheet: trying to get color but there's no sprite!");
+      return new Color(0, 0, 0);
+    }
+    const pixelPosInSprite = spritesheetCoordsToSpriteCoords(
+      pos,
+      this._pixelDimensions,
+      sprite.position,
+      sprite.dimensions
+    );
+    const color = sprite.getPixelColorAt(pixelPosInSprite);
+    // console.log(color);
+    return color;
   }
 
   /**
    * Returns the Sprite that contains the pixel at the given position
    * @param p position on image in pixels
    */
-  private getSpriteFromCoordinates(p: ImageCoordinates): Sprite | null {
+  public getSpriteFromCoordinates(p: ImageCoordinates): Sprite | null {
     const t = this.getTileIndexFromCoordinates(p);
     const sprite = this._spriteMap[t.y][t.x];
     return sprite;
@@ -426,7 +439,7 @@ function addSpriteBoxToTileGridCanvas(
  * @param spd the size of the sprite, in pixels
  * @returns coordinates of the pixel in terms of a sprite at the given position
  */
-function spritesheetCoordsToSpriteCoords(
+export function spritesheetCoordsToSpriteCoords(
   ssc: ImageCoordinates,
   ssd: Dimensions,
   stp: ImageCoordinates,
