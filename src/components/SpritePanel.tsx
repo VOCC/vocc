@@ -34,7 +34,7 @@ export default function SpritePanel({
 
   return (
     <div>
-      <div className="spritepanel-header">Sprites</div>
+      <div className="panel-header">Sprites</div>
       <div className="spritepanel-container">
         <NewSpriteForm onAddSprite={onAddSprite}></NewSpriteForm>
         {renderSpriteList(sprites)}
@@ -137,7 +137,7 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
     <form onSubmit={handleSubmit}>
       <div className="spritepanel-label">Dimensions</div>
       <div className="sprite-input-container">
-        <label htmlFor="sprite-height" className="spritepanel-label-num">Height: </label>
+        <label htmlFor="sprite-height" className="spritepanel-label-dim">Height: </label>
         <select
           className="sprite-select"
           id="sprite-height"
@@ -151,7 +151,7 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
           <option value={64}>64</option>
         </select>
         <br />
-        <label htmlFor="sprite-width" className="spritepanel-label-num">Width: </label>
+        <label htmlFor="sprite-width" className="spritepanel-label-dim">Width: </label>
         <select
           className="sprite-select"
           id="sprite-width"
@@ -165,10 +165,10 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
           <option value={64}>64</option>
         </select>
       </div>
-      {/* <br /> */}
+      <br />
       <div className="spritepanel-label">Position</div>
       <div className="sprite-input-container">
-        <label htmlFor="sprite-pos-x" className="spritepanel-label-pos">X: </label>
+        <label htmlFor="sprite-pos-x" className="spritepanel-label-pos">X:</label>
         <input
           className="sprite-input"
           id="sprite-pos-x"
@@ -179,7 +179,7 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
           value={position.x}
           onChange={handlePosXChange}
         ></input>
-        <label htmlFor="sprite-pos-y" className="spritepanel-label-pos">Y: </label>
+        <label htmlFor="sprite-pos-y" className="spritepanel-label-pos">Y:</label>
         <input
           className="sprite-input"
           id="sprite-pos-y"
@@ -191,7 +191,7 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
           onChange={handlePosYChange}
         ></input>
       </div>
-      {/* <br /> */}
+      <br />
       <button className="sprite-button">Add Sprite</button>
     </form>
   );

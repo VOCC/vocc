@@ -41,7 +41,7 @@ export default function PalettePanel({
       ></ColorInput>
       <QuantizeButton handleQuantize={handleQuantize} />
       <div className="panel-header">Properties</div>
-      <div className="settings-container">
+      <div className="properties-container">
         <div>
           Mode: &nbsp; {settings.editorMode}
           <br/>
@@ -117,7 +117,6 @@ function ColorInput({
     <div className="rgb-container">
         <label className="rgb-label">R</label>
         <input
-          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
@@ -126,7 +125,6 @@ function ColorInput({
         ></input>
         <label className="rgb-label">G</label>
         <input
-          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}
@@ -135,7 +133,6 @@ function ColorInput({
         ></input>
         <label className="rgb-label">B</label>
         <input
-          className="rgb-input"
           type="number"
           max={MAX_COLOR_VAL}
           min={MIN_COLOR_VAL}

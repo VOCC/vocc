@@ -26,29 +26,31 @@ $red: rgb(255, 59, 48);
 $teal: rgb(90, 200, 250);
 $yellow: rgb(255, 204, 0);
 
-// Dark layout colors
+// dark theme colors - default layout
 $dark-bg: #252426;
-$dark-nav: #3c3c3c;
-$dark-nav-active: #505050;
-$dark-sidebar: #515151;
-$dark-sidebar2: #383838;
+$dark-border: #5e5e61d8;
+$dark-shadow: rgba(0, 0, 0, 0.2);
 $dark-active: #4d85ee;
 $dark-active2: #858585;
 $dark-inactive: #777777;
 $dark-inactive2: #666666;
-$dark-border: #5e5e61d8;
+
+$dark-nav: #3c3c3c;
+$dark-nav-active: #505050;
+$dark-sidebar: #515151;
+$dark-sidebar2: #383838;
+$dark-modal: #363636;
+$dark-modal-input: #00000070;
+$dark-button: #4f6daf;
+$dark-button2: #555d63;
 
 $dark-text: white;
 $dark-text-secondary: #b9b9b9;
-$dark-button: #636262;
-$dark-button2: #5c5f61;
-$dark-modal: #363636;
-$dark-modal-input: #00000070;
-
-$dark-title: #e45eff;
+$dark-text-alt: #d6d6d6;
 $dark-subtitle: #e0e0e0;
 
-// Light layout colors
+
+// light theme colors - not implemented
 $bg-color: white;
 $bg-color-secondary: $lgray5;
 $text-color: $dgray4;
