@@ -1,8 +1,8 @@
-import Color from "../models/Color";
 import { saveAs } from "file-saver";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import Bitmap3 from "../models/Bitmap3";
 import Bitmap4 from "../models/Bitmap4";
+import Color from "../models/Color";
 import Palette, { paletteIndexToCol } from "../models/Palette";
 import Spritesheet4 from "../models/Spritesheet4";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
@@ -13,7 +13,7 @@ import {
   mode3BitmapAsBackgroundHeader,
   mode3BitmapAsBackgroundSource,
 } from "../util/exportUtils";
-import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
+import { loadNewImage } from "../util/fileLoadUtils";
 import { quantize } from "../util/quantize";
 import {
   Dimensions,
@@ -31,6 +31,7 @@ import ImportButton from "./buttons/ImportButton";
 import Dropdown from "./Dropdown";
 import EditorCanvas from "./EditorCanvas";
 import useModal from "./hooks/useModal";
+import ImportPaletteModal from "./modals/ImportPaletteModal";
 import NewImageModal from "./modals/NewImageModal";
 import PalettePanel from "./PalettePanel";
 import SpritePanel from "./SpritePanel";
@@ -74,6 +75,10 @@ function App(): JSX.Element {
     isShowing: isMode4BitmapModalShowing,
     toggle: toggleMode4BitmpModal,
   } = useModal();
+  const {
+    isShowing: isPaletteModalShowing,
+    toggle: togglePaletteModal,
+  } = useModal();
 
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
   const handleMouseWheelEvent = useCallback((e) => scaleDispatch(e), []);
@@ -89,9 +94,9 @@ function App(): JSX.Element {
       case "Image":
         handleImageLoad(element.files[0]);
         break;
-      case "Palette":
-        handlePaletteLoad(element.files[0]);
-        break;
+      // case "Palette":
+      //   handlePaletteLoad(element.files[0]);
+      //   break;
     }
   };
 
@@ -189,27 +194,25 @@ function App(): JSX.Element {
 
   const handleClearLocalStorage = () => window.localStorage.clear();
 
-  const handlePaletteLoad = async (palFile: File | null) => {
-    if (palFile) {
-      console.log("Loading palette from file...");
-      let newPalette = await loadNewPalette(palFile);
-      if (newPalette) {
-        if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
-          image.updatePalette(newPalette);
-        }
-        handlePaletteChange(newPalette);
-      }
-    }
-  };
+  // const handlePaletteLoad = async (palFile: File | null) => {
+  //   if (palFile) {
+  //     console.log("Loading palette from file...");
+  //     let newPalette = await loadNewPalette(palFile);
+  //     if (newPalette) {
+  //       if (image instanceof Bitmap4) {
+  //         image.updatePalette(newPalette);
+  //       }
+  //       handlePaletteChange(newPalette);
+  //     }
+  //   }
+  // };
 
-  const handlePaletteImport = (
-    oldPal: Palette,
-    newPal: Palette,
-    oldStartRow: number,
-    newStartRow: number,
-    numRows: number,
-    overwrite: boolean
-  ) => {};
+  const handlePaletteImport = (pal: Palette) => {
+    if (image instanceof Bitmap4) {
+      image.updatePalette(pal);
+    }
+    handlePaletteChange(pal.slice());
+  };
 
   const handleToolChange = useCallback(
     (newTool: Tool) => {
@@ -561,10 +564,18 @@ function App(): JSX.Element {
             buttonLabel="Image (*.png, *.bmp, *.jpg)"
           />
           <div className="dd-divider"></div>
-          <ImportButton
+          {/* <ImportButton
             onFileInputChange={handleFileInputChange.bind(null, "Palette")}
             buttonLabel="Color Palette (*.pal)"
-          />
+          /> */}
+
+          <button onClick={togglePaletteModal}>Palette</button>
+          <ImportPaletteModal
+            isShowing={isPaletteModalShowing}
+            hide={togglePaletteModal}
+            onAccept={handlePaletteImport}
+            oldPal={palette}
+          ></ImportPaletteModal>
         </Dropdown>
         <Dropdown label="Export">
           <div className="dd-content-header">Image</div>
