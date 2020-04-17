@@ -1,87 +1,66 @@
 .spritepanel-container {
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 0.75rem;
-  padding-bottom: 0.25rem;
+  margin: 0 auto 0 auto;
   border-radius: 4px;
+  padding: 0.5rem 0.75rem;
   display: block;
   max-width: fit-content;
-  text-align: center;
   background-color: $dark-nav;
-}
-
-// header above container
-.spritepanel-header {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-family:'Open Sans', sans-serif;
-  font-weight: 600;
-  font-size: 8.5pt;
-  color: $dark-text;
+  font-size: 9pt;
 }
 
-// headers inside container
 .spritepanel-label {
-  // padding-top: 0.5rem;
+  margin-top: 0.5rem;
   margin-bottom: 0.25rem;
-  text-align: center;
-  font-size: 910t;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.75px;
+  font-family: "Lucida Console", Monaco, monospace;
   font-weight: bold;
-  font-family: 'Open Sans', sans-serif;
-  color: $dark-text;
 }
 
-// labels for position variables
 .spritepanel-label-pos {
-  padding: 0rem 0.15rem 0rem 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.25rem;
   text-align: center;
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+.spritepanel-label-dim {
+  padding-bottom: 0.5rem;
+  display: inline-flex;
+  width: 4rem;
   letter-spacing: 0.5px;
-  font-weight: 500;
-  font-size: 10pt;
+  font-family: "Lucida Console", Monaco, monospace;
 }
 
-// labels for dimension variables
-.spritepanel-label-num {
-  @extend .modal-label-num;
-  padding-left: 0.15rem;
-  text-align: right;
-}
-
-// container for input/select boxes
 .sprite-input-container {
-  margin: 0.25rem 0.5rem 0.75rem auto;
-  justify-content: center;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  display: inline-block;
+  position: relative;
 }
 
-// tile position X/Y input boxes
 .sprite-input {
   border-radius: 4px;
+  padding-left: 4px;
   height: 30px;
   min-height: 28px;
   min-width: 40px;
   max-width: 40px;
   text-align: left;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 10pt;
+  font-family: "Open Sans", sans-serif;
 }
 
-// height/weight select boxes
 .sprite-select {
-  margin: 0.25rem 2.5rem 0.1rem 0rem;
+  margin-bottom: 0.15rem;
   border: none;
   border-radius: 4px;
-  min-height: 28px;
+  padding-left: 4px;
   height: 30px;
+  min-height: 28px;
   min-width: 52px;
   max-width: 52px;
-  line-height: 10pt;
-  text-align: center;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 10pt;
   background-color: $dark-modal-input;
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
   color: $dark-text;
 }

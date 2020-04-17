@@ -2,11 +2,11 @@
   margin-left: 0;
   border: 1px solid $dark-sidebar;
   border-radius: 4px;
+  background-color: $dark-sidebar2;
+  text-align: center;
   line-height: 24px;
   letter-spacing: 0.5px;
-  text-align: center;
   font-size: 10pt;
-  background-color: $dark-sidebar2;
   color: $dark-text;
   &:hover {
     background-color: $dark-active;
@@ -34,16 +34,13 @@ input[type="file"] {
 
 .dd-button {
   @extend .button;
-  margin-top: 1px;
-  margin-bottom: 0.25rem;
   margin: 1px 0.5rem 0.25rem 0;
   border: none;
-  padding: 12px 12px;
-  padding-top: 14px;
+  padding: 14px 12px 12px 12px;
+  background-color: $dark-nav;
   line-height: 2px;
   letter-spacing: 0.5px;
   color: $dark-subtitle;
-  background-color: $dark-nav;
   &:hover {
     background-color: $dark-nav-active;
   }
@@ -57,148 +54,28 @@ input[type="file"] {
   cursor: pointer;
 }
 
-.dd-container {
-  position: relative;
-  display: inline-block;
-}
-
-.dd-content {
-  padding-bottom: 0.15rem;
-  display: none;
-  min-width: fit-content;
-  position: absolute;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-  // text-indent: 0.5rem;
-  letter-spacing: 0.25px;
-  line-height: 18pt;
-  font-size: 10pt;
-  background-color: $dark-nav;
-}
-
-.dd-content button {
-  @extend .dd-button;
-  margin: none;
-  padding-left: 0.6rem;
-  width: 100%;
-  border-radius: 0;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.dd-content label {
-  @extend .dd-button;
-  display: inline-block;
-  margin: none;
-  padding-left: 0.6rem;
-  width: 100%;
-  border-radius: 0;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.dd-content form {
-  margin: none;
-  padding: none;
-}
-
-.dd-content-header {
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  font-size: 8pt;
-  font-weight: bold;
-  color: $lgray4;
-}
-
-.dd-divider {
-  margin: 0.25rem 0.5rem 0.25rem 0.5rem;
-  border: 0.5px solid $gray;
-}
-
-.dd-show {
-  display: block;
-}
-
-.quantize-container {
-  padding: 1rem;
-  width: 100%;
-  text-align: center;
-}
-
 .quantize-button {
-  // @extend .button;
-  // margin-top: 1rem;
-  // border: none;
-  // padding-top: 3px;
-  // padding-left: 12px;
-  // padding-right: 12px;
-  // text-align: center;
-  // font-weight: 500;
-  // background-color: $dark-sidebar2;
   @extend .button;
+  margin-right: 1rem;
   border: none;
-  padding: 2px 1rem 0 1rem;
+  padding: 1px 1rem 0 1rem;
   min-height: 32px;
   max-height: 32px;
+  background-color: $dark-nav;
   text-align: center;
   line-height: 0;
   letter-spacing: 0.5px;
   font-weight: 500;
-  background-color: $dark-nav;
-}
-
-.quantize-input {
-  // margin-left: 0.75rem;
-  // border-radius: 4px;
-  // width: 64px;
-  // box-sizing: border-box;
-  margin-left: 0.75rem;
-  border-radius: 4px;
-  min-height: 32px;
-  max-height: 32px;
-  max-width: 54px;
-  box-sizing: border-box;
-  text-align: center;
-  font-family: 'Open Sans', sans-serif;
 }
 
 .sprite-button {
   @extend .quantize-button;
-  margin: 0.25rem auto 0.5rem auto;
+  margin: 1rem 0 0.5rem 0;
   padding: 0.75rem;
-  font-family: 'Open Sans', sans-serif;
-  letter-spacing: 0.5px;
-  font-size: 10pt;
   background-color: $dark-button;
-}
-
-@mixin track() {
-  background: $slider-handle; /* Green background */
-  width: 0.5em; /* Set a specific slider handle width */
-  height: 1em; /* Slider handle height */
-  cursor: pointer; /* Cursor on hover */
-}
-
-.color-input-container {
-  width: 100%;
   text-align: center;
-}
-
-.color-input {
-  appearance: none;
-  height: 0.5em;
-  margin: 1em;
-  width: 80%;
-  border-radius: 4px;
-  background: $slider-bg;
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none; /* Override default look */
-    appearance: none;
-    @include track();
-  }
-  &::-moz-range-thumb {
-    @include track();
-  }
+  letter-spacing: 0.5px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+  font-size: 9pt;
 }

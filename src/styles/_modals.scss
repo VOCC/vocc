@@ -1,21 +1,21 @@
 .modal-overlay {
+  height: 100vh;
+  width: 100vw;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1040;
-  width: 100vw;
-  height: 100vh;
   background-color: #000;
   opacity: 0.5;
 }
 
 .modal-wrapper {
+  height: 100%;  
+  width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1050;
-  width: 100%;
-  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   outline: 0;
@@ -24,26 +24,26 @@
 .modal {
   margin: 2.5rem auto;
   border-radius: 9px;
-  position: relative;
-  z-index: 100;
   min-height: 290px;
   max-width: 500px;
+  position: relative;
+  z-index: 100;
+  background-color: $dark-modal;
   letter-spacing: 0.5px;
   font-family: "Open Sans", sans-serif;
   font-size: 10pt;
-  background-color: $dark-modal;
   color: $dark-text;
 }
 
 .modal-header {
-  display: flex;
   padding: 1.75rem;
+  display: flex;
   height: fit-content;
-  justify-content: center;
   min-width: 100%;
-  letter-spacing: 2px;
+  justify-content: center;
   text-align: center;
   text-transform: uppercase;
+  letter-spacing: 2px;
   font-weight: 700;
   font-size: 9pt;
 }
@@ -52,16 +52,16 @@
   padding: 0rem 0.5rem 0rem 2rem;
   letter-spacing: 0.5px;
   font-family: "Open Sans", sans-serif;
-  font-size: 10pt;
   font-weight: bold;
+  font-size: 10pt;
 }
 
 .modal-label-num {
   padding: 0rem 0.5rem 0rem 2.5rem;
   display: inline-block;
   width: 100px;
-  letter-spacing: 0.5px;
   text-align: center;
+  letter-spacing: 0.5px;
   font-family: "Open Sans", sans-serif;
   font-size: 10pt;
 }
@@ -71,13 +71,13 @@
   margin: 0.5rem 0rem;
   border: none;
   padding: 0.5rem 0rem;
-  float: right;
   min-width: 80px;
   max-width: 80px;
+  float: right;
+  background-color: $dark-button;
+  text-align: center;
   line-height: 10pt;
   letter-spacing: 0.5px;
-  text-align: center;
-  background-color: $dark-button;
   &:hover {
     background-color: $dark-active;
   }
@@ -99,33 +99,6 @@
   float: right;
 }
 
-input[type="text"] {
-  margin-left: 0.25rem;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  width: 75%;
-  text-align: left;
-  letter-spacing: 0.5pt;
-  font-family: "Open Sans", sans-serif;
-  background-color: $dark-modal-input;
-  color: $dark-text;
-}
-
-input[type="number"] {
-  margin-top: 0.25rem;
-  margin-right: 2px;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  min-width: 50px;
-  max-width: 50px;
-  font-family: "Open Sans", sans-serif;
-  background-color: $dark-modal-input;
-  color: $dark-text;
-  &::-webkit-inner-spin-button {
-    opacity: 0;
-  }
-}
-
 .modal-input-text {
   justify-content: center;
 }
@@ -134,13 +107,3 @@ input[type="number"] {
   margin-top: 0.5rem;
   margin-left: 0.5rem;
 }
-
-// .modal-close-button {
-//   font-size: 1.4rem;
-//   font-weight: 700;
-//   line-height: 1;
-//   color: #000;
-//   opacity: 0.3;
-//   cursor: pointer;
-//   border: none;
-// }
