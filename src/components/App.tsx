@@ -7,7 +7,12 @@ import Palette, { paletteIndexToCol } from "../models/Palette";
 import Spritesheet4 from "../models/Spritesheet4";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
-import { exportImage, exportPalette } from "../util/exportUtils";
+import {
+  exportImage,
+  exportPalette,
+  mode3BitmapAsBackgroundHeader,
+  mode3BitmapAsBackgroundSource,
+} from "../util/exportUtils";
 import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
 import { quantize } from "../util/quantize";
 import {
@@ -204,7 +209,7 @@ function App(): JSX.Element {
     newStartRow: number,
     numRows: number,
     overwrite: boolean
-  ) => { };
+  ) => {};
 
   const handleToolChange = useCallback(
     (newTool: Tool) => {
@@ -342,6 +347,21 @@ function App(): JSX.Element {
         let hBlob = new Blob([image.headerData]);
         saveAs(hBlob, fileName + fileType);
         return;
+      case "BG":
+        if (image instanceof Bitmap3) {
+          //.c file
+          fileType = ".c";
+          let cBlob = new Blob([mode3BitmapAsBackgroundSource(image)]);
+          saveAs(cBlob, fileName + fileType);
+          //.h file
+          fileType = ".h";
+          let hBlob = new Blob([mode3BitmapAsBackgroundHeader(image)]);
+          saveAs(hBlob, fileName + fileType);
+          return;
+        } else {
+          alert("Background export only supported for Mode 3.");
+          return;
+        }
       case "PAL":
         //.pal file
         if (!palette) {
@@ -431,13 +451,18 @@ function App(): JSX.Element {
 
       const buildPalette = (paletteString: string): Palette => {
         interface IColor {
-          r: number, g: number, b: number, a: number
+          r: number;
+          g: number;
+          b: number;
+          a: number;
         }
         // The following cast is definitely unsafe.
-        let parsedPalette = JSON.parse(paletteString) as IColor[]
-        let newPalette = parsedPalette.map((c) => new Color(c.r, c.g, c.b, c.a))
+        let parsedPalette = JSON.parse(paletteString) as IColor[];
+        let newPalette = parsedPalette.map(
+          (c) => new Color(c.r, c.g, c.b, c.a)
+        );
         return newPalette;
-      }
+      };
 
       switch (parsedImageMode) {
         case 0:
@@ -449,13 +474,7 @@ function App(): JSX.Element {
             console.log(newPalette);
             const parsedImage = JSON.parse(loadedImage) as SpritesheetDataStore;
             setPalette(newPalette);
-            setImage(
-              Spritesheet4.fromDataStore(
-                parsedImage,
-                newPalette,
-                0
-              )
-            );
+            setImage(Spritesheet4.fromDataStore(parsedImage, newPalette, 0));
             let newEditorSettings = DEFAULT_SETTINGS;
             newEditorSettings.imageMode = parsedImageMode;
             newEditorSettings.editorMode = parsedImageType;
@@ -563,6 +582,12 @@ function App(): JSX.Element {
             startImageExport={handleImageExport.bind(null, "GBA")}
             buttonLabel="C Source Code (*.c/.h)"
           />
+          {image instanceof Bitmap3 ? (
+            <ExportButton
+              startImageExport={handleImageExport.bind(null, "BG")}
+              buttonLabel="C Source as background"
+            />
+          ) : null}
           <div className="dd-divider"></div>
           <ExportButton
             startImageExport={handleImageExport.bind(null, "PAL")}
@@ -627,10 +652,10 @@ function App(): JSX.Element {
               onMouseWheel={handleMouseWheelEvent}
             />
           ) : (
-              <div className="start-message">
-                <em>Import an image to get started</em>
-              </div>
-            )}
+            <div className="start-message">
+              <em>Import an image to get started</em>
+            </div>
+          )}
         </div>
         <div className="right-panel">
           <PalettePanel
