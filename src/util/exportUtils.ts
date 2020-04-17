@@ -1,6 +1,8 @@
-import { ImageInterface, Color, Dimensions, Mode } from "./interfaces";
-import { PALETTE_LENGTH } from "./consts";
+import Color from "../models/Color";
+import Bitmap3 from "../models/Bitmap3";
 import Palette from "../models/Palette";
+import { PALETTE_LENGTH } from "./consts";
+import { Dimensions, ImageInterface, Mode } from "./types";
 
 /*
   getGBAImageString
@@ -25,13 +27,32 @@ export function generateCSourceFileString(
   }
 }
 
+/**
+ * "Poor man's" background export function. Exports the entire source code for
+ * a background generated using mode 3 bitmap data.
+ * @param image the mode 3 bitmap to export as a background
+ */
+export function mode3BitmapAsBackgroundSource(image: Bitmap3): string {
+  return "have fun!";
+}
+
+/**
+ * "Poor man's" background header export function. Exports the header file data
+ * for a background generated using mode 3 bitmap data.
+ * @param image the mode 3 bitmap to export as a background
+ */
+export function mode3BitmapAsBackgroundHeader(image: Bitmap3): string {
+  return "";
+}
+
 function generateMode3CSourceFileString(image: ImageInterface): string {
-  const { fileName, dimensions, imageData } = image.getImageDataStore();
+  const { fileName, dimensions, imageData } = image.imageDataStore;
 
   const variableName = fileName.slice(0, fileName.lastIndexOf("."));
   const bitmapLength = dimensions.height * dimensions.width;
-  const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${bitmapLength /
-    2}]__attribute__((aligned(4)))=\n{\n\t`;
+  const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${
+    bitmapLength / 2
+  }]__attribute__((aligned(4)))=\n{\n\t`;
 
   let imageDataHexString = ``;
 
@@ -67,14 +88,15 @@ function generateMode4CSourceFileString(
     return generateMode3CSourceFileString(image);
   }
 
-  const { fileName, dimensions, imageData } = image.getImageDataStore();
+  const { fileName, dimensions, imageData } = image.imageDataStore;
 
   // Note: we compress the length of the bitmap by 2 because we can fit 2 chars
   // into a short
   const variableName = fileName.slice(0, fileName.lastIndexOf("."));
   const bitmapLength = dimensions.height * dimensions.width;
-  const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${bitmapLength /
-    2}]__attribute__((aligned(4)))=\n{\n`;
+  const imageDefinitionString = `const unsigned short ${variableName}Bitmap[${
+    bitmapLength / 2
+  }]__attribute__((aligned(4)))=\n{\n`;
 
   let imageDataHexString = "";
   for (let i = 0; i < imageData.length; i += 2) {
@@ -121,7 +143,7 @@ export function generateHeaderString(
 export function generateMode3HeaderString({
   fileName,
   imageDimensions,
-  palette
+  palette,
 }: headerFileParams): string {
   const variableName = fileName.slice(0, fileName.lastIndexOf("."));
   const bitmapLength = imageDimensions.height * imageDimensions.width;
@@ -152,7 +174,7 @@ export function generateMode3HeaderString({
 export function generateMode4HeaderString({
   fileName,
   imageDimensions,
-  palette
+  palette,
 }: headerFileParams): string {
   if (!palette) {
     console.error(
@@ -160,7 +182,7 @@ export function generateMode4HeaderString({
     );
     return generateMode3HeaderString({
       fileName: fileName,
-      imageDimensions: imageDimensions
+      imageDimensions: imageDimensions,
     });
   }
 
@@ -175,12 +197,14 @@ export function generateMode4HeaderString({
   const imageWidthDefinition = `#define ${variableName.toUpperCase()}_WIDTH ${
     imageDimensions.width
   }\n`;
-  const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${bitmapLength /
-    2}];\n\n`;
+  const imageDefinitionString = `extern const unsigned short ${variableName}Bitmap[${
+    bitmapLength / 2
+  }];\n\n`;
 
   // Palette length is uncompressed
-  const paletteLengthDefinition = `#define ${variableName.toUpperCase()}_PAL_SIZE ${PALETTE_LENGTH *
-    2}\n`;
+  const paletteLengthDefinition = `#define ${variableName.toUpperCase()}_PAL_SIZE ${
+    PALETTE_LENGTH * 2
+  }\n`;
   const paletteDefinitionString = `extern const unsigned short ${variableName}Palette[${PALETTE_LENGTH}];\n\n`;
 
   const headerString =
@@ -193,6 +217,21 @@ export function generateMode4HeaderString({
 
   return headerString;
 }
+
+export const PALETTE_HEADER = (varName: string, palLength = PALETTE_LENGTH) =>
+  `#define ${varName}PalLen ${palLength * 2}\n` +
+  `extern const unsigned short ${varName}Palette[${palLength}];\n\n`;
+
+export const SS_TILES_HEADER = (
+  varName: string,
+  ssDimensions = { height: 256, width: 256 }
+) => {
+  const len = ssDimensions.height * ssDimensions.width;
+  return (
+    `#define ${varName}TilesLen ${len / 2}\n` +
+    `extern const unsigned short ${varName}Tiles[${len / 4}];\n\n`
+  );
+};
 
 function paletteIndicesToHex(index1: number, index2: number): string {
   if (index1 > 255 || index2 > 255) {
@@ -222,7 +261,7 @@ function paletteIndicesToHex(index1: number, index2: number): string {
 function pixelToHex(bgr: number[]): string {
   // convert to 16-bit binary format: 0bbbbbgggggrrrrr
   let binary_value = "0";
-  bgr.forEach(element => {
+  bgr.forEach((element) => {
     element = Math.floor((element * 32) / 256);
     let elementString = element.toString(2); // convert to binary
     while (elementString.length < 5) {
@@ -254,7 +293,7 @@ export function paletteToHex(palette: Palette): string {
   let palFile = "";
   let count = 1;
   const alignment = 4; //this number can change depending on how we want to format
-  palette.forEach(element => {
+  palette.forEach((element) => {
     let hex = "0x00";
     hex +=
       element.r < 16 ? "0" + element.r.toString(16) : element.r.toString(16);

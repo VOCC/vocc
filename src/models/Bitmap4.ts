@@ -1,16 +1,12 @@
+import Color from "../models/Color";
 import {
-  Color,
-  Dimensions,
-  ImageCoordinates,
-  ImageDataStore
-} from "../util/interfaces";
-import {
-  generateHeaderString,
-  generateCSourceFileString
+  generateCSourceFileString,
+  generateHeaderString
 } from "../util/exportUtils";
-import Palette from "./Palette";
-import ImageCanvas from "./ImageCanvas";
+import { Dimensions, ImageCoordinates, ImageDataStore } from "../util/types";
 import Bitmap from "./Bitmap";
+import ImageCanvas from "./ImageCanvas";
+import Palette from "./Palette";
 
 export default class Bitmap4 extends Bitmap {
   private data: number[];
@@ -43,7 +39,12 @@ export default class Bitmap4 extends Bitmap {
     return new Bitmap4(fileName, palette, dimensions, imageData as number[]);
   }
 
-  public getHeaderData(): string {
+  public updateFromStore({ imageData }: ImageDataStore): void {
+    this.data = imageData as number[];
+    this.imageCanvas.redrawImage(this);
+  }
+
+  public get headerData(): string {
     return generateHeaderString(
       {
         fileName: this.fileName,
@@ -54,7 +55,7 @@ export default class Bitmap4 extends Bitmap {
     );
   }
 
-  public getCSourceData(): string {
+  public get cSourceData(): string {
     return generateCSourceFileString(this, 4, this.palette);
   }
 
@@ -90,9 +91,9 @@ export default class Bitmap4 extends Bitmap {
     this.imageCanvas.redrawImage(this);
   }
 
-  public getImageDataStore(): ImageDataStore {
+  public get imageDataStore(): ImageDataStore {
     return {
-      imageData: this.data,
+      imageData: this.data.slice(),
       dimensions: this.dimensions,
       fileName: this.fileName
     };

@@ -1,31 +1,41 @@
 import { saveAs } from "file-saver";
-import React, { useCallback, useReducer, useState, useEffect } from "react";
-import { Tool, STORAGE, DEFAULT_SETTINGS } from "../util/consts";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
+import Bitmap3 from "../models/Bitmap3";
+import Bitmap4 from "../models/Bitmap4";
+import Color from "../models/Color";
+import Palette, { paletteIndexToCol } from "../models/Palette";
+import Spritesheet4 from "../models/Spritesheet4";
+import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
-import { exportImage, exportPalette } from "../util/exportUtils";
-import { loadNewImage } from "../util/fileLoadUtils";
 import {
-  Color,
+  exportImage,
+  exportPalette,
+  mode3BitmapAsBackgroundHeader,
+  mode3BitmapAsBackgroundSource,
+} from "../util/exportUtils";
+import { loadNewImage } from "../util/fileLoadUtils";
+import { quantize } from "../util/quantize";
+import {
   Dimensions,
   EditorMode,
   EditorSettings,
-  Mode,
+  ImageCoordinates,
   ImageDataStore,
-} from "../util/interfaces";
-import { quantize } from "../util/quantize";
-import Bitmap from "../models/Bitmap";
-import Bitmap3 from "../models/Bitmap3";
-import Bitmap4 from "../models/Bitmap4";
-import Palette from "../models/Palette";
+  ImageInterface,
+  Mode,
+  SpriteDimensions,
+  SpritesheetDataStore,
+} from "../util/types";
 import ExportButton from "./buttons/ExportButton";
 import ImportButton from "./buttons/ImportButton";
 import Dropdown from "./Dropdown";
 import EditorCanvas from "./EditorCanvas";
-import PalettePanel from "./PalettePanel";
-import ToolsPanel from "./ToolsPanel";
-import NewImageModal from "./modals/NewImageModal";
 import useModal from "./hooks/useModal";
 import ImportPaletteModal from "./modals/ImportPaletteModal";
+import NewImageModal from "./modals/NewImageModal";
+import PalettePanel from "./PalettePanel";
+import SpritePanel from "./SpritePanel";
+import ToolsPanel from "./ToolsPanel";
 
 function scaleReducer(state: number, e: WheelEvent) {
   const direction = e.deltaY < 0 ? -1 : 1;
@@ -37,7 +47,7 @@ function scaleReducer(state: number, e: WheelEvent) {
 }
 
 function App(): JSX.Element {
-  const [image, setImage] = useState<Bitmap>();
+  const [image, setImage] = useState<ImageInterface>();
   const [palette, setPalette] = useState<Palette>(DEFAULT_PALETTE);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
   const [editorSettings, setEditorSettings] = useState<EditorSettings>({
@@ -46,6 +56,16 @@ function App(): JSX.Element {
     imageMode: 3,
     editorMode: EditorMode.Bitmap,
   });
+
+  const [, updateState] = React.useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+
+  /**
+   * The undo stack will hold stringified ImageDataStore objects ONLY. They will
+   * be decoded on undo.
+   */
+  const [undoStack, setUndoStack] = useState<Array<string>>([]);
+  const [undoPointer, setUndoPointer] = useState<number>(-1);
 
   const {
     isShowing: isMode3BitmapModalShowing,
@@ -84,16 +104,75 @@ function App(): JSX.Element {
     if (imageFile) {
       console.log("Loading image from file...");
       let image = await loadNewImage(imageFile);
-      setImage(image);
+      resetUndo();
+      handleImageChange(image);
     }
   };
 
-  const handleImageChange = (newImage: Bitmap) => {
-    window.localStorage.setItem(
-      STORAGE.imageData,
-      JSON.stringify(newImage.getImageDataStore())
-    );
+  const handleImageChange = (newImage: ImageInterface) => {
+    let store: string;
+    if (newImage instanceof Spritesheet4) {
+      store = JSON.stringify(newImage.spritesheetDataStore);
+    } else {
+      store = JSON.stringify(newImage.imageDataStore);
+    }
+    window.localStorage.setItem(STORAGE.imageData, store);
+    pushUndoStack(store);
     setImage(newImage);
+  };
+
+  const handleAddSprite = (
+    position: ImageCoordinates,
+    dimensions: SpriteDimensions,
+    paletteRow = 0
+  ) => {
+    let spritesheet = image as Spritesheet4;
+    spritesheet.addSprite(position, dimensions);
+    handleImageChange(spritesheet);
+    forceUpdate();
+    console.log("Adding sprite");
+  };
+
+  const handleRemoveSprite = (image: ImageInterface | undefined, i: number) => {
+    if (image && image instanceof Spritesheet4) {
+      (image as Spritesheet4).removeSprite(i);
+    }
+    forceUpdate();
+  };
+
+  const pushUndoStack = (imageDataStoreString: string) => {
+    let newStack = undoStack.slice(0, undoPointer + 1);
+    newStack.push(imageDataStoreString);
+    setUndoStack(newStack);
+    setUndoPointer(newStack.length - 1);
+  };
+
+  const handleUndo = useCallback(() => {
+    console.log("trying to undo");
+    if (image && undoPointer >= 1) {
+      if (image instanceof Spritesheet4) {
+      } else {
+      }
+      const newStoreString = undoStack[undoPointer - 1];
+      const newStore = JSON.parse(newStoreString);
+      window.localStorage.setItem(STORAGE.imageData, newStoreString);
+      image.updateFromStore(newStore);
+      setUndoPointer(undoPointer - 1);
+      setImage(image);
+    }
+  }, [undoStack, undoPointer, image]);
+
+  const handleRedo = useCallback(() => {
+    console.log("trying to redo");
+    if (image && undoPointer + 1 < undoStack.length) {
+      image.updateFromStore(JSON.parse(undoStack[undoPointer + 1]));
+      setUndoPointer(undoPointer + 1);
+    }
+  }, [image, undoPointer, undoStack]);
+
+  const resetUndo = () => {
+    setUndoStack([]);
+    setUndoPointer(-1);
   };
 
   const handlePaletteChange = (newPalette: Palette) => {
@@ -156,7 +235,7 @@ function App(): JSX.Element {
    * @param imageMode The image mode to edit in. Can be any of the GBA Modes,
    * although only 0, 3, and 4 are supported.
    */
-  const handleNewBitmap = (
+  const handleNewImage = (
     editorMode: EditorMode,
     imageMode: Mode,
     fileName: string,
@@ -178,24 +257,35 @@ function App(): JSX.Element {
             handleSettingsChange(editorSettings);
             handleImageChange(new Bitmap3(fileName, dimensions));
             handlePaletteChange(palette);
-            break;
+            return;
           case 4: // Set up the editor for working on a mode 4 paletted bitmap
             editorSettings.editorMode = EditorMode.Bitmap;
             editorSettings.imageMode = 4;
             handleSettingsChange(editorSettings);
             handleImageChange(new Bitmap4(fileName, palette, dimensions));
             handlePaletteChange(palette);
-            break;
+            return;
           default:
             alert("Unsupported image mode!");
-            break;
+            return;
         }
-        break;
       case EditorMode.Spritesheet:
+        editorSettings.editorMode = EditorMode.Spritesheet;
+        editorSettings.imageMode = 0;
+        handleSettingsChange(editorSettings);
+        handleImageChange(
+          new Spritesheet4(
+            "untitled",
+            palette,
+            paletteIndexToCol(selectedColorIndex)
+          )
+        );
+        handlePaletteChange(palette);
+        return;
       case EditorMode.Background:
       default:
         alert("Unsupported editing mode!");
-        break;
+        return;
     }
   };
 
@@ -205,7 +295,7 @@ function App(): JSX.Element {
       alert("Requantization of paletted images currently not supported!");
     } else {
       let ok = window.confirm(
-        "(Don't panic!) Quantizing a bitmap will change it from mode 3 to mode 4. Is this okay?"
+        "Quantizing a bitmap will change it from mode 3 to mode 4. Is this okay?"
       );
       if (ok) {
         let { palette, sprite } = quantize(image, newColorDepth);
@@ -217,7 +307,7 @@ function App(): JSX.Element {
 
   const handleChangeSelectedColor = (newIndex: number) => {
     setSelectedColorIndex(newIndex);
-    if (image instanceof Bitmap4) {
+    if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
       image.setPaletteIndex(newIndex);
     }
   };
@@ -225,7 +315,7 @@ function App(): JSX.Element {
   const handleColorChange = (newColor: Color): void => {
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
-    if (image instanceof Bitmap4) {
+    if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
       image.updatePalette(newPalette);
     }
     handlePaletteChange(newPalette);
@@ -253,13 +343,28 @@ function App(): JSX.Element {
         }
         //.c file
         fileType = ".c";
-        let cBlob = new Blob([image.getCSourceData()]);
+        let cBlob = new Blob([image.cSourceData]);
         saveAs(cBlob, fileName + fileType);
         //.h file
         fileType = ".h";
-        let hBlob = new Blob([image.getHeaderData()]);
+        let hBlob = new Blob([image.headerData]);
         saveAs(hBlob, fileName + fileType);
         return;
+      case "BG":
+        if (image instanceof Bitmap3) {
+          //.c file
+          fileType = ".c";
+          let cBlob = new Blob([mode3BitmapAsBackgroundSource(image)]);
+          saveAs(cBlob, fileName + fileType);
+          //.h file
+          fileType = ".h";
+          let hBlob = new Blob([mode3BitmapAsBackgroundHeader(image)]);
+          saveAs(hBlob, fileName + fileType);
+          return;
+        } else {
+          alert("Background export only supported for Mode 3.");
+          return;
+        }
       case "PAL":
         //.pal file
         if (!palette) {
@@ -304,6 +409,25 @@ function App(): JSX.Element {
     }
   };
 
+  /**
+   * Set up listeners for undo and redo.
+   */
+  useEffect(() => {
+    const keydownHandler = (e: KeyboardEvent) => {
+      if (e.keyCode === 89 && e.ctrlKey) {
+      } else if (e.keyCode === 90 && e.ctrlKey && e.shiftKey) {
+        handleRedo();
+      } else if (e.keyCode === 90 && e.ctrlKey) {
+        handleUndo();
+      }
+    };
+    document.addEventListener("keydown", keydownHandler);
+    return () => document.removeEventListener("keydown", keydownHandler);
+  }, [handleUndo, handleRedo]);
+
+  /**
+   * Load Images from local storage.
+   */
   useEffect(() => {
     const alertBadFormatting = () =>
       alert("Image data incorrectly formatted. Aborting load operation.");
@@ -325,12 +449,43 @@ function App(): JSX.Element {
         return;
       }
 
-      const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
       const parsedImageMode: Mode = parseInt(loadedImageMode) as Mode;
       const parsedImageType: EditorMode = loadedImageType as EditorMode;
 
+      const buildPalette = (paletteString: string): Palette => {
+        interface IColor {
+          r: number;
+          g: number;
+          b: number;
+          a: number;
+        }
+        // The following cast is definitely unsafe.
+        let parsedPalette = JSON.parse(paletteString) as IColor[];
+        let newPalette = parsedPalette.map(
+          (c) => new Color(c.r, c.g, c.b, c.a)
+        );
+        return newPalette;
+      };
+
       switch (parsedImageMode) {
+        case 0:
+          if (!loadedPalette) {
+            alertBadFormatting();
+            return;
+          } else {
+            const newPalette = buildPalette(loadedPalette);
+            console.log(newPalette);
+            const parsedImage = JSON.parse(loadedImage) as SpritesheetDataStore;
+            setPalette(newPalette);
+            setImage(Spritesheet4.fromDataStore(parsedImage, newPalette, 0));
+            let newEditorSettings = DEFAULT_SETTINGS;
+            newEditorSettings.imageMode = parsedImageMode;
+            newEditorSettings.editorMode = parsedImageType;
+            setEditorSettings(newEditorSettings);
+          }
+          break;
         case 3:
+          const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
           setImage(Bitmap3.fromDataStore(parsedImage));
           let newEditorSettings = DEFAULT_SETTINGS;
           newEditorSettings.imageMode = parsedImageMode;
@@ -342,9 +497,10 @@ function App(): JSX.Element {
             alertBadFormatting();
             return;
           } else {
-            const parsedPalette = JSON.parse(loadedPalette) as Palette;
-            setImage(Bitmap4.fromDataStore(parsedImage, parsedPalette));
-            setPalette(parsedPalette);
+            const parsedImage = JSON.parse(loadedImage) as ImageDataStore;
+            const newPalette = buildPalette(loadedPalette);
+            setImage(Bitmap4.fromDataStore(parsedImage, newPalette));
+            setPalette(newPalette);
             let newEditorSettings = DEFAULT_SETTINGS;
             newEditorSettings.imageMode = parsedImageMode;
             newEditorSettings.editorMode = parsedImageType;
@@ -367,19 +523,22 @@ function App(): JSX.Element {
           <NewImageModal
             isShowing={isMode3BitmapModalShowing}
             hide={toggleMode3BitmpModal}
-            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 3)}
+            onAccept={handleNewImage.bind(null, EditorMode.Bitmap, 3)}
           ></NewImageModal>
           <button onClick={toggleMode4BitmpModal}>Mode 4</button>
           <NewImageModal
             isShowing={isMode4BitmapModalShowing}
             hide={toggleMode4BitmpModal}
-            onAccept={handleNewBitmap.bind(null, EditorMode.Bitmap, 4)}
+            onAccept={handleNewImage.bind(null, EditorMode.Bitmap, 4)}
           ></NewImageModal>
           <div className="dd-divider"></div>
           <div className="dd-content-header">Spritesheet</div>
           <button
             onClick={() =>
-              alert("Spritesheet editing not currently supported.")
+              handleNewImage(EditorMode.Spritesheet, 0, "untitled", {
+                height: 256,
+                width: 256,
+              })
             }
           >
             4 bpp
@@ -393,8 +552,8 @@ function App(): JSX.Element {
           </button>
         </Dropdown>
         <Dropdown label="Edit">
-          <button onClick={() => null}>Undo</button>
-          <button onClick={() => null}>Redo</button>
+          <button onClick={() => handleUndo()}>Undo</button>
+          <button onClick={() => handleRedo()}>Redo</button>
           <div className="dd-divider"></div>
           <button onClick={() => null}>Clear All</button>
         </Dropdown>
@@ -434,6 +593,12 @@ function App(): JSX.Element {
             startImageExport={handleImageExport.bind(null, "GBA")}
             buttonLabel="C Source Code (*.c/.h)"
           />
+          {image instanceof Bitmap3 ? (
+            <ExportButton
+              startImageExport={handleImageExport.bind(null, "BG")}
+              buttonLabel="C Source as background"
+            />
+          ) : null}
           <div className="dd-divider"></div>
           <ExportButton
             startImageExport={handleImageExport.bind(null, "PAL")}
@@ -494,6 +659,7 @@ function App(): JSX.Element {
               selectedPaletteIndex={selectedColorIndex}
               scale={scale}
               onChangeImage={handleImageChange}
+              onChangeColor={handleColorChange}
               onMouseWheel={handleMouseWheelEvent}
             />
           ) : (
@@ -513,6 +679,14 @@ function App(): JSX.Element {
             settings={editorSettings}
             onSettingsChange={handleSettingsChange}
           />
+          {editorSettings.editorMode === EditorMode.Spritesheet ? (
+            <SpritePanel
+              onAddSprite={handleAddSprite}
+              onRemoveSprite={(i) => handleRemoveSprite(image, i)}
+              onUpdatePaletteRow={forceUpdate}
+              sprites={(image as Spritesheet4).sprites}
+            />
+          ) : null}
         </div>
       </div>
     </div>

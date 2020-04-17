@@ -1,7 +1,7 @@
-import Bitmap4 from "../models/Bitmap4";
-import Palette from "../models/Palette";
-import { Color } from "./interfaces";
 import Bitmap from "../models/Bitmap";
+import Bitmap4 from "../models/Bitmap4";
+import Color from "../models/Color";
+import Palette from "../models/Palette";
 
 const BLACK: Color = new Color(0, 0, 0, 1);
 
@@ -9,6 +9,7 @@ export function quantize(
   image: Bitmap,
   depth: number
 ): { sprite: Bitmap4; palette: Palette } {
+
   let centroids: number[][];
   let imageArr = imageToArr(image);
   let colors = depth;
@@ -59,7 +60,7 @@ export function quantize(
     clusters.push(newCluster);
   }
   // sort clusters from largest to smallest
-  clusters.sort(function(a, b) {
+  clusters.sort(function (a, b) {
     return b.length - a.length;
   });
 
@@ -105,8 +106,13 @@ export function quantize(
   return { sprite, palette };
 }
 
-// Used to find index of colors for building sprite colorArray
-// This kills the imageArr (imageArr is destroyed by this function)
+/**
+ * Used to find the index of colors for building Palette of
+ * quantized image
+ * NOTE: This function destroys imageArr
+ * @param imageArr The image to quantize as a 2D array
+ * @param colorArr List of unique colors in the image
+ */
 function getColorIndex(imageArr: number[][], colorArr: number[]): number {
   for (let i = 0; i < imageArr.length; i++) {
     if (
@@ -121,7 +127,10 @@ function getColorIndex(imageArr: number[][], colorArr: number[]): number {
   return -1;
 }
 
-//converts imageObject into array of colors for k-means
+/**
+ * converst image into array of RGB color values
+ * @param image The image to convert to 2d array
+ */
 function imageToArr(image: Bitmap): number[][] {
   let imageArr = [];
   for (let y = 0; y < image.dimensions.height; y++) {
@@ -137,10 +146,14 @@ function imageToArr(image: Bitmap): number[][] {
   return imageArr;
 }
 
-//used to find clusters of similar points for image depth reduction (quantization)
-//arrayToProcess: number array of colors; [[r, g, b], [r, g, b], ...]
-//centroids: center point of clusters;
-//clusters: number of clusters to generate
+/**
+ * Used to find clusters of similar colors for image color quantization
+ * @param arrayToProcess 2D array of RGB color values for the image to quantize
+ * @param centroids List of center points for each color cluster
+ *  2D array of RGB values
+ * @param clusters 3D array of clusters for color quantization
+ * Each centroid is associated with a cluster
+ */
 function kmeans(
   arrayToProcess: number[][],
   centroids: number[][],
@@ -199,9 +212,9 @@ function kmeans(
           Math.min(
             Math.max(
               centroids[clusterIterate][i] /
-                (Groups[clusterIterate].length <= 1
-                  ? 1
-                  : Groups[clusterIterate].length),
+              (Groups[clusterIterate].length <= 1
+                ? 1
+                : Groups[clusterIterate].length),
               0
             ),
             255
@@ -231,15 +244,13 @@ function kmeans(
   return { groups: Groups, centers: centroids };
 }
 
-//function to determine if there exists a group of centroids with specific
-//average distance between them
-//points: list of points to search
-//midDist: desired average distance
-//numCentroids: number of points to find
-//
-//returns:
-//possible (boolean)
-//centers (list of points with desired distance)
+/**
+ * Used to determine if there exists a group of points with a at most 
+ * minDist distance between them
+ * @param points list of points to search
+ * @param midDist average distance to check for
+ * @param numCentroids number of points to find
+ */
 function centroidPossible(
   points: number[][],
   midDist: number,
@@ -276,6 +287,14 @@ function centroidPossible(
 
 //binary search to find centroids, reutrn list of centroids with
 // average largest distance between them
+
+/**
+ * Used to find optimal centroids for kmeans
+ * Uses binary search to find the group of centroids with min average distance
+ * between them
+ * @param uniqueColors 2D array of unique RGB color values
+ * @param depth number of centroids to find
+ */
 function findCentroids(
   uniqueColors: number[][],
   depth: number

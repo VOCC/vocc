@@ -1,18 +1,14 @@
+import Color from "../models/Color";
 import {
-  Color,
-  Dimensions,
-  ImageCoordinates,
-  ImageDataStore
-} from "../util/interfaces";
-import {
-  generateHeaderString,
-  generateCSourceFileString
+  generateCSourceFileString,
+  generateHeaderString
 } from "../util/exportUtils";
 import * as Loader from "../util/fileLoadUtils";
+import { Dimensions, ImageCoordinates, ImageDataStore } from "../util/types";
 import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 
-class Bitmap3 extends Bitmap {
+export default class Bitmap3 extends Bitmap {
   protected imageCanvas: ImageCanvas;
 
   constructor(
@@ -30,14 +26,28 @@ class Bitmap3 extends Bitmap {
     dimensions,
     fileName
   }: ImageDataStore): Bitmap3 {
-    return new Bitmap3(fileName, dimensions, imageData as Uint8ClampedArray);
+    return new Bitmap3(fileName, dimensions, Uint8ClampedArray.from(imageData));
   }
 
-  public getCSourceData(): string {
+  public updateFromStore({ imageData }: ImageDataStore) {
+    console.log(imageData as Uint8ClampedArray);
+    this.imageData = imageData as Uint8ClampedArray;
+    this.imageCanvas.redrawImage(this);
+  }
+
+  public get imageDataStore(): ImageDataStore {
+    return {
+      fileName: this.fileName,
+      dimensions: this.dimensions,
+      imageData: Array.from(this.imageData)
+    };
+  }
+
+  public get cSourceData(): string {
     return generateCSourceFileString(this, 3);
   }
 
-  public getHeaderData(): string {
+  public get headerData(): string {
     return generateHeaderString(
       { fileName: this.fileName, imageDimensions: this.dimensions },
       3
@@ -58,5 +68,3 @@ class Bitmap3 extends Bitmap {
     this.imageCanvas.updatePixel(pos, color);
   }
 }
-
-export default Bitmap3;

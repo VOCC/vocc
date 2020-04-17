@@ -1,4 +1,5 @@
-import { Dimensions, Color, EditorMode, EditorSettings } from "./interfaces";
+import Color from "../models/Color";
+import { Dimensions, EditorMode, EditorSettings } from "./types";
 
 export const COLORS = {
   black: new Color(0, 0, 0, 1),
@@ -17,7 +18,8 @@ export enum Tool {
   ELLIPSE,
   ZOOM,
   PAN,
-  DROPPER
+  DROPPER,
+  LAYER
 }
 
 export const STORAGE = {
