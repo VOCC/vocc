@@ -1,5 +1,9 @@
 import { createHiddenCanvas } from "../util/fileLoadUtils";
-import { PALETTE_HEADER, SS_TILES_HEADER, colorToHex, PaletteToGBA } from "../util/exportUtils";
+import {
+  PALETTE_HEADER,
+  SS_TILES_HEADER,
+  PaletteToGBA,
+} from "../util/exportUtils";
 import {
   Dimensions,
   ImageCoordinates,
@@ -172,16 +176,16 @@ export default class Spritesheet4 implements ImageInterface {
     );
   }
 
-/**
- * Get the COLOR at an index on the spritesheet
- * @param pos ImageCoordinates of the pixel
- * returns Color of the pixel
- */
+  /**
+   * Get the COLOR at an index on the spritesheet
+   * @param pos ImageCoordinates of the pixel
+   * returns Color of the pixel
+   */
   public getPixelColorAt(pos: ImageCoordinates): Color {
     const sprite = this.getSpriteFromCoordinates(pos);
     if (!sprite) {
       console.warn("Spritesheet: trying to get color but there's no sprite!");
-      return new Color (0,0,0);
+      return new Color(0, 0, 0);
     }
     const pixelCoords = spritesheetCoordsToSpriteCoords(
       pos,
@@ -331,10 +335,10 @@ export default class Spritesheet4 implements ImageInterface {
    * Get properly formatted c code cotaining an array of spritesheet tile data.
    * Each index is the hex color value of the pixel.
    * Iterates one 8x8 TILE at a time going left to right and then down...
-   * 
+   *
    * ex. 32 tiles x 32 tiles spritesheet
    * -------------------------
-   * | 0  | 1  | 2  |...| 32 |                   
+   * | 0  | 1  | 2  |...| 32 |
    * | 33 | 34 | 35 |...| 64 |
    * | .                     |
    * | .    .                |
@@ -344,23 +348,63 @@ export default class Spritesheet4 implements ImageInterface {
    */
   private get tileData(): String {
     const name = this.fileName.slice(0, this.fileName.lastIndexOf("."));
-    const size = (this.dimensions.height * this.dimensions.width) / 4;
-    let toReturn = "const unsigned short " + name + "Tiles[" + size + "] __attribute__((aligned(4)))=\n{\n\t";
-    for (let tileNum = 0; tileNum < SS4_SIZE_TILES.height * SS4_SIZE_TILES.width; tileNum++) {
-      // we are considering 8x8 tiles
-      for (let tileRow = 0; tileRow < 8; tileRow++) {
-        for (let tileCol = 0; tileCol < 8; tileCol++) {
-          const coords : ImageCoordinates = {
-            x: (tileCol + (tileNum * 8)) % SS4_SIZE_PIXELS.width, 
-            y: (tileRow + Math.floor(tileNum / SS4_SIZE_TILES.width) * 8)
-          };
-          toReturn += colorToHex(this.getPixelColorAt(coords)) + ",";
-          if (tileCol === 7) {
-            toReturn += "\n\t";
+    const size = (this.dimensions.height * this.dimensions.width) / 4; // 4bpp
+    let toReturn =
+      "const unsigned short " +
+      name +
+      "Tiles[" +
+      size +
+      "] __attribute__((aligned(4)))=\n{\n\t";
+    // for (
+    //   let tileNum = 0;
+    //   tileNum < SS4_SIZE_TILES.height * SS4_SIZE_TILES.width;
+    //   tileNum++
+    // ) {
+    for (let ssty = 0; ssty < this._tileDimensions.height; ssty++) {
+      for (let sstx = 0; sstx < this._tileDimensions.width; sstx++) {
+        const sprite = this._spriteMap[ssty][sstx];
+        if (sprite) {
+          for (let tileRow = 0; tileRow < 8; tileRow += 1) {
+            for (let tileCol = 0; tileCol < 8; tileCol += 4) {
+              // const ssCoords: ImageCoordinates = {
+              //   x: (tileCol + tileNum * 8) % SS4_SIZE_PIXELS.width,
+              //   y: tileRow + Math.floor(tileNum / SS4_SIZE_TILES.width) * 8,
+              // };
+              // toReturn += colorToHex(this.getPixelColorAt(coords)) + ",";
+              const ssCoords: ImageCoordinates = {
+                x: sstx * TILE_SIZE.width + tileCol,
+                y: ssty * TILE_SIZE.height + tileRow,
+              };
+              // Translate coordinates to be relative to sprite
+              const spCoords = spritesheetCoordsToSpriteCoords(
+                ssCoords,
+                this._pixelDimensions,
+                sprite.position,
+                sprite.dimensions
+              );
+              // Get 8 bits worth of data
+              const d0 = sprite.getDataAt(spCoords);
+              const d1 = sprite.getDataAt({ x: spCoords.x + 1, y: spCoords.y });
+              const d2 = sprite.getDataAt({ x: spCoords.x + 2, y: spCoords.y });
+              const d3 = sprite.getDataAt({ x: spCoords.x + 3, y: spCoords.y });
+              const out = (d0 << 0) + (d1 << 4) + (d2 << 8) + (d3 << 12);
+              const outString = "0x" + out.toString(16).padStart(4, "0") + ", ";
+              console.log(outString);
+              toReturn += outString;
+            }
+            if (tileRow === 3 || tileRow === 7) {
+              toReturn += "\n\t";
+            }
           }
+        } else {
+          toReturn +=
+            "0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,\n\t" +
+            "0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,\n\t";
+        }
+        if ((sstx + 1) % 4 === 0) {
+          toReturn += "\n\t";
         }
       }
-      toReturn += "\n\t";
     }
     toReturn += "};";
     return toReturn;
@@ -371,9 +415,12 @@ export default class Spritesheet4 implements ImageInterface {
    * Contains the spritesheet data and palette.
    */
   public get cSourceData(): string {
-    return "//spritesheet export\n" 
-    + this.tileData + "\n\n" 
-    + PaletteToGBA(this._palette);
+    return (
+      "//spritesheet export\n" +
+      this.tileData +
+      "\n\n" +
+      PaletteToGBA(this._palette)
+    );
   }
 }
 
