@@ -3,14 +3,14 @@ import React, { useCallback, useReducer, useState, useEffect } from "react";
 import { Tool, STORAGE, DEFAULT_SETTINGS } from "../util/consts";
 import DEFAULT_PALETTE from "../util/defaultPalette";
 import { exportImage, exportPalette } from "../util/exportUtils";
-import { loadNewImage, loadNewPalette } from "../util/fileLoadUtils";
+import { loadNewImage } from "../util/fileLoadUtils";
 import {
   Color,
   Dimensions,
   EditorMode,
   EditorSettings,
   Mode,
-  ImageDataStore
+  ImageDataStore,
 } from "../util/interfaces";
 import { quantize } from "../util/quantize";
 import Bitmap from "../models/Bitmap";
@@ -44,25 +44,24 @@ function App(): JSX.Element {
     grid: true,
     currentTool: Tool.PENCIL,
     imageMode: 3,
-    editorMode: EditorMode.Bitmap
+    editorMode: EditorMode.Bitmap,
   });
 
   const {
     isShowing: isMode3BitmapModalShowing,
-    toggle: toggleMode3BitmpModal
+    toggle: toggleMode3BitmpModal,
   } = useModal();
   const {
     isShowing: isMode4BitmapModalShowing,
-    toggle: toggleMode4BitmpModal
+    toggle: toggleMode4BitmpModal,
   } = useModal();
- const {
-   isShowing: isPaletteModalShowing,
-   toggle: togglePaletteModal
+  const {
+    isShowing: isPaletteModalShowing,
+    toggle: togglePaletteModal,
   } = useModal();
-
 
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
-  const handleMouseWheelEvent = useCallback(e => scaleDispatch(e), []);
+  const handleMouseWheelEvent = useCallback((e) => scaleDispatch(e), []);
 
   const handleFileInputChange = (
     type: "Image" | "Palette",
@@ -129,13 +128,8 @@ function App(): JSX.Element {
   //   }
   // };
 
-  const handlePaletteImport = (
-    pal: Palette,
-  ) => {
-    if (image instanceof Bitmap4) {
-      image.updatePalette(pal);
-    }
-    handlePaletteChange(pal);
+  const handlePaletteImport = (pal: Palette) => {
+    handlePaletteChange(pal.slice());
   };
 
   const handleToolChange = useCallback(
@@ -144,7 +138,7 @@ function App(): JSX.Element {
         grid: editorSettings.grid,
         currentTool: newTool,
         imageMode: editorSettings.imageMode,
-        editorMode: editorSettings.editorMode
+        editorMode: editorSettings.editorMode,
       });
     },
     [editorSettings]
