@@ -8,7 +8,7 @@ import { Dimensions, ImageCoordinates, ImageDataStore } from "../util/types";
 import Bitmap from "./Bitmap";
 import ImageCanvas from "./ImageCanvas";
 
-class Bitmap3 extends Bitmap {
+export default class Bitmap3 extends Bitmap {
   protected imageCanvas: ImageCanvas;
 
   constructor(
@@ -68,5 +68,3 @@ class Bitmap3 extends Bitmap {
     this.imageCanvas.updatePixel(pos, color);
   }
 }
-
-export default Bitmap3;
