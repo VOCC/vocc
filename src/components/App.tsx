@@ -129,6 +129,9 @@ function App(): JSX.Element {
   // };
 
   const handlePaletteImport = (pal: Palette) => {
+    if (image instanceof Bitmap4) {
+      image.updatePalette(pal);
+    }
     handlePaletteChange(pal.slice());
   };
 
