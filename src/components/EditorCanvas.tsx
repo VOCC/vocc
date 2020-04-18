@@ -93,7 +93,6 @@ export default function EditorCanvas({
       );
     }
     // Always draw tile grid on spritesheets
-    // TODO: Add option for this
     if (
       settings.grid &&
       image instanceof Spritesheet4 &&

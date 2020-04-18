@@ -83,6 +83,12 @@ function App(): JSX.Element {
   const [scale, scaleDispatch] = useReducer(scaleReducer, 8);
   const handleMouseWheelEvent = useCallback((e) => scaleDispatch(e), []);
 
+  /**
+   * Handler for importing a file
+   * @param type file input type: image or palette
+   * @param element the HTML element or null
+   * @param event the HTML element's event
+   */
   const handleFileInputChange = (
     type: "Image" | "Palette",
     element: HTMLInputElement | null,
@@ -100,6 +106,10 @@ function App(): JSX.Element {
     }
   };
 
+  /**
+   * Helper to load an imported image file
+   * @param imageFile the image file to load
+   */
   const handleImageLoad = async (imageFile: File | null) => {
     if (imageFile) {
       console.log("Loading image from file...");
@@ -109,6 +119,10 @@ function App(): JSX.Element {
     }
   };
 
+  /**
+   * Handler for changes to the image being used
+   * @param newImage the new image to be used
+   */
   const handleImageChange = (newImage: ImageInterface) => {
     let store: string;
     if (newImage instanceof Spritesheet4) {
@@ -121,6 +135,14 @@ function App(): JSX.Element {
     setImage(newImage);
   };
 
+  /**
+   * Handler for adding sprites to a spritesheet.
+   * Parameters are given by user interaction.
+   * ONLY used on spritesheets. 
+   * @param position position of the sprite on the spritesheet
+   * @param dimensions dimensions of the sprite
+   * @param paletteRow the row being used to color the sprite
+   */
   const handleAddSprite = (
     position: ImageCoordinates,
     dimensions: SpriteDimensions,
@@ -133,6 +155,12 @@ function App(): JSX.Element {
     console.log("Adding sprite");
   };
 
+  /**
+   * Handler for removing a sprite from the spritesheet.
+   * ONLY used on spritesheets.
+   * @param image the sprite being removed
+   * @param i position of the sprite in the spritesheet
+   */
   const handleRemoveSprite = (image: ImageInterface | undefined, i: number) => {
     if (image && image instanceof Spritesheet4) {
       (image as Spritesheet4).removeSprite(i);
@@ -147,6 +175,9 @@ function App(): JSX.Element {
     setUndoPointer(newStack.length - 1);
   };
 
+  /**
+   * Handler for undoing actions on the editor canvas
+   */
   const handleUndo = useCallback(() => {
     console.log("trying to undo");
     if (image && undoPointer >= 1) {
@@ -162,6 +193,9 @@ function App(): JSX.Element {
     }
   }, [undoStack, undoPointer, image]);
 
+  /**
+   * Handler for redoing actions on the editor canvas
+   */
   const handleRedo = useCallback(() => {
     console.log("trying to redo");
     if (image && undoPointer + 1 < undoStack.length) {
@@ -175,11 +209,19 @@ function App(): JSX.Element {
     setUndoPointer(-1);
   };
 
+  /**
+   * Handler for changes made to the palette
+   * @param newPalette the new and updated palette
+   */
   const handlePaletteChange = (newPalette: Palette) => {
     window.localStorage.setItem(STORAGE.palette, JSON.stringify(newPalette));
     setPalette(newPalette);
   };
 
+  /**
+   * Handler for changes to the editor settings
+   * @param newSettings the new and udpated editor settings
+   */
   const handleSettingsChange = (newSettings: EditorSettings) => {
     window.localStorage.setItem(
       STORAGE.imageMode,
@@ -207,6 +249,10 @@ function App(): JSX.Element {
   //   }
   // };
 
+  /**
+   * Handler for importing a new palette
+   * @param pal the palette being imported
+   */
   const handlePaletteImport = (pal: Palette) => {
     if (image instanceof Bitmap4) {
       image.updatePalette(pal);
@@ -214,6 +260,9 @@ function App(): JSX.Element {
     handlePaletteChange(pal.slice());
   };
 
+  /**
+   * Handler for when user changes to a different drawing tool
+   */
   const handleToolChange = useCallback(
     (newTool: Tool) => {
       handleSettingsChange({
@@ -289,6 +338,10 @@ function App(): JSX.Element {
     }
   };
 
+  /**
+   * Handler for quantizing an image to a specified amount of colors
+   * @param newColorDepth How many colors you want the image to be made of
+   */
   const handleQuantize = (newColorDepth: number): void => {
     newColorDepth = Math.floor(newColorDepth); // just in case of a float
     if (!(image instanceof Bitmap3)) {
@@ -305,6 +358,10 @@ function App(): JSX.Element {
     }
   };
 
+  /**
+   * Handler for when user selects a new index/color in the palette
+   * @param newIndex The index of the color in the palette array
+   */
   const handleChangeSelectedColor = (newIndex: number) => {
     setSelectedColorIndex(newIndex);
     if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
@@ -312,6 +369,10 @@ function App(): JSX.Element {
     }
   };
 
+  /**
+   * Handler for when the user changes the color at some index in the palette
+   * @param newColor new color to appear in the palette
+   */
   const handleColorChange = (newColor: Color): void => {
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
@@ -321,6 +382,10 @@ function App(): JSX.Element {
     handlePaletteChange(newPalette);
   };
 
+  /**
+   * Handler for exporting an image or palette
+   * @param type The type for the file export (GBA, PAL, PNG, JPG, BMP, etc.)
+   */
   const handleImageExport = async (type: string) => {
     let fileName;
     let fileType = "";
