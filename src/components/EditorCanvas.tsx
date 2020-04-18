@@ -20,6 +20,7 @@ import { spritesheetCoordsToSpriteCoords } from "../models/Spritesheet4";
 const PIXELGRID_ZOOM_LIMIT = 8;
 const TILEGRID_ZOOM_LIMIT = 4;
 
+// INTERFACE
 interface EditorCanvasProps {
   image: ImageInterface;
   palette: Palette;
@@ -43,25 +44,27 @@ export default function EditorCanvas({
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasSize, setCanvasSize] = useState<number[]>([0, 0]);
-
-  ///////////////////// Drawing Tool
-  const [isPainting, setIsPainting] = useState<boolean>(false);
   const [mousePos, setMousePos] = useState<ImageCoordinates | undefined>(
     undefined
   );
-  const [startPos, setStartPos] = useState<ImageCoordinates>({
+  const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
     x: 0,
     y: 0,
   });
-  const [imagePosition, setImagePosition] = useState<ImageCoordinates>({
+  ///// variables for draw tools
+  const [isPainting, setIsPainting] = useState<boolean>(false);
+  const [startPos, setStartPos] = useState<ImageCoordinates>({
     x: 0,
     y: 0,
   });
   const [endingPos, setEndingPos] = useState<ImageCoordinates | undefined>(
     undefined
   );
-  ///////////////////////////////////////////
+  ////////////////////////////////
 
+  /**
+   * Callback for drawing the image state on the editor canvas
+   */
   const drawImageOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -164,8 +167,11 @@ export default function EditorCanvas({
    */
   useLayoutEffect(() => drawImageOnCanvas());
 
-  /////////////////////////////////////////////////////////////////////////////
-  // Drawing Tool
+  /**
+   * Gets (x,y) coordinate of the mouse on the canvas
+   * returns undefined if cannot get the mouse position
+   * @param e Mouse Event
+   */
   const getMousePos = (e: MouseEvent): ImageCoordinates | undefined => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -180,6 +186,11 @@ export default function EditorCanvas({
     return undefined;
   };
 
+  /**
+   * Callback for translating the mouse position to the (x,y) pixel coordinates
+   * of the image state
+   * @returns undefined if out of image bounds, otherwise the pixel coordinate
+   */
   const getImageCoord = useCallback(
     (mousePos: ImageCoordinates): ImageCoordinates | undefined => {
       const x = Math.floor((mousePos.x - imagePosition.x) / scale);
@@ -196,21 +207,11 @@ export default function EditorCanvas({
     [scale, imagePosition, image.dimensions]
   );
 
-  // const atNewPixel = useCallback((newPos: ImageCoordinates): boolean => {
-  //   if (!mousePos) return false;
-  //   const prevImgCoord = getImageCoord(mousePos);
-  //   if (!prevImgCoord) return false;
-  //   const prevPixel = {
-  //     x: imagePosition.x + prevImgCoord.x * scale,
-  //     y: imagePosition.y + prevImgCoord.y * scale
-  //   }
-
-  //   if (prevPixel.x === newPos.x && prevPixel.y === newPos.y) {
-  //     return false;
-  //   }
-  //   return true;
-  // }, [mousePos, getImageCoord, imagePosition, scale]);
-
+  /**
+   * Pencil Tool:
+   * Sets the specified pixel on the image state (directly modifies the image)
+   * Will update the editor canvas to reflect the change
+   */
   const fillPixel = useCallback(
     (pos: ImageCoordinates | undefined, color: Color): void => {
       if (!pos) return;
@@ -224,6 +225,10 @@ export default function EditorCanvas({
     [drawImageOnCanvas, image]
   );
 
+  /**
+   * Bucket Tool:
+   * runs BFS to color all neighbor pixels of similar color
+   */
   const bucketFill = useCallback(
     (
       pos: ImageCoordinates | undefined,
@@ -236,7 +241,6 @@ export default function EditorCanvas({
       const color = image.getPixelColorAt(pos);
       if (color.isEqual(newColor)) return;
       image.setPixelColor(pos, newColor);
-      // console.log(color);
       let queue = new Array<ImageCoordinates>(pos);
       let explored = new Array<ImageCoordinates>(pos);
       while (queue[0] !== undefined) {
@@ -255,7 +259,7 @@ export default function EditorCanvas({
         if (curr.x < botRight.x - 1) {
           edges.push({ x: curr.x + 1, y: curr.y });
         }
-        ///
+        // sets pixel color for all viable pixels
         edges
           .filter((n) => !explored.includes(n))
           .forEach((n) => {
@@ -272,22 +276,9 @@ export default function EditorCanvas({
     [image, drawImageOnCanvas]
   );
 
-  // const rectangle = useCallback((): void => {
-  //   if (!endingPos) return;
-  //   if (!canvasRef.current) return;
-  //   const context = canvasRef.current.getContext('2d');
-  //   if (!context) return;
-  //   // drawImageOnCanvas();
-  //   const color = palette[selectedPaletteIndex];
-  //   const colorString = `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-  //   context.fillStyle = colorString;
-  //   context.lineWidth = 1;
-  //   context.rect(
-  //     startPos.x, startPos.y,
-  //     endingPos.x - startPos.x, endingPos.y - startPos.y);
-  //   context.fill();
-  // }, [startPos, endingPos, palette, selectedPaletteIndex]);
-
+  /**
+   * Callback for mousedown event (user starts using a tool)
+   */
   const startPaint = useCallback(
     (e: MouseEvent) => {
       const mousePosition = getMousePos(e);
@@ -298,7 +289,6 @@ export default function EditorCanvas({
       if (!canvasRef.current) return;
       const context = canvasRef.current.getContext("2d");
       if (!context) return;
-      // if (!imageCoord) return;
       switch (settings.currentTool) {
         case Tool.PENCIL:
           setIsPainting(true);
@@ -367,6 +357,9 @@ export default function EditorCanvas({
     ]
   );
 
+  /**
+   * Callback for mousemove event (user drags mouse to continuously use tool)
+   */
   const paint = useCallback(
     (e: MouseEvent) => {
       const newMousePos = getMousePos(e);
@@ -417,9 +410,13 @@ export default function EditorCanvas({
     ]
   );
 
+  /**
+   * Callback for mouseup or mouseleave events (user stops using tool)
+   */
   const stopPaint = useCallback(() => {
     setMousePos(undefined);
     setIsPainting(false);
+    // Rectangle Tool implementation (updates corresponding pixels in image)
     if (settings.currentTool === Tool.SQUARE) {
       if (!endingPos) return;
       let s = startPos;
@@ -442,7 +439,7 @@ export default function EditorCanvas({
       }
       drawImageOnCanvas();
     }
-
+    // Ellipse Tool implementation (updates corresponding pixels in image)
     if (settings.currentTool === Tool.ELLIPSE) {
       console.log("drawing ellipse");
       if (!endingPos) return;
@@ -496,11 +493,15 @@ export default function EditorCanvas({
     onChangeImage,
   ]);
 
+  /**
+   * Callback for when mouse leaves editor canvas
+   */
   const mouseLeave = useCallback(() => {
     setMousePos(undefined);
     setIsPainting(false);
   }, []);
 
+  //////////////////////////////// Mouse Event Listeners
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -527,8 +528,7 @@ export default function EditorCanvas({
       canvas.removeEventListener("mouseleave", mouseLeave);
     };
   }, [stopPaint, mouseLeave]);
-
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
 
   return (
     <canvas
