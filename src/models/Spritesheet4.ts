@@ -69,7 +69,7 @@ export default class Spritesheet4 implements ImageInterface {
     this._tileGridHiddenCanvas = createTileGridHiddenCanvas(
       this._tileDimensions
     );
-    this._backgroundColor = new Color(255, 0, 255, 1);
+    this._backgroundColor = this._palette[0];
     this.fillBackground();
     this._sprites = [];
   }
@@ -239,6 +239,10 @@ export default class Spritesheet4 implements ImageInterface {
     sprite.setPixelColorAt(pixelCoords, this._selectedPaletteCol);
     this.drawToHiddenCanvas();
     return;
+  }
+
+  public setBackgroundColor(color: Color): void {
+    this._backgroundColor = color;
   }
 
   /**

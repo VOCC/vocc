@@ -307,6 +307,13 @@ function App(): JSX.Element {
   const handleColorChange = (newColor: Color): void => {
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
+    if (selectedColorIndex % 16 === 0 && image instanceof Spritesheet4) {
+      for (let i = 0; i < 16; i++) {
+        let index = i * 16;
+        newPalette[index] = newColor;
+      }
+      image.setBackgroundColor(newColor);
+    }
     if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
       image.updatePalette(newPalette);
     }
