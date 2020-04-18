@@ -23,7 +23,7 @@ export default function PalettePanel({
   onChangeColor,
   handleQuantize,
   settings,
-  onSettingsChange
+  onSettingsChange,
 }: PalettePanelProps): JSX.Element {
   return (
     <div>
@@ -41,10 +41,10 @@ export default function PalettePanel({
       ></ColorInput>
       <QuantizeButton handleQuantize={handleQuantize} />
       <div className="panel-header">Properties</div>
-      <div className="settings-container">
+      <div className="properties-container">
         <div>
-          Mode: &nbsp; {settings.editorMode}
-          <br/>
+          Mode: &nbsp; {settings.imageMode}
+          <br />
           Type: &nbsp; {settings.editorMode.toString()}
         </div>
       </div>
@@ -78,7 +78,7 @@ interface ColorInputProps {
 
 function ColorInput({
   currentColor,
-  onChangeColor
+  onChangeColor,
 }: ColorInputProps): JSX.Element {
   // const [color, setColor] = useState<Color>(Color256to32(currentColor));
 
@@ -115,33 +115,30 @@ function ColorInput({
 
   return (
     <div className="rgb-container">
-        <label className="rgb-label">R</label>
-        <input
-          className="rgb-input"
-          type="number"
-          max={MAX_COLOR_VAL}
-          min={MIN_COLOR_VAL}
-          value={color32.r}
-          onChange={e => handleRChange(parseInt(e.target.value))}
-        ></input>
-        <label className="rgb-label">G</label>
-        <input
-          className="rgb-input"
-          type="number"
-          max={MAX_COLOR_VAL}
-          min={MIN_COLOR_VAL}
-          value={color32.g}
-          onChange={e => handleGChange(parseInt(e.target.value))}
-        ></input>
-        <label className="rgb-label">B</label>
-        <input
-          className="rgb-input"
-          type="number"
-          max={MAX_COLOR_VAL}
-          min={MIN_COLOR_VAL}
-          value={color32.b}
-          onChange={e => handleBChange(parseInt(e.target.value))}
-        ></input>
+      <label className="rgb-label">R</label>
+      <input
+        type="number"
+        max={MAX_COLOR_VAL}
+        min={MIN_COLOR_VAL}
+        value={color32.r}
+        onChange={(e) => handleRChange(parseInt(e.target.value))}
+      ></input>
+      <label className="rgb-label">G</label>
+      <input
+        type="number"
+        max={MAX_COLOR_VAL}
+        min={MIN_COLOR_VAL}
+        value={color32.g}
+        onChange={(e) => handleGChange(parseInt(e.target.value))}
+      ></input>
+      <label className="rgb-label">B</label>
+      <input
+        type="number"
+        max={MAX_COLOR_VAL}
+        min={MIN_COLOR_VAL}
+        value={color32.b}
+        onChange={(e) => handleBChange(parseInt(e.target.value))}
+      ></input>
     </div>
   );
 }

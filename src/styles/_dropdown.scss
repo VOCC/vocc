@@ -1,30 +1,29 @@
 .dd-container {
-  margin-top: 0.15rem;
   display: inline-block;
   position: relative;
 }
 
 .dd-content {
-  padding-top: 0.15rem;
   padding-bottom: 0.15rem;
   display: none;
-  position: absolute;
   min-width: fit-content;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  box-shadow: 0px 8px 16px 0px $dark-shadow;
   z-index: 1;
-  line-height: 18pt;
-  font-size: 9pt;
   background-color: $dark-nav;
+  line-height: 18pt;
+  letter-spacing: 0.25px;
+  font-size: 10pt;
 }
 
 .dd-content button {
   @extend .dd-button;
   margin: none;
-  padding-left: 0.6rem;
   border-radius: 0;
+  padding-left: 0.6rem;
   width: 100%;
-  white-space: nowrap;
   text-align: left;
+  white-space: nowrap;
 }
 
 .dd-content form {
@@ -32,13 +31,24 @@
   padding: none;
 }
 
+.dd-content label {
+  @extend .dd-button;
+  margin: none;
+  border-radius: 0;
+  padding-left: 0.6rem;
+  display: inline-block;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+}
+
 .dd-content-header {
+  padding-right: 2rem;
+  padding-left: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.75px;
-  padding-left: 0.5rem;
-  padding-right: 2rem;
-  font-size: 8pt;
   font-weight: bold;
+  font-size: 8pt;
   color: $dark-text-secondary;
 }
 

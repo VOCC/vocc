@@ -13,7 +13,6 @@ import {
   EditorSettings,
   ImageCoordinates,
   ImageInterface,
-  Dimensions,
 } from "../util/types";
 import { spritesheetCoordsToSpriteCoords } from "../models/Spritesheet4";
 
@@ -28,6 +27,7 @@ interface EditorCanvasProps {
   settings: EditorSettings;
   scale: number;
   onChangeImage: (newImage: ImageInterface) => void;
+  onChangeColor: (newColor: Color) => void;
   onMouseWheel: (e: WheelEvent) => void;
 }
 
@@ -38,6 +38,7 @@ export default function EditorCanvas({
   settings,
   scale,
   onChangeImage,
+  onChangeColor,
   onMouseWheel,
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -224,8 +225,12 @@ export default function EditorCanvas({
   );
 
   const bucketFill = useCallback(
-    (pos: ImageCoordinates | undefined, newColor: Color,
-      topLeft: ImageCoordinates, botRight: ImageCoordinates): void => {
+    (
+      pos: ImageCoordinates | undefined,
+      newColor: Color,
+      topLeft: ImageCoordinates,
+      botRight: ImageCoordinates
+    ): void => {
       // BFS fill
       if (!pos) return;
       const color = image.getPixelColorAt(pos);
@@ -299,23 +304,34 @@ export default function EditorCanvas({
           fillPixel(imageCoord, palette[selectedPaletteIndex]);
           break;
         case Tool.BUCKET:
-          let topLeft = {x: 0, y: 0};
+          let topLeft = { x: 0, y: 0 };
           let dims = image.dimensions;
-          let botRight = {x: dims.width, y: dims.height};
+          let botRight = { x: dims.width, y: dims.height };
           if (image instanceof Spritesheet4) {
             const sprite = image.getSpriteFromCoordinates(imageCoord);
             if (!sprite) return;
             dims = sprite.dimensions;
             const spriteCoord = spritesheetCoordsToSpriteCoords(
-              imageCoord, image.dimensions, sprite.position,
-              sprite.dimensions);
-            topLeft = {x: imageCoord.x - spriteCoord.x,
-                       y: imageCoord.y - spriteCoord.y};
-            botRight = {x: topLeft.x + dims.width,
-                        y: topLeft.y + dims.height};
+              imageCoord,
+              image.dimensions,
+              sprite.position,
+              sprite.dimensions
+            );
+            topLeft = {
+              x: imageCoord.x - spriteCoord.x,
+              y: imageCoord.y - spriteCoord.y,
+            };
+            botRight = {
+              x: topLeft.x + dims.width,
+              y: topLeft.y + dims.height,
+            };
           }
           bucketFill(
-            imageCoord, palette[selectedPaletteIndex], topLeft, botRight);
+            imageCoord,
+            palette[selectedPaletteIndex],
+            topLeft,
+            botRight
+          );
           break;
         case Tool.SQUARE:
           if (!imageCoord) return;
@@ -327,12 +343,20 @@ export default function EditorCanvas({
           if (!imageCoord) return;
           setStartPos(imageCoord);
           setIsPainting(true);
+          break;
         case Tool.PAN:
           setIsPainting(true);
+          break;
+        case Tool.DROPPER:
+          if (!imageCoord) return;
+          const color = image.getPixelColorAt(imageCoord);
+          onChangeColor(color);
           break;
       }
     },
     [
+      image,
+      onChangeColor,
       settings.currentTool,
       bucketFill,
       fillPixel,
@@ -421,11 +445,27 @@ export default function EditorCanvas({
     if (settings.currentTool === Tool.ELLIPSE) {
       console.log("drawing ellipse");
       if (!endingPos) return;
-      let center = startPos;
-      let a = Math.abs(endingPos.x - center.x);
-      let b = Math.abs(endingPos.y - center.y);
-      let s = { x: center.x - a, y: center.y - b };
-      let e = { x: center.x + a, y: center.y + b };
+      let s = startPos;
+      let e = endingPos;
+      if (e.x < s.x) {
+        let temp = s.x;
+        s = { x: e.x, y: s.y };
+        e = { x: temp, y: e.y };
+      }
+      if (e.y < s.y) {
+        let temp = s.y;
+        s = { x: s.x, y: e.y };
+        e = { x: e.x, y: temp };
+      }
+      let center = {
+        x: (s.x + e.x) / 2,
+        y: (s.y + e.y) / 2,
+      };
+      // let center = startPos;
+      let a = Math.abs(e.x - center.x);
+      let b = Math.abs(e.y - center.y);
+      // let s = { x: center.x - a, y: center.y - b };
+      // let e = { x: center.x + a, y: center.y + b };
       for (let i = s.y; i <= e.y; i++) {
         for (let j = s.x; j <= e.x; j++) {
           let point = { x: j, y: i };
@@ -506,8 +546,12 @@ const generateEditorCanvasProps = (tool: Tool): string => {
       return base + "bucket";
     case Tool.SQUARE:
       return base + "square";
+    case Tool.ELLIPSE:
+      return base + "ellipse";
     case Tool.PAN:
       return base + "pan";
+    case Tool.DROPPER:
+      return base + "dropper";
   }
   return base;
 };
