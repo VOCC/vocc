@@ -8,7 +8,7 @@
 .toggle {
   @extend .button;
   margin: 0 0.2rem 0.4rem 0.2rem;
-  padding-top: 3.5px;
+  // padding-top: 3px;
   height: 34px;
   width: 34px;
 }
@@ -19,7 +19,7 @@
 
 .toggle-on {
   @extend .toggle;
-  border-color: $dark-active;
-  background-color: $dark-active;
+  border-color: $dark-active1;
+  background-color: $dark-active1;
   color: $bg-color;
 }

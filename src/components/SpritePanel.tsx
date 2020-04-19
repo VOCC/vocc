@@ -37,7 +37,9 @@ export default function SpritePanel({
       <div className="panel-header">Sprites</div>
       <div className="spritepanel-container">
         <NewSpriteForm onAddSprite={onAddSprite}></NewSpriteForm>
-        {renderSpriteList(sprites)}
+        <div className="sprite-list-container">
+          {renderSpriteList(sprites)}
+        </div>
       </div>
     </div>
   );
@@ -66,18 +68,27 @@ function SpriteListItem({
     }
   };
   return (
-    <div key={i}>
-      <strong>Sprite {i}: </strong>
-      p:({sprite.position.x}, {sprite.position.y}), d:({sprite.dimensions.width}
-      , {sprite.dimensions.height})<button onClick={onRemoveSprite}>X</button>
-      <label>Row</label>
-      <input
-        type="number"
-        min={0}
-        max={15}
-        value={paletteRow}
-        onChange={handleChangePaletteRow}
-      ></input>
+    <div className="sprite-list-content">
+      <div key={i}>
+        <div className="sprite-list-label">Sprite #{i}
+          <button onClick={onRemoveSprite} className="x-button">x</button>
+        </div>
+        Position: ({sprite.position.x}, {sprite.position.y})
+        <br /> 
+        Dimensions: {sprite.dimensions.height}x{sprite.dimensions.width} px
+        <br />
+        <label>Palette Row: </label>
+        <input
+          className="row-num-input"
+          // type="number"
+          min={0}
+          max={15}
+          value={paletteRow}
+          onChange={handleChangePaletteRow}
+        ></input>
+        <br />
+        {/* <button onClick={onRemoveSprite}>X</button> */}
+      </div>
     </div>
   );
 }
@@ -137,7 +148,7 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
     <form onSubmit={handleSubmit}>
       <div className="spritepanel-label">Dimensions</div>
       <div className="sprite-input-container">
-        <label htmlFor="sprite-height" className="spritepanel-label-dim">Height: </label>
+        <label htmlFor="sprite-height" className="spritepanel-label-dim">Height:</label>
         <select
           className="sprite-select"
           id="sprite-height"
@@ -151,7 +162,7 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
           <option value={64}>64</option>
         </select>
         <br />
-        <label htmlFor="sprite-width" className="spritepanel-label-dim">Width: </label>
+        <label htmlFor="sprite-width" className="spritepanel-label-dim">Width:</label>
         <select
           className="sprite-select"
           id="sprite-width"
@@ -193,6 +204,8 @@ function NewSpriteForm({ onAddSprite }: NewSpriteFormProps) {
       </div>
       <br />
       <button className="sprite-button">Add Sprite</button>
+      {/* <div className="spritepanel-divider"></div> */}
+      {/* <div className="spritepanel-label">Sprite List </div> */}
     </form>
   );
 }

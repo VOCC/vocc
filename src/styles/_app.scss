@@ -100,8 +100,10 @@ input[type="text"] {
 }
 
 input[type="number"] {
-  margin-right: 0.5rem;
-  margin-left: 0.05rem;
+  // margin-right: 0.5rem;
+  // margin-left: 0.05rem;
+  // margin-bottom: 0.25rem;
+  margin: 0.25rem 0.5rem 0rem 0.05rem;
   border: none;
   border-radius: 4px;
   padding: 0.35rem 0.25rem 0.25rem 0.5rem;
