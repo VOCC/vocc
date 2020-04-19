@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import ImportButton from "../buttons/ImportButton";
 import Palette from "../../models/Palette";
-import DEFAULT_PALETTE from "../../util/defaultPalette";
+import { DEFAULT_PALETTE } from "../../util/defaultPalette";
 import { loadNewPalette } from "../../util/fileLoadUtils";
 
 interface ImportPaletteModalProps {

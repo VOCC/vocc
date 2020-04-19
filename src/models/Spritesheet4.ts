@@ -45,6 +45,7 @@ const TILEGRID_RATIO = 8;
 export default class Spritesheet4 implements ImageInterface {
   public fileName: string;
 
+  private _backgroundColor: Color;
   private _palette: Palette;
 
   /** The currently selected palette column to be drawn on the spritesheet */
@@ -88,7 +89,8 @@ export default class Spritesheet4 implements ImageInterface {
     this._tileGridHiddenCanvas = TileGridUtils.createHiddenCanvas(
       this._tileDimensions
     );
-    this.fillBlank();
+    this._backgroundColor = this._palette[0];
+    this.fillBackground();
     this._sprites = [];
   }
 
@@ -258,16 +260,16 @@ export default class Spritesheet4 implements ImageInterface {
   }
 
   /**
-   * Gets the pixel color at a specific position on the spritesheet
-   * (automatically determines what sprite to look at)
-   * @param pos the position to get the pixel color at, in pixels
-   * @returns the pixel color at the specified position
+   * Gets the specified color of the sprite on the spritesheet.
+   * @param pos position on image in pixels
+   * @returns the color of the sprite at the given position or the transparent 
+   * background color if there is no sprite at the given position.
    */
   public getPixelColorAt(pos: ImageCoordinates): Color {
     const sprite = this.getSpriteFromCoordinates(pos);
     if (!sprite) {
       console.warn("Spritesheet: trying to get color but there's no sprite!");
-      return new Color(0, 0, 0);
+      return this._palette[0];
     }
     const pixelPosInSprite = spritesheetCoordsToSpriteCoords(
       pos,
@@ -343,6 +345,10 @@ export default class Spritesheet4 implements ImageInterface {
     return;
   }
 
+  public setBackgroundColor(color: Color): void {
+    this._backgroundColor = color;
+  }
+
   /**
    * Sets the selected palette column using the given palette index.
    * @param newPaletteIndex the index in the palette to set the selected column
@@ -353,14 +359,10 @@ export default class Spritesheet4 implements ImageInterface {
     console.log(this._selectedPaletteCol);
   }
 
-  /**
-   * Fills the spritesheet's hidden canvas (for displaying) with the value at
-   * the 0th index of the palette, i.e. the transparent color.
-   */
-  private fillBlank() {
+  private fillBackground() {
     const ctx = this._hiddenCanvas.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = this._palette[0].toString();
+    ctx.fillStyle = this._backgroundColor.toString();
     ctx.fillRect(0, 0, this.dimensions.width, this.dimensions.height);
   }
 
@@ -373,7 +375,7 @@ export default class Spritesheet4 implements ImageInterface {
     const ctx = this._hiddenCanvas.getContext("2d");
     if (!ctx) return;
 
-    this.fillBlank();
+    this.fillBackground();
 
     this.sprites.forEach((sprite) => {
       ctx.drawImage(

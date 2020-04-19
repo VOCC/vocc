@@ -6,7 +6,7 @@ import Color from "../models/Color";
 import Palette, { paletteIndexToCol } from "../models/Palette";
 import Spritesheet4 from "../models/Spritesheet4";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
-import DEFAULT_PALETTE from "../util/defaultPalette";
+import { DEFAULT_PALETTE, SPRITESHEET_PALETTE } from "../util/defaultPalette";
 import {
   exportImage,
   exportPalette,
@@ -276,11 +276,11 @@ function App(): JSX.Element {
         handleImageChange(
           new Spritesheet4(
             "untitled",
-            palette,
+            SPRITESHEET_PALETTE,
             paletteIndexToCol(selectedColorIndex)
           )
         );
-        handlePaletteChange(palette);
+        handlePaletteChange(SPRITESHEET_PALETTE);
         return;
       case EditorMode.Background:
       default:
@@ -315,6 +315,13 @@ function App(): JSX.Element {
   const handleColorChange = (newColor: Color): void => {
     const newPalette = palette.slice();
     newPalette[selectedColorIndex] = newColor;
+    if (selectedColorIndex % 16 === 0 && image instanceof Spritesheet4) {
+      for (let i = 0; i < 16; i++) {
+        let index = i * 16;
+        newPalette[index] = newColor;
+      }
+      image.setBackgroundColor(newColor);
+    }
     if (image instanceof Bitmap4 || image instanceof Spritesheet4) {
       image.updatePalette(newPalette);
     }
