@@ -13,7 +13,6 @@ import {
   EditorSettings,
   ImageCoordinates,
   ImageInterface,
-  Dimensions,
 } from "../util/types";
 import { spritesheetCoordsToSpriteCoords } from "../models/Spritesheet4";
 
@@ -40,7 +39,7 @@ export default function EditorCanvas({
   scale,
   onChangeImage,
   onChangeColor,
-  onMouseWheel
+  onMouseWheel,
 }: EditorCanvasProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasSize, setCanvasSize] = useState<number[]>([0, 0]);
@@ -226,8 +225,12 @@ export default function EditorCanvas({
   );
 
   const bucketFill = useCallback(
-    (pos: ImageCoordinates | undefined, newColor: Color,
-      topLeft: ImageCoordinates, botRight: ImageCoordinates): void => {
+    (
+      pos: ImageCoordinates | undefined,
+      newColor: Color,
+      topLeft: ImageCoordinates,
+      botRight: ImageCoordinates
+    ): void => {
       // BFS fill
       if (!pos) return;
       const color = image.getPixelColorAt(pos);
@@ -302,23 +305,34 @@ export default function EditorCanvas({
           fillPixel(imageCoord, palette[selectedPaletteIndex]);
           break;
         case Tool.BUCKET:
-          let topLeft = {x: 0, y: 0};
+          let topLeft = { x: 0, y: 0 };
           let dims = image.dimensions;
-          let botRight = {x: dims.width, y: dims.height};
+          let botRight = { x: dims.width, y: dims.height };
           if (image instanceof Spritesheet4) {
             const sprite = image.getSpriteFromCoordinates(imageCoord);
             if (!sprite) return;
             dims = sprite.dimensions;
             const spriteCoord = spritesheetCoordsToSpriteCoords(
-              imageCoord, image.dimensions, sprite.position,
-              sprite.dimensions);
-            topLeft = {x: imageCoord.x - spriteCoord.x,
-                       y: imageCoord.y - spriteCoord.y};
-            botRight = {x: topLeft.x + dims.width,
-                        y: topLeft.y + dims.height};
+              imageCoord,
+              image.dimensions,
+              sprite.position,
+              sprite.dimensions
+            );
+            topLeft = {
+              x: imageCoord.x - spriteCoord.x,
+              y: imageCoord.y - spriteCoord.y,
+            };
+            botRight = {
+              x: topLeft.x + dims.width,
+              y: topLeft.y + dims.height,
+            };
           }
           bucketFill(
-            imageCoord, palette[selectedPaletteIndex], topLeft, botRight);
+            imageCoord,
+            palette[selectedPaletteIndex],
+            topLeft,
+            botRight
+          );
           break;
         case Tool.SQUARE:
           if (!imageCoord) return;
@@ -446,7 +460,7 @@ export default function EditorCanvas({
       }
       let center = {
         x: (s.x + e.x) / 2,
-        y: (s.y + e.y) / 2
+        y: (s.y + e.y) / 2,
       };
       // let center = startPos;
       let a = Math.abs(e.x - center.x);

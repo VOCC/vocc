@@ -105,6 +105,16 @@ export default class Sprite implements ISprite, Drawable {
     return this._palette[offset(PALETTE_SIZE, { x: col, y: this._paletteRow })];
   }
 
+  /**
+   * Gets the 4bpp data (the palette column) for a specific pixel in the sprite.
+   * Used for exporting data.
+   * @param pos the position on the sprtie to get data from, in pixels
+   * @returns the sprite data from position pos. Guaranteed to fit in 4 bits.
+   */
+  public getDataAt(pos: ImageCoordinates): number {
+    return this._data[offset(this._dimensions, pos)];
+  }
+
   public dangerouslySetData(data: Uint8ClampedArray) {
     this._data = data;
     this._imageCanvas.redrawImage(this);
