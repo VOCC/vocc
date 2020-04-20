@@ -4,11 +4,13 @@ VOCC is a web-based image editor focused on Game Boy Advance Development.
 
 ## Usage
 
-Visit the [website](loganbussell.com/vocc) to use the application.
+Visit the [website](https://loganbussell.com/vocc) to use the application. You won't need to download anything or install any dependencies, all you need is a web browser.
 
-### Installation / Offline use
+### Installation for offline use
 
-If you are using a modern web browser that supports progressive web applications (PWAs), then when you visit the website you should see a button that says "Install" in the title bar. Clicking this button installs the application locally and you can use it offline. Tested on Chrome, Chromium, and Brave.
+By default, the VOCC website should be able to be used while offline. In some certain cases, you can "install" a shortcut to the application to your operating system.
+
+If you are using a modern web browser that supports progressive web applications (PWAs), then when you visit the website you should see a button that says "Install" in the title bar. Clicking this button installs the application locally and you can use it offline. Tested on Chrome, Chromium, and Brave. Firefox does not support installing PWAs.
 
 If you're using a different browser that supports service workers, offline use should still work but you won't be able to install the application.
 
@@ -40,10 +42,14 @@ First, make sure your Linux installation is fully up to date (on Ubuntu, run `su
    `cd vocc`
 4. Install dependencies  
    `yarn`
-5. Start the application  
+5. Start the application
    `yarn start`
 
-## Making Changes
+## Contributing
+
+If you notice a bug, please create an issue!
+
+If you're looking to contribute code, please look at the Projects tab to see some of the ongoing development for this project and find an issue to look at.
 
 See https://help.github.com/en/articles/configuring-a-remote-for-a-fork to configure your own fork of this repo.
 
