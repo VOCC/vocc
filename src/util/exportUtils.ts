@@ -4,6 +4,14 @@ import Palette from "../models/Palette";
 import { PALETTE_LENGTH } from "./consts";
 import { Dimensions, ImageInterface, Mode } from "./types";
 
+export enum exportType {
+  GBA,
+  PAL,
+  BMP,
+  PNG,
+  BG,
+}
+
 /*
   getGBAImageString
 
@@ -32,7 +40,8 @@ export function generateCSourceFileString(
  * a background generated using mode 3 bitmap data.
  * @param image the mode 3 bitmap to export as a background
  */
-export function mode3BitmapAsBackgroundSource(image: Bitmap3): string {
+//TODO :Rename
+export function mode3BitmapAsTiledBackgroundSource(image: Bitmap3): string {
   return "have fun!";
 }
 
@@ -350,11 +359,11 @@ export function exportPalette(pal: Palette): string {
 
 export async function exportImage(
   img: ImageInterface,
-  type: string
+  type: exportType
 ): Promise<Blob | null> {
   switch (type) {
-    case "BMP":
-    case "PNG":
+    case exportType.BMP:
+    case exportType.PNG:
       return await img.getImageFileBlob();
     default:
       return new Blob(["Invalid file type"]);

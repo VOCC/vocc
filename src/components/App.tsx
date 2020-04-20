@@ -7,12 +7,7 @@ import Palette, { paletteIndexToCol } from "../models/Palette";
 import Spritesheet4 from "../models/Spritesheet4";
 import { DEFAULT_SETTINGS, STORAGE, Tool } from "../util/consts";
 import { DEFAULT_PALETTE, SPRITESHEET_PALETTE } from "../util/defaultPalette";
-import {
-  exportImage,
-  exportPalette,
-  mode3BitmapAsBackgroundHeader,
-  mode3BitmapAsBackgroundSource,
-} from "../util/exportUtils";
+import { exportImage, exportPalette, exportType } from "../util/exportUtils";
 import { loadNewImage } from "../util/fileLoadUtils";
 import { quantize } from "../util/quantize";
 import {
@@ -328,7 +323,7 @@ function App(): JSX.Element {
     handlePaletteChange(newPalette);
   };
 
-  const handleImageExport = async (type: string) => {
+  const handleImageExport = async (kind: exportType) => {
     let fileName;
     let fileType = "";
     let blob: Blob | null;
@@ -342,8 +337,8 @@ function App(): JSX.Element {
     const exportFailAlert = () =>
       alert("Failed to export image! Check console for more information.");
 
-    switch (type) {
-      case "GBA":
+    switch (kind) {
+      case exportType.GBA:
         if (!image) {
           alert("No image to export! Try importing one first.");
           return;
@@ -357,22 +352,11 @@ function App(): JSX.Element {
         let hBlob = new Blob([image.headerData]);
         saveAs(hBlob, fileName + fileType);
         return;
-      case "BG":
-        if (image instanceof Bitmap3) {
-          //.c file
-          fileType = ".c";
-          let cBlob = new Blob([mode3BitmapAsBackgroundSource(image)]);
-          saveAs(cBlob, fileName + fileType);
-          //.h file
-          fileType = ".h";
-          let hBlob = new Blob([mode3BitmapAsBackgroundHeader(image)]);
-          saveAs(hBlob, fileName + fileType);
-          return;
-        } else {
-          alert("Background export only supported for Mode 3.");
-          return;
-        }
-      case "PAL":
+      case exportType.BG:
+        blob = null;
+        console.log("Trying to export as background!");
+        break;
+      case exportType.PAL:
         //.pal file
         if (!palette) {
           alert("Can't export a non-existant palette!");
@@ -382,32 +366,24 @@ function App(): JSX.Element {
           blob = new Blob([exportPalette(palette)]);
           break;
         }
-      case "BMP":
+      case exportType.BMP:
         if (!image) {
           alert("No image to export! Try importing one first.");
           return;
         }
         //.bmp file
         fileType = ".bmp";
-        blob = await exportImage(image, type);
+        blob = await exportImage(image, kind);
         break;
-      case "PNG":
+      case exportType.PNG:
         if (!image) {
           alert("No image to export! Try importing one first.");
           return;
         }
         //.png file
         fileType = ".png";
-        blob = await exportImage(image, type);
+        blob = await exportImage(image, kind);
         break;
-      default:
-        if (!image) {
-          alert("No image to export! Try importing one first.");
-          return;
-        }
-        //default as .txt if unrecognized type is selected
-        fileType = ".txt";
-        blob = await exportImage(image, type);
     }
     if (!blob) {
       exportFailAlert();
@@ -587,28 +563,22 @@ function App(): JSX.Element {
         <Dropdown label="Export">
           <div className="dd-content-header">Image</div>
           <ExportButton
-            startImageExport={handleImageExport.bind(null, "PNG")}
+            startImageExport={handleImageExport.bind(null, exportType.PNG)}
             buttonLabel="PNG Image (*.png)"
           />
           <ExportButton
-            startImageExport={handleImageExport.bind(null, "BMP")}
+            startImageExport={handleImageExport.bind(null, exportType.BMP)}
             buttonLabel="Bitmap (*.bmp)"
           />
           <div className="dd-divider"></div>
           <div className="dd-content-header">GBA</div>
           <ExportButton
-            startImageExport={handleImageExport.bind(null, "GBA")}
+            startImageExport={handleImageExport.bind(null, exportType.GBA)}
             buttonLabel="C Source Code (*.c/.h)"
           />
-          {image instanceof Bitmap3 ? (
-            <ExportButton
-              startImageExport={handleImageExport.bind(null, "BG")}
-              buttonLabel="C Source as background"
-            />
-          ) : null}
           <div className="dd-divider"></div>
           <ExportButton
-            startImageExport={handleImageExport.bind(null, "PAL")}
+            startImageExport={handleImageExport.bind(null, exportType.PAL)}
             buttonLabel="Color Palette (*.pal)"
           />
         </Dropdown>
