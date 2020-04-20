@@ -15,8 +15,7 @@ function ImportButton({ onFileInputChange, buttonLabel }: IProps): JSX.Element {
 
   return (
     <>
-      <label>
-        {buttonLabel}
+      <label>{buttonLabel}
         <input
           type="file"
           accept=".png, .jpg, .jpeg, .bmp, .pal"
