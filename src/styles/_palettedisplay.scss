@@ -1,0 +1,82 @@
+.palette-container {
+  text-align: center;
+}
+
+.palette-canvas {
+  padding-bottom: 0.5rem;
+  height: 192px;
+  width: 192px;
+}
+
+.rgb-container {
+  margin-top: 0.25rem;
+  border-radius: 4px;
+  display: block;
+  width: 100%;
+}
+
+.rgb-label {
+  padding: 0 0.3rem 0.25rem 0.5rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 10pt;
+  color: $dark-text;
+}
+
+.properties-container {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  display: block;
+  width: fit-content;
+  background-color: $dark-nav;
+  text-align: left;
+  line-height: 18pt;
+  letter-spacing: 0px;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: 500;
+  font-size: 9pt;
+}
+
+.quantize-container {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  text-align: center;
+}
+
+.quantize-input {
+  @extend input[type="number"];
+  min-height: 28px;
+  max-height: 28px;
+  position: relative;
+  vertical-align: bottom;
+}
+
+@mixin track() {
+  background: $slider-handle; /* Green background */
+  width: 0.5em; /* Set a specific slider handle width */
+  height: 1em; /* Slider handle height */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.color-input-container {
+  width: 100%;
+  text-align: center;
+}
+
+.color-input {
+  appearance: none;
+  height: 0.5em;
+  margin: 1rem;
+  width: 80%;
+  border-radius: 4px;
+  background: $slider-bg;
+
+  &::-moz-range-thumb {
+    @include track();
+  }
+}

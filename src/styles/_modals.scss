@@ -1,0 +1,211 @@
+.modal-overlay {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  background-color: #000;
+  opacity: 0.5;
+}
+
+.modal-wrapper {
+  height: 100%;  
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: 0;
+}
+
+.modal {
+  margin: 2.5rem auto;
+  border-radius: 9px;
+  min-height: 290px;
+  max-width: 500px;
+  position: relative;
+  z-index: 100;
+  background-color: $dark-modal;
+  letter-spacing: 0.5px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 10pt;
+  color: $dark-text;
+}
+
+.import-pal-modal {
+  @extend .modal;
+  min-height: 320px;
+  max-height: 320px;
+  min-width: 400px;
+  max-width: 400px;
+  font-weight: normal;
+}
+
+.modal-header {
+  padding: 1.75rem;
+  display: flex;
+  height: fit-content;
+  min-width: 100%;
+  justify-content: center;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 9pt;
+}
+
+.modal-label {
+  padding: 0rem 0.5rem 0rem 2rem;
+  letter-spacing: 0.5px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: bold;
+  font-size: 10pt;
+}
+
+.modal-label-num {
+  padding: 0rem 0.5rem 0rem 2.5rem;
+  display: inline-block;
+  width: 100px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: normal;
+  font-size: 10pt;
+}
+
+.modal-label-button {
+  @extend .modal-label-num;
+  padding-left: 0rem;
+  text-align: center;
+}
+
+.modal-label-input {
+  padding-left: 1rem;
+  display: inline-block;
+  width: 80%;
+  letter-spacing: 0.5px;
+  vertical-align: bottom;
+  text-align: left;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-size: 10pt;
+}
+
+.modal-button {
+  @extend .button;
+  margin: 0.5rem 0rem;
+  border: none;
+  padding: 0.5rem 0rem;
+  min-width: 80px;
+  max-width: 80px;
+  float: right;
+  background-color: $dark-button;
+  text-align: center;
+  line-height: 10pt;
+  letter-spacing: 0.5px;
+  &:hover {
+    background-color: $dark-active;
+  }
+  &:focus {
+    outline: none;
+    background-color: $dark-nav-active;
+  }
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.modal-button-left {
+  margin-left: 30%;
+  float: left;
+}
+
+.modal-button-right {
+  margin-right: 30%;
+  float: right;
+}
+
+.modal-import-left {
+  margin-left: 25%;
+  float: left;
+}
+
+.modal-import-right {
+  margin-right: 25%;
+  float: right;
+}
+
+.modal-button-import {
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  min-width: 80px;
+  max-width: 80px;
+  background-color: $dark-button;
+  letter-spacing: 1px;
+  font-weight: normal;
+  color: $dark-text;
+  &:hover {
+    background-color: $dark-active;
+  }
+}
+
+input[type="text"] {
+  margin-left: 0.25rem;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  width: 90%;
+  text-align: left;
+  letter-spacing: 0.5pt;
+  font-family: "Open Sans", sans-serif;
+  background-color: $dark-modal-input;
+  color: $dark-text;
+}
+
+input[type="number"] {
+  margin-top: 0.25rem;
+  margin-right: 2px;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.25rem 0.2rem 0.5rem;
+  min-width: 50px;
+  max-width: 50px;
+  vertical-align: center;
+  font-family: "Open Sans", sans-serif;
+  background-color: $dark-modal-input;
+  color: $dark-text;
+  &::-webkit-inner-spin-button {
+    opacity: 70;
+  }
+}
+
+.modal-input-text {
+  justify-content: center;
+}
+
+.modal-input-container {
+  margin: auto;
+  display: flex;
+  // justify-content: center;
+  align-items: center;
+}
+
+.modal-prop-container {
+  margin: 0.25rem auto 0.5rem auto;
+  min-width: 80%;
+  max-width: 80%;
+}
+
+.modal-input-num {
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.modal-input {
+  @extend input[type="number"];
+  margin: none;
+  display: inline-block;
+
+}

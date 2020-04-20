@@ -1,58 +1,30 @@
-import React, { useState, useRef } from "react";
-import "../../styles/buttons.scss";
+import React, { useRef } from "react";
 
-type ImageFile = File | null;
+type ImportFile = File | null;
 
 interface IProps {
-  onImageChange: (imageFile: ImageFile) => void;
+  buttonLabel: string;
+  onFileInputChange: (
+    element: HTMLInputElement | null,
+    event: React.FormEvent<HTMLInputElement>
+  ) => void;
 }
 
-interface IFile {
-  fileName: string;
-  hasLoadedImage: boolean;
-}
-
-function ImportButton({ onImageChange }: IProps): JSX.Element {
-  const [file, setImageFile] = useState<IFile>({
-    fileName: "No file name",
-    hasLoadedImage: false
-  });
+function ImportButton({ onFileInputChange, buttonLabel }: IProps): JSX.Element {
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLInputElement>): void => {
-    e.preventDefault();
-    if (fileInput.current) {
-      if (fileInput.current.files) {
-        setImageFile({
-          fileName: fileInput.current.files[0].name,
-          hasLoadedImage: true
-        });
-        onImageChange(fileInput.current.files[0]);
-      }
-    }
-  };
-
-  const renderLoaded = (imageTitle: string): JSX.Element => (
-    <div className="import-loaded">
-      Loaded <em>{imageTitle}</em>
-    </div>
-  );
-
-  const renderUnloaded = (): JSX.Element => (
-    <button className="button import-button">
-      <label>
-        Import Image
+  return (
+    <>
+      <label>{buttonLabel}
         <input
           type="file"
-          accept=".png, .jpg, .jpeg"
+          accept=".png, .jpg, .jpeg, .bmp, .pal"
           ref={fileInput}
-          onChange={handleSubmit}
+          onChange={e => onFileInputChange(fileInput.current, e)}
         />
       </label>
-    </button>
+    </>
   );
-
-  return file.hasLoadedImage ? renderLoaded(file.fileName) : renderUnloaded();
 }
 
 export default ImportButton;

@@ -1,5 +1,5 @@
-import ImageObject from "./ImageObject";
-import { Dimensions } from "../../lib/interfaces";
+import ImageObject from "./Bitmap3";
+import { Dimensions } from "../util/types";
 
 export default class Background {
   private indexArray: number[];

@@ -1,16 +1,15 @@
-import ImageObject from "../components/objects/ImageObject";
-import Sprite from "../components/objects/Sprite";
-import Palette from "../components/objects/Palette";
-import { Color } from "./interfaces";
+import Bitmap from "../models/Bitmap";
+import Bitmap4 from "../models/Bitmap4";
+import Color from "../models/Color";
+import Palette from "../models/Palette";
 
-const BLACK: Color = {
-  r: 0,
-  g: 0,
-  b: 0,
-  a: 1
-};
+const BLACK: Color = new Color(0, 0, 0, 1);
 
-export function quantize(image: ImageObject, depth: number) {
+export function quantize(
+  image: Bitmap,
+  depth: number
+): { sprite: Bitmap4; palette: Palette } {
+
   let centroids: number[][];
   let imageArr = imageToArr(image);
   let colors = depth;
@@ -28,31 +27,17 @@ export function quantize(image: ImageObject, depth: number) {
     }
   }
 
-  //no point in trying to find more clusters than we have unique colors
-  if (uniqueColors.length < colors) {
+  //pick unique colors for centroids using binary search to find points with
+  //largest average distance
+  if (colors === 1 || uniqueColors.length < colors) {
+    centroids = uniqueColors;
     colors = uniqueColors.length;
+  } else {
+    let { pickedCentroids } = findCentroids(uniqueColors, colors);
+    // console.log(pickedCentroids)
+    centroids = JSON.parse(JSON.stringify(pickedCentroids));
   }
 
-  centroids = [];
-
-  // pick first unique colors for centroids
-  // for (i = 0; i < colors; i ++) {
-  //     centroids[i] = (uniqueColors[i]);
-  // }
-
-  //pick random unique colors for centroids
-  let picked: number[] = [];
-  let random: number;
-  let max = uniqueColors.length;
-  for (let i = 0; i < colors; i++) {
-    do {
-      random = Math.floor(Math.random() * max);
-    } while (picked.includes(random));
-    picked.push(random);
-  }
-  for (let i = 0; i < picked.length; i++) {
-    centroids[i] = uniqueColors[picked[i]];
-  }
   // use K-means to fit all colors in image to 'colors' clusters
   let { groups, centers } = kmeans(
     JSON.parse(JSON.stringify(imageArr)),
@@ -74,30 +59,31 @@ export function quantize(image: ImageObject, depth: number) {
     }
     clusters.push(newCluster);
   }
-
   // sort clusters from largest to smallest
-  clusters.sort(function(a, b) {
+  clusters.sort(function (a, b) {
     return b.length - a.length;
   });
+
+  console.log(clusters);
 
   let spriteIndexArrayLength = image.dimensions.height * image.dimensions.width;
 
   // generate out sprite and palette based on k-means clusters
-  let spriteIndexArray: number[] = new Array(spriteIndexArrayLength);
-  spriteIndexArray.fill(0, 0, spriteIndexArrayLength);
+  let spriteIndexArray: number[] = new Array<number>(spriteIndexArrayLength);
+  spriteIndexArray.fill(0);
 
-  let paletteColorArray: Color[] = new Array(256);
+  let palette: Color[] = new Array(256);
 
   //clusters: [center[r,g,b]], [point 1[r,g,b]], ...]
   let i = 0;
   for (i; i < clusters.length && i < MaxPalSize; i++) {
-    let center: Color = {
-      r: Math.round(Math.min(Math.max(clusters[i][0][0], 0), 255)),
-      g: Math.round(Math.min(Math.max(clusters[i][0][1], 0), 255)),
-      b: Math.round(Math.min(Math.max(clusters[i][0][2], 0), 255)),
-      a: 1
-    };
-    paletteColorArray[i] = center;
+    let center: Color = new Color(
+      clusters[i][0][0],
+      clusters[i][0][1],
+      clusters[i][0][2],
+      1
+    );
+    palette[i] = center;
     for (let j = 1; j < clusters[i].length; j++) {
       let imageIndex = getColorIndex(imageArr, clusters[i][j]);
       // console.log(imageIndex);
@@ -106,23 +92,27 @@ export function quantize(image: ImageObject, depth: number) {
       }
     }
   }
-
+  // console.log(paletteColorArray)
   for (i; i < MaxPalSize; i++) {
-    paletteColorArray[i] = BLACK;
+    palette[i] = BLACK;
   }
 
-  let palette = new Palette(paletteColorArray);
-  let sprite = new Sprite(
+  let sprite = new Bitmap4(
     image.fileName,
-    spriteIndexArray,
     palette,
-    image.dimensions
+    image.dimensions,
+    spriteIndexArray
   );
-  return { sprite: sprite, palette: palette };
+  return { sprite, palette };
 }
 
-// Used to find index of colors for building sprite colorArray
-// This kills the imageArr (imageArr is destroyed by this function)
+/**
+ * Used to find the index of colors for building Palette of
+ * quantized image
+ * NOTE: This function destroys imageArr
+ * @param imageArr The image to quantize as a 2D array
+ * @param colorArr List of unique colors in the image
+ */
 function getColorIndex(imageArr: number[][], colorArr: number[]): number {
   for (let i = 0; i < imageArr.length; i++) {
     if (
@@ -137,8 +127,11 @@ function getColorIndex(imageArr: number[][], colorArr: number[]): number {
   return -1;
 }
 
-//converts imageObject into array of colors for k-means
-function imageToArr(image: ImageObject): number[][] {
+/**
+ * converst image into array of RGB color values
+ * @param image The image to convert to 2d array
+ */
+function imageToArr(image: Bitmap): number[][] {
   let imageArr = [];
   for (let y = 0; y < image.dimensions.height; y++) {
     for (let x = 0; x < image.dimensions.width; x++) {
@@ -153,10 +146,14 @@ function imageToArr(image: ImageObject): number[][] {
   return imageArr;
 }
 
-//used to find clusters of similar points for image depth reduction (quantization)
-//arrayToProcess: number array of colors; [[r, g, b], [r, g, b], ...]
-//centroids: center point of clusters;
-//clusters: number of clusters to generate
+/**
+ * Used to find clusters of similar colors for image color quantization
+ * @param arrayToProcess 2D array of RGB color values for the image to quantize
+ * @param centroids List of center points for each color cluster
+ *  2D array of RGB values
+ * @param clusters 3D array of clusters for color quantization
+ * Each centroid is associated with a cluster
+ */
 function kmeans(
   arrayToProcess: number[][],
   centroids: number[][],
@@ -172,6 +169,10 @@ function kmeans(
     for (let reset = 0; reset < clusters; reset++) {
       Groups[reset] = [];
     }
+
+    changed = false;
+
+    changed = false;
 
     for (let i = 0; i < arrayToProcess.length; i++) {
       let minDist = -1;
@@ -201,22 +202,19 @@ function kmeans(
     }
 
     for (let clusterIterate = 0; clusterIterate < clusters; clusterIterate++) {
-      let totalGroups = Groups[clusterIterate].length;
-      for (let i = 0; i < totalGroups; i++) {
-        let totalGroupsSize = Groups[clusterIterate][i].length;
-        for (let j = 0; j < totalGroupsSize; j++) {
+      for (let i = 0; i < Groups[clusterIterate].length; i++) {
+        for (let j = 0; j < Groups[clusterIterate][i].length; j++) {
           centroids[clusterIterate][j] += Groups[clusterIterate][i][j];
         }
       }
-
       for (let i = 0; i < centroids[clusterIterate].length; i++) {
         centroids[clusterIterate][i] = Math.round(
           Math.min(
             Math.max(
               centroids[clusterIterate][i] /
-                (Groups[clusterIterate].length <= 0
-                  ? 1
-                  : Groups[clusterIterate].length),
+              (Groups[clusterIterate].length <= 1
+                ? 1
+                : Groups[clusterIterate].length),
               0
             ),
             255
@@ -233,15 +231,95 @@ function kmeans(
     iterations++;
   } while (changed === true && iterations < 1000);
 
-  // console.log("kmeans output:")
-  // console.log(iterations);
+  console.log("kmeans output:");
+  console.log(iterations);
   // console.log(Groups.length);
   // console.log(Groups);
-  // console.log("..........")
+  console.log("..........");
 
   // let ret = [Groups, centroids];
   // console.log(ret);
   // return ret;
 
   return { groups: Groups, centers: centroids };
+}
+
+/**
+ * Used to determine if there exists a group of points with a at most 
+ * minDist distance between them
+ * @param points list of points to search
+ * @param midDist average distance to check for
+ * @param numCentroids number of points to find
+ */
+function centroidPossible(
+  points: number[][],
+  midDist: number,
+  numCentroids: number
+): { possible: boolean; centers: number[][] } {
+  let centroids = 1;
+  let currColor: number[] = points[0];
+  let possible = false;
+  let centers: number[][] = [];
+
+  centers.push(currColor);
+
+  for (let i = 0; i < points.length; i++) {
+    let dist = 0;
+
+    for (let j = 0; j < points[i].length; j++) {
+      dist += Math.pow(Math.abs(points[i][j] - currColor[j]), 2);
+    }
+    dist = Math.sqrt(dist);
+
+    if (dist >= midDist) {
+      centroids++;
+      currColor = points[i];
+      centers.push(points[i]);
+
+      if (centroids >= numCentroids) {
+        possible = true;
+        return { possible, centers };
+      }
+    }
+  }
+  return { possible, centers };
+}
+
+//binary search to find centroids, reutrn list of centroids with
+// average largest distance between them
+
+/**
+ * Used to find optimal centroids for kmeans
+ * Uses binary search to find the group of centroids with min average distance
+ * between them
+ * @param uniqueColors 2D array of unique RGB color values
+ * @param depth number of centroids to find
+ */
+function findCentroids(
+  uniqueColors: number[][],
+  depth: number
+): { pickedCentroids: number[][] } {
+  let maxDist = 442;
+  let minDist = 0;
+  let midDist = (maxDist + minDist) / 2;
+
+  let dist = 0;
+
+  let pickedCentroids: number[][] = [];
+
+  while (minDist <= maxDist) {
+    midDist = (maxDist + minDist) / 2;
+    let { possible, centers } = centroidPossible(uniqueColors, midDist, depth);
+
+    if (!possible) {
+      maxDist = midDist - 1;
+    } else {
+      if (dist < midDist) {
+        pickedCentroids = JSON.parse(JSON.stringify(centers));
+        dist = midDist;
+      }
+      minDist = midDist + 1;
+    }
+  }
+  return { pickedCentroids };
 }

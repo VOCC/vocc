@@ -1,0 +1,66 @@
+// Shamelessly ripped from Apple Human Interface Guidelines
+// https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/color/
+
+$gray: #8e8e93;
+
+$lgray2: #aeaeb2;
+$lgray3: #c7c7cc;
+$lgray4: #d1d1d6;
+$lgray5: #e5e5ea;
+$lgray6: #f2f2f7;
+
+$dgray2: #636366;
+$dgray3: #48484a;
+$dgray4: #3a3a3c;
+$dgray5: #2c2c2e;
+$dgray6: #1c1c1e;
+
+$white: white;
+$blue: rgb(0, 122, 255);
+$green: rgb(52, 199, 89);
+$indigo: rgb(88, 86, 214);
+$orange: rgb(255, 149, 0);
+$pink: rgb(255, 45, 85);
+$purple: rgb(175, 82, 222);
+$red: rgb(255, 59, 48);
+$teal: rgb(90, 200, 250);
+$yellow: rgb(255, 204, 0);
+
+// dark theme colors - default layout
+$dark-bg: #252426;
+$dark-border: #5e5e61d8;
+$dark-shadow: rgba(0, 0, 0, 0.2);
+$dark-active: #296eee;
+$dark-active1: #4989ffad;
+$dark-active2: #858585;
+$dark-inactive: #777777;
+$dark-inactive2: #666666;
+
+$dark-nav: #3c3c3c;
+$dark-nav-active: #505050;
+$dark-sidebar: #515151;
+$dark-sidebar2: #383838;
+$dark-modal: #363636;
+$dark-modal-input: #00000070;
+$dark-button: #537dcc;
+$dark-button2: #555d63;
+$dark-button-x: #ffffff00;
+$dark-button-x2: #df6666;
+
+$dark-text: white;
+$dark-text-secondary: #b9b9b9;
+$dark-text-alt: #d6d6d6;
+$dark-text-contrast: #f8dc3e;
+$dark-subtitle: #e0e0e0;
+
+
+// light theme colors - not implemented
+$bg-color: white;
+$bg-color-secondary: $lgray5;
+$text-color: $dgray4;
+$text-color-secondary: $gray;
+$border-color: $lgray3;
+
+$button-highlight: $blue;
+$slider-bg: $gray;
+$slider-handle: $blue;

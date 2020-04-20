@@ -1,18 +1,18 @@
 import React from "react";
-import "../../styles/buttons.scss";
 
 interface ExportButtonProps {
   startImageExport: () => void;
+  buttonLabel: string;
 }
 
-function ExportButton({ startImageExport }: ExportButtonProps): JSX.Element {
+function ExportButton({ startImageExport, buttonLabel }: ExportButtonProps): JSX.Element {
   const handleClick = () => {
     startImageExport();
   };
 
   return (
     <button className="button export-button" onClick={handleClick}>
-      Export
+      {buttonLabel}
     </button>
   );
 }

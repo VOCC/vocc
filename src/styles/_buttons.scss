@@ -1,0 +1,119 @@
+.button {
+  margin-left: 0;
+  border: 1px solid $dark-sidebar;
+  border-radius: 4px;
+  background-color: $dark-sidebar2;
+  text-align: center;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  font-size: 10pt;
+  color: $dark-text;
+  &:hover {
+    background-color: $dark-active;
+    color: $bg-color;
+  }
+  transition: 0.1s;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.import-file-button {
+  margin: 0rem 0.75rem 0rem 2rem;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  display: inline-block;
+  background-color: $dark-modal-input;
+  position: relative;
+  font-weight: normal;
+  color: $dark-text;
+  cursor: pointer;
+  &:hover {
+    background-color: $dark-active;
+    color: $bg-color;
+  }
+}
+
+.import-button {
+  @extend .dd-button;
+}
+
+.import-loaded {
+  margin-right: 0.5rem;
+  font-size: 10pt;
+}
+
+.export-button {
+  @extend .dd-button;
+}
+
+.dd-button {
+  @extend .button;
+  margin: 1px 0.5rem 0.25rem 0;
+  border: none;
+  padding: 14px 12px 12px 12px;
+  background-color: $dark-nav;
+  line-height: 2px;
+  letter-spacing: 0.5px;
+  color: $dark-subtitle;
+  &:hover {
+    background-color: $dark-nav-active;
+  }
+  &:focus {
+    outline: none;
+    background-color: $dark-nav-active;
+  }
+  &::-moz-focus-inner {
+    border: 0;
+  }
+  cursor: pointer;
+}
+
+.quantize-button {
+  @extend .button;
+  margin-right: 1rem;
+  border: none;
+  padding: 0.75rem;
+  min-height: 32px;
+  max-height: 32px;
+  background-color: $dark-button;
+  text-align: center;
+  line-height: 0;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-size: 9pt;
+
+}
+
+.sprite-button {
+  @extend .quantize-button;
+  margin: 1rem 0 0.5rem 0;
+  padding: 0.75rem;
+  background-color: $dark-button;
+  text-align: center;
+  letter-spacing: 0.5px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+  font-size: 9pt;
+}
+
+.x-button {
+  margin-left: 4.25rem;
+  padding: 2px 5px 5.5px 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: $dark-button-x;
+  text-align: center;
+  line-height: 8pt;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+  font-size: 10pt;
+  color: $lgray4;
+  &:hover {
+    border-color: $dark-button-x2;
+    background-color: $dark-button-x2;
+    color: white;
+  }
+}
