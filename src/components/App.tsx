@@ -648,7 +648,9 @@ function App(): JSX.Element {
               onToolChange={handleToolChange}
             ></ToolsPanel>
           </div>
-          {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
+          <div className="scale-container">
+            {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
+          </div>
         </div>
         <div className="image-container">
           {image ? (

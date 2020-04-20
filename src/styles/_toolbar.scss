@@ -23,3 +23,19 @@
   background-color: $dark-active1;
   color: $bg-color;
 }
+
+.scale-container{
+  margin: 0rem 0rem 1rem 0.4rem;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+  display: block;
+  // width: 75%;
+  background-color: $dark-nav;
+  position: fixed;
+  bottom: 0;
+  text-align: center;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: 500;
+  font-size: 8pt;
+  color: $dark-text-contrast;
+}
