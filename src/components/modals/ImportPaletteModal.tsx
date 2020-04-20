@@ -29,8 +29,8 @@ const ImportPaletteModal = ({ onAccept, isShowing, hide, oldPal }: ImportPalette
             tabIndex={-1}
             role="dialog"
           >
-            <div className="modal">
-              <div className="modal-header">Import a New Palette</div>
+            <div className="import-pal-modal">
+              <div className="modal-header">Import A Color Palette</div>
               <ImportPaletteForm
                 onAccept={(pal, oldStartRow, newStartRow, numRows) => {
                   onAccept(pal, oldStartRow, newStartRow, numRows);
@@ -38,8 +38,8 @@ const ImportPaletteModal = ({ onAccept, isShowing, hide, oldPal }: ImportPalette
                 }}
                 oldPal={oldPal}
               ></ImportPaletteForm>
-              <div className="modal-button-right">
-                <button onClick={hide} className="modal-button">Cancel</button>
+              <div className="modal-import-right">
+                <button onClick={hide} className="modal-button-import">Cancel</button>
               </div>
             </div>
           </div>
@@ -94,48 +94,56 @@ const ImportPaletteForm = ({ onAccept, oldPal }: ImportPaletteFormProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="modal-input-text">
-      <ImportButton
-            onFileInputChange={handleFileInputChange}
-            buttonLabel="Color Palette (*.pal)"
-          />
-      </div>      
+      <div className="modal-input-container">
+        {/* <label className="modal-label">Palette:</label> */}
+        <div className="import-file-button">
+        <ImportButton
+          onFileInputChange={handleFileInputChange}
+          buttonLabel="Choose File"
+        />
+        </div>
+        (*.pal)
+      </div>
       <br />
-      <label className="modal-label">Palette Rows (0-15)</label>
-      <div className="modal-input-num">
-        <label htmlFor="startRow" className="modal-label-num">Current Palette Starting Row:</label>
+      <label className="modal-label"> Properties: </label>
+      <br />
+      <div className="modal-prop-container">
+        <label htmlFor="currStartRow" className="modal-label-input">Current Palette Starting Row:</label>
         <input
-          id="start"
+          id="currStartRow"
           type="number"
           min={0}
           max={16}
           value={oldStartRow}
           onChange={handleOldStartRowChange}
+          className="modal-input"
         />
         <br />
-        <label htmlFor="startRow" className="modal-label-num">Imported Palette Starting Row:</label>
+        <label htmlFor="importStartRow" className="modal-label-input">Imported Palette Starting Row:</label>
         <input
-          id="start"
+          id="importStartRow"
           type="number"
           min={0}
           max={16}
           value={newStartRow}
           onChange={handleNewStartRowChange}
+          className="modal-input"
         />
         <br />
-        <label htmlFor="numRows" className="modal-label-num">Number of Rows:</label>
+        <label htmlFor="numRows" className="modal-label-input">Number of Rows:</label>
         <input
-          id="width"
+          id="numRows"
           type="number"
           min={0}
           max={16}          
           value={numRows}
           onChange={handleNumRowsChange}
+          className="modal-input"
         />
       </div>
       <br />
-      <div className="modal-button-left">
-      <button className="modal-button">OK</button>
+      <div className="modal-import-left">
+        <button className="modal-button-import">OK</button>
       </div>
     </form>
   );
