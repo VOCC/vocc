@@ -647,10 +647,13 @@ function App(): JSX.Element {
               onSettingsChange={handleSettingsChange}
               onToolChange={handleToolChange}
             ></ToolsPanel>
+            <div className="scale-container">
+              {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
+            </div>
           </div>
-          <div className="scale-container">
+          {/* <div className="scale-container">
             {image ? <div> Scale: {scale.toFixed(2)}x </div> : null}
-          </div>
+          </div> */}
         </div>
         <div className="image-container">
           {image ? (

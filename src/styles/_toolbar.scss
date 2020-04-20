@@ -3,6 +3,8 @@
   margin-left: 0.5rem;
   max-width: 90px;
   text-align: center;
+  justify-content: center;
+  align-items: center;
 }
 
 .toggle {
@@ -25,15 +27,12 @@
 }
 
 .scale-container{
-  margin: 0rem 0rem 1rem 0.4rem;
-  border-radius: 4px;
-  padding: 0.25rem 0.5rem 0.25rem 0.5rem;
-  display: block;
-  // width: 75%;
-  background-color: $dark-nav;
+  margin: 0 auto 0.5rem auto;
+  width: fit-content;
   position: fixed;
   bottom: 0;
-  text-align: center;
+  left: 10px;
+  text-align: right;
   font-family: "Lucida Console", Monaco, monospace;
   font-weight: 500;
   font-size: 8pt;
