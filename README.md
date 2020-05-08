@@ -4,7 +4,7 @@ VOCC is a web-based image editor focused on Game Boy Advance Development.
 
 ## Usage
 
-Visit the [website](https://loganbussell.com/vocc) to use the application. You won't need to download anything or install any dependencies, all you need is a web browser.
+Visit the [website](https://vocc.github.io/vocc) to use the application. You won't need to download anything or install any dependencies, all you need is a web browser.
 
 Please view the [release notes](release_notes.md) for a summary of the most recent changes and known issues.
 
