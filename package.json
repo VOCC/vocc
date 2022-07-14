@@ -2,7 +2,7 @@
   "name": "gba_vocc_ts",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://loganbussell.com/vocc",
+  "homepage": "https://vocc.github.io/vocc",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.27",
     "@fortawesome/free-regular-svg-icons": "^5.12.1",
